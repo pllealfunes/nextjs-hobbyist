@@ -2,7 +2,7 @@
 
 A blogging platform where users can blog about their hobbies, explore new ideas, and discover new passions.
 
-This project is being built with Next.js, Tailwind, Shadcn, Prisma, Postgres, and Vercel.
+This project is being built with Next.js, TypeScript, Tailwind, Shadcn, Prisma, Postgres, and Vercel.
 
 ## Project Tasks
 
