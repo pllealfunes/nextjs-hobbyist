@@ -1,101 +1,126 @@
-import Image from "next/image";
+import Link from "next/link";
+
+// Sample cards with data from JSONPlaceholder API
+const cards = [
+  {
+    id: 1,
+    title: "How to Boost Your Conversion Rate",
+    date: "March 16, 2020",
+    user: {
+      name: "Michael Foster",
+      image: "https://randomuser.me/api/portraits/men/1.jpg",
+    },
+    backgroundImage: "https://picsum.photos/200/300", // Use a valid image URL
+  },
+  {
+    id: 2,
+    title: "10 Tips for Successful Blogging",
+    date: "April 10, 2021",
+    user: {
+      name: "Sarah Johnson",
+      image: "https://randomuser.me/api/portraits/women/1.jpg",
+    },
+    backgroundImage: "https://picsum.photos/200/300", // Use a valid image URL
+  },
+  {
+    id: 3,
+    title: "Understanding the Basics of Marketing",
+    date: "May 25, 2022",
+    user: {
+      name: "John Doe",
+      image: "https://randomuser.me/api/portraits/men/2.jpg",
+    },
+    backgroundImage: "https://picsum.photos/200/300", // Use a valid image URL
+  },
+];
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div className="bg-zinc-50">
+      <header className="absolute inset-x-0 top-0 z-50">
+        <nav
+          aria-label="Global"
+          className="flex items-center justify-between p-6 lg:px-8"
+        >
+          <div className="flex lg:flex-1">
+            <div className="flex justify-center items-center">
+              <Link href="/" className="-m-1.5 p-1.5">
+                <span className="sr-only">Hobbyist</span>
+                <img
+                  alt="Logo"
+                  src="/images/feather.svg"
+                  className="h-9 w-auto"
+                />
+              </Link>
+            </div>
+          </div>
+          <div className="flex gap-x-6 items-center">
+            <Link href="#" className="font-semibold leading-6 text-gray-900">
+              Explore
+            </Link>
+            <Link
+              href="#"
+              className="font-semibold leading-6 text-white bg-rose-300 px-4 py-2 rounded-md shadow-xl shadow-inner"
+            >
+              Login
+            </Link>
+            <Link href="#" className="font-semibold leading-6 text-gray-900">
+              Signup
+            </Link>
+          </div>
+        </nav>
+      </header>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+      <section className="relative isolate px-6 lg:px-8">
+        <div className="mx-auto py-32 sm:py-48 lg:py-56 text-center">
+          <h1 className="text-6xl font-bold tracking-tight text-rose-300 sm:text-7xl">
+            Hobbyist
+          </h1>
+          <p className="mt-6 text-lg leading-8 text-gray-600">
+            Blog, Explore, and Discover New Passions
+          </p>
+
+          <div className="mt-12">
+            <div className="flex flex-row flex-wrap justify-center items-center">
+              {cards.map((card) => (
+                <div
+                  key={card.id}
+                  className="relative h-96 w-80 m-4 overflow-hidden flex-shrink-0 rounded-lg shadow-2xl"
+                >
+                  <div className="absolute inset-0 bg-black opacity-30 z-10" />
+                  <div
+                    className="bg-cover bg-center h-full w-full flex flex-col justify-end p-4"
+                    style={{ backgroundImage: `url(${card.backgroundImage})` }}
+                  >
+                    <div className="relative z-20 flex flex-col">
+                      <div className="flex items-center justify-between mt-2">
+                        <p className="text-white font-semibold mr-2">
+                          {card.date}
+                        </p>
+                        <div className="flex items-center">
+                          <img
+                            src={card.user.image}
+                            alt={card.user.name}
+                            className="h-6 w-6 rounded-full mr-2"
+                          />
+                          <span className="text-white font-semibold">
+                            {card.user.name}
+                          </span>
+                        </div>
+                      </div>
+                      <h2 className="mt-2 text-lg font-bold text-white text-left">
+                        {card.title}
+                      </h2>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </section>
+
+      <section></section>
     </div>
   );
 }
