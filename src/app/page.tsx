@@ -226,10 +226,10 @@ export default function Home() {
                 World.
               </p>
               <p className="mt-6 text-lg leading-8 text-gray-600">
-                Whether you're sharing your expertise or exploring new ideas,
-                our platform empowers you to blog effortlessly. Discover new
-                hobbies, connect with like-minded individuals, and ignite your
-                passions—all in one place.
+                Whether you&apos;re sharing your expertise or exploring new
+                ideas, our platform empowers you to blog effortlessly. Discover
+                new hobbies, connect with like-minded individuals, and ignite
+                your passions—all in one place.
               </p>
               <dl className="mt-10 max-w-xl space-y-8 text-base leading-7 text-gray-600 lg:max-w-none">
                 {features.map((feature) => (
