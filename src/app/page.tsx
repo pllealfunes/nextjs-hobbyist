@@ -54,7 +54,7 @@ const features = [
     id: 1,
     name: "Blog About Your Passions",
     description:
-      " Share your Tips, Tricks, To Dos, How-To's, How Do I's? and I think I Got It's.",
+      " Share your Tips, Tricks, To Dos, How-To&apos;s, How Do I&apos;s? and I think I Got It&apos;s.",
     icon: (
       <svg
         xmlns="http://www.w3.org/2000/svg"
