@@ -271,9 +271,11 @@ export default function Home() {
             <div className="flex justify-center items-center">
               <Link href="/" className="-m-1.5 p-1.5">
                 <span className="sr-only">Hobbyist</span>
-                <img
+                <Image
                   alt="Logo"
                   src="/images/feather.svg"
+                  width={24}
+                  height={24}
                   className="h-6 w-auto"
                 />
               </Link>
