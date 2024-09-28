@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 // Sample cards with data from JSONPlaceholder API
 const cards = [
@@ -125,9 +126,11 @@ export default function Home() {
             <div className="flex justify-center items-center">
               <Link href="/" className="-m-1.5 p-1.5">
                 <span className="sr-only">Hobbyist</span>
-                <img
+                <Image
                   alt="Logo"
                   src="/images/feather.svg"
+                  height={36}
+                  width={36}
                   className="h-9 w-auto"
                 />
               </Link>
@@ -186,9 +189,11 @@ export default function Home() {
                           {card.date}
                         </p>
                         <div className="flex items-center">
-                          <img
+                          <Image
                             src={card.user.image}
                             alt={card.user.name}
+                            height={24}
+                            width={24}
                             className="h-6 w-6 rounded-full mr-2"
                           />
                           <span className="text-white font-semibold">
@@ -248,10 +253,13 @@ export default function Home() {
             </div>
 
             {/* Image Section */}
-            <img
+            <Image
               src="https://tailwindui.com/img/component-images/dark-project-app-screenshot.png"
               alt="Product screenshot"
-              className="max-w-full h-auto rounded-xl shadow-xl shadow-rose-300 ring-1 ring-rose-400/10"
+              layout="responsive"
+              width={1200}
+              height={900}
+              className="w-full h-auto rounded-xl shadow-xl shadow-rose-300 ring-1 ring-rose-400/10"
             />
           </div>
         </div>
