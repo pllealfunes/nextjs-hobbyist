@@ -38,7 +38,7 @@ const cards = [
 
   {
     id: 4,
-    title: "Brd Watching for Beginners",
+    title: "Bird Watching for Beginners",
     date: "Sept 25, 2024",
     user: {
       name: "Tina Fey",
@@ -54,7 +54,7 @@ const features = [
     id: 1,
     name: "Blog About Your Passions",
     description:
-      " Share your Tips, Tricks, To Dos, How-To&apos;s, How Do I&apos;s? and I think I Got It&apos;s.",
+      "Share your Tips, Tricks, To Dos, How-To&apos;s, How Do I&apos;s? and I think I Got It&apos;s.",
     icon: (
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -70,7 +70,7 @@ const features = [
     id: 2,
     name: "Discover New Hobbies",
     description:
-      " Explore more about you what you love. In the process you might just find a new love or even an old one.",
+      "Explore more about what you love. In the process, you might just find a new love or even an old one.",
     icon: (
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -90,7 +90,7 @@ const features = [
     id: 3,
     name: "Connect with Communities",
     description:
-      " Discover categroies and users that fuel your passions, and follow each others journey for inspiration.",
+      "Discover categroies and users that fuel your passions, and follow each others journey for inspiration.",
     icon: (
       <svg
         xmlns="http://www.w3.org/2000/svg"
