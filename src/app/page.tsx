@@ -255,11 +255,10 @@ export default function Home() {
             {/* Image Section */}
             <Image
               src="https://tailwindui.com/img/component-images/dark-project-app-screenshot.png"
-              alt="Product screenshot"
-              layout="responsive"
-              width={1200}
-              height={900}
-              className="w-full h-auto rounded-xl shadow-xl shadow-rose-300 ring-1 ring-rose-400/10"
+              alt="Description"
+              width={500} // replace with your desired width
+              height={300} // replace with your desired height
+              style={{ objectFit: "cover" }} // optional, depending on your layout needs
             />
           </div>
         </div>
