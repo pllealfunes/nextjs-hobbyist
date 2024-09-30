@@ -1,8 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import Image from "next/image";
 import { CarouselPlugin } from "@/app/carousel";
+import Nav from "@/components/ui/nav";
+import Footer from "@/components/ui/footer";
 
 // Sample cards with data from JSONPlaceholder API
 const cards = [
@@ -128,61 +129,7 @@ export default function Home() {
 
   return (
     <div>
-      <header className="absolute inset-x-0 top-0 z-50 bg-zinc-50">
-        <nav
-          aria-label="Global"
-          className="flex items-center justify-between p-6 lg:px-8"
-        >
-          <div className="flex lg:flex-1">
-            <div className="flex justify-center items-center">
-              <Link
-                href="/"
-                className="-m-1.5 p-1.5"
-                aria-label="Go to homepage"
-              >
-                <span className="sr-only">Hobbyist</span>
-                <Image
-                  alt="Logo"
-                  src="/images/feather.svg"
-                  height={36}
-                  width={36}
-                  className="h-9 w-auto"
-                />
-              </Link>
-              <p
-                className="text-rose-300 m-2 text-2xl font-semibold"
-                aria-hidden="true"
-              >
-                Hobbyist
-              </p>
-            </div>
-          </div>
-          <div className="flex gap-x-6 items-center">
-            <Link
-              href="#"
-              className="font-semibold leading-6 text-gray-900"
-              aria-label="Explore content"
-            >
-              Explore
-            </Link>
-            <Link
-              href="#"
-              className="bg-rose-500 hover:bg-rose-600 text-white font-semibold py-2 px-4 rounded-full shadow-md transition duration-300 leading-6 shadow-xl"
-              aria-label="Login to your account"
-            >
-              Login
-            </Link>
-            <Link
-              href="#"
-              className="font-semibold leading-6 text-gray-900"
-              aria-label="Sign up for an account"
-            >
-              Signup
-            </Link>
-          </div>
-        </nav>
-      </header>
-
+      <Nav />
       <section className="relative isolate px-6 lg:px-8 bg-zinc-50">
         <div className="mx-auto py-32 sm:py-48 lg:py-48 flex flex-col justify-evenly items-center">
           <p
@@ -359,51 +306,7 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="bg-zinc-50">
-        <div className="w-full mx-auto p-4 md:py-8">
-          <div className="sm:flex sm:items-center sm:justify-between">
-            <div className="flex justify-center items-center">
-              <Link
-                href="/"
-                className="-m-1.5 p-1.5"
-                aria-label="Go to homepage"
-              >
-                <span className="sr-only">Hobbyist</span>
-                <Image
-                  alt="Logo"
-                  src="/images/feather.svg"
-                  width={24}
-                  height={24}
-                  className="h-6 w-auto"
-                />
-              </Link>
-              <span className="ml-2 text-sm text-gray-600">
-                © 2024 Hobbyist
-              </span>
-            </div>
-            <ul className="mt-3 flex flex-wrap justify-center text-sm font-medium text-gray-900 sm:mt-0">
-              <li className="mr-4 hover:underline">
-                <Link href="#" aria-label="Privacy Policy">
-                  Privacy Policy
-                </Link>
-              </li>
-              <li className="mr-4 hover:underline">
-                <Link href="#" aria-label="Terms of Service">
-                  Terms of Service
-                </Link>
-              </li>
-              <li className="hover:underline">
-                <Link href="#" aria-label="Contact Us">
-                  Contact Us
-                </Link>
-              </li>
-            </ul>
-          </div>
-          <div className="mt-4 text-center text-sm text-gray-600">
-            © {new Date().getFullYear()} Hobbyist. All Rights Reserved.
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

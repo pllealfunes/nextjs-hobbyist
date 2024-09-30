@@ -36,7 +36,7 @@ export function CarouselPlugin({ cards }: CarouselPluginProps) {
   return (
     <Carousel
       plugins={[plugin.current]}
-      className="w-full max-w-4xl mx-auto" // Center the carousel with mx-auto
+      className="w-full max-w-4xl mx-auto"
       onMouseEnter={plugin.current.stop}
       onMouseLeave={plugin.current.reset}
     >
@@ -45,10 +45,8 @@ export function CarouselPlugin({ cards }: CarouselPluginProps) {
         {cards.map((card) => (
           <CarouselItem key={card.id}>
             <div className="p-4">
-              {" "}
-              {/* Increased padding */}
               <div
-                className="relative w-full h-[500px] bg-cover bg-center rounded-lg" // Increased height
+                className="relative w-full h-[500px] bg-cover bg-center rounded-lg"
                 style={{ backgroundImage: `url(${card.backgroundImage})` }}
               >
                 <div className="flex flex-col justify-end p-6 h-full bg-black bg-opacity-50 rounded-lg">
