@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { CarouselPlugin } from "@/app/carousel";
 
 // Sample cards with data from JSONPlaceholder API
 const cards = [
@@ -46,6 +47,16 @@ const cards = [
     },
     backgroundImage: "https://picsum.photos/200/300", // Use a valid image URL
   },
+];
+
+const categories = [
+  "Physical",
+  "Creative",
+  "Mental",
+  "Food",
+  "Musical",
+  "Collecting",
+  "Games + Puzzles",
 ];
 
 // Sample cards with data from JSONPlaceholder API
@@ -124,7 +135,11 @@ export default function Home() {
         >
           <div className="flex lg:flex-1">
             <div className="flex justify-center items-center">
-              <Link href="/" className="-m-1.5 p-1.5">
+              <Link
+                href="/"
+                className="-m-1.5 p-1.5"
+                aria-label="Go to homepage"
+              >
                 <span className="sr-only">Hobbyist</span>
                 <Image
                   alt="Logo"
@@ -134,22 +149,34 @@ export default function Home() {
                   className="h-9 w-auto"
                 />
               </Link>
-              <p className="text-rose-300 m-2 text-2xl font-semibold">
+              <p
+                className="text-rose-300 m-2 text-2xl font-semibold"
+                aria-hidden="true"
+              >
                 Hobbyist
               </p>
             </div>
           </div>
           <div className="flex gap-x-6 items-center">
-            <Link href="#" className="font-semibold leading-6 text-gray-900">
+            <Link
+              href="#"
+              className="font-semibold leading-6 text-gray-900"
+              aria-label="Explore content"
+            >
               Explore
             </Link>
             <Link
               href="#"
-              className="font-semibold leading-6 text-white bg-rose-300 px-4 py-2 rounded-md shadow-xl"
+              className="bg-rose-500 hover:bg-rose-600 text-white font-semibold py-2 px-4 rounded-full shadow-md transition duration-300 leading-6 shadow-xl"
+              aria-label="Login to your account"
             >
               Login
             </Link>
-            <Link href="#" className="font-semibold leading-6 text-gray-900">
+            <Link
+              href="#"
+              className="font-semibold leading-6 text-gray-900"
+              aria-label="Sign up for an account"
+            >
               Signup
             </Link>
           </div>
@@ -158,7 +185,11 @@ export default function Home() {
 
       <section className="relative isolate px-6 lg:px-8 bg-zinc-50">
         <div className="mx-auto py-32 sm:py-48 lg:py-48 flex flex-col justify-evenly items-center">
-          <p className="text-6xl font-semibold text-gray-600">
+          <p
+            className="text-6xl font-semibold text-gray-600 text-center"
+            role="heading"
+            aria-level={1}
+          >
             Blog. Explore. Discover.
           </p>
           <div className="mt-28">
@@ -177,15 +208,20 @@ export default function Home() {
                       index % 2 === 0 ? "-20px" : "20px"
                     }) rotate(${index % 2 === 0 ? "-5deg" : "5deg"})`,
                   }}
+                  role="article" // Improved semantics for each card
                 >
                   <div className="absolute inset-0 bg-black opacity-30 z-10" />
                   <div
                     className="bg-cover bg-center h-full w-full flex flex-col justify-end p-4"
                     style={{ backgroundImage: `url(${card.backgroundImage})` }}
+                    aria-label={`Background image for ${card.title}`}
                   >
                     <div className="relative z-20 flex flex-col">
                       <div className="flex items-center justify-between mt-2">
-                        <p className="text-white font-semibold mr-2">
+                        <p
+                          className="text-white font-semibold mr-2"
+                          aria-label={`Published on ${card.date}`}
+                        >
                           {card.date}
                         </p>
                         <div className="flex items-center">
@@ -201,7 +237,10 @@ export default function Home() {
                           </span>
                         </div>
                       </div>
-                      <h2 className="mt-2 text-lg font-bold text-white text-left">
+                      <h2
+                        className="mt-2 text-lg font-bold text-white text-left"
+                        aria-label={card.title}
+                      >
                         {card.title}
                       </h2>
                     </div>
@@ -209,6 +248,29 @@ export default function Home() {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-gradient-to-br from-rose-100 to-rose-500 py-24 sm:py-32">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <h2
+            className="text-center text-3xl font-bold tracking-tight text-gray-900"
+            role="heading"
+            aria-level={2}
+          >
+            Explore Categories and Discover Content Tailored to Your Interests
+          </h2>
+          <div className="mt-10 flex flex-wrap justify-center gap-4">
+            {categories.map((category) => (
+              <button
+                key={category}
+                className="bg-rose-500 hover:bg-rose-600 text-white font-semibold py-2 px-4 rounded-full shadow-md transition duration-300"
+                aria-label={`Explore ${category} category`}
+              >
+                {category}
+              </button>
+            ))}
           </div>
         </div>
       </section>
@@ -221,7 +283,11 @@ export default function Home() {
               <h2 className="text-base font-semibold leading-7 text-rose-500">
                 Share and Discover with Ease
               </h2>
-              <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+              <p
+                className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl"
+                role="heading"
+                aria-level={2}
+              >
                 Everything You Need to Bring Your Hobbies and Passions to the
                 World.
               </p>
@@ -238,8 +304,6 @@ export default function Home() {
                       <div>{feature.icon}</div>
                     </div>
                     <div className="ml-1">
-                      {" "}
-                      {/* Adjusted margin for spacing */}
                       <dt className="font-semibold text-rose-500">
                         {feature.name}
                       </dt>
@@ -253,13 +317,44 @@ export default function Home() {
             </div>
 
             {/* Image Section */}
-            <Image
-              src="https://tailwindui.com/img/component-images/dark-project-app-screenshot.png"
-              alt="Description"
-              width={500} // replace with your desired width
-              height={300} // replace with your desired height
-              style={{ objectFit: "cover" }} // optional, depending on your layout needs
-            />
+            <div className="flex justify-center">
+              <CarouselPlugin cards={cards} />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-gradient-to-br from-rose-100 to-rose-500 p-24 sm:p-32 flex justify-center items-center">
+        <div className="mx-auto max-w-2xl lg:mx-0">
+          <h2
+            className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl"
+            role="heading"
+            aria-level={2}
+          >
+            Unlock Your Creativity.
+            <br />
+            Start exploring and sharing today.
+          </h2>
+          <p className="mt-6 text-lg leading-8 text-gray-900">
+            Share your passions, discover new ideas, and connect with a
+            community that inspires growth. Start creating and exploring content
+            that matters to you.
+          </p>
+          <div className="mt-10 flex items-center justify-center gap-x-6 lg:justify-start">
+            <a
+              href="#"
+              className="bg-rose-500 hover:bg-rose-600 text-white font-semibold py-2 px-4 rounded-full shadow-md transition duration-300"
+              aria-label="Get started with Hobbyist"
+            >
+              Get started
+            </a>
+            <a
+              href="#"
+              className="font-bold leading-6 text-gray-900"
+              aria-label="Learn more about Hobbyist"
+            >
+              Learn more <span aria-hidden="true">→</span>
+            </a>
           </div>
         </div>
       </section>
@@ -268,7 +363,11 @@ export default function Home() {
         <div className="w-full mx-auto p-4 md:py-8">
           <div className="sm:flex sm:items-center sm:justify-between">
             <div className="flex justify-center items-center">
-              <Link href="/" className="-m-1.5 p-1.5">
+              <Link
+                href="/"
+                className="-m-1.5 p-1.5"
+                aria-label="Go to homepage"
+              >
                 <span className="sr-only">Hobbyist</span>
                 <Image
                   alt="Logo"
@@ -278,41 +377,31 @@ export default function Home() {
                   className="h-6 w-auto"
                 />
               </Link>
-              <span className="self-center text-2xl font-semibold whitespace-nowrap text-rose-300 m-2">
-                Hobbyist
+              <span className="ml-2 text-sm text-gray-600">
+                © 2024 Hobbyist
               </span>
             </div>
-            <ul className="flex flex-wrap items-center mb-6 text-sm font-medium sm:mb-0 text-gray-900">
-              <li>
-                <a href="#" className="hover:underline me-4 md:me-6">
-                  About
-                </a>
+            <ul className="mt-3 flex flex-wrap justify-center text-sm font-medium text-gray-900 sm:mt-0">
+              <li className="mr-4 hover:underline">
+                <Link href="#" aria-label="Privacy Policy">
+                  Privacy Policy
+                </Link>
               </li>
-              <li>
-                <a href="#" className="hover:underline me-4 md:me-6">
-                  GitHub Repo
-                </a>
+              <li className="mr-4 hover:underline">
+                <Link href="#" aria-label="Terms of Service">
+                  Terms of Service
+                </Link>
               </li>
-              <li>
-                <a href="#" className="hover:underline me-4 md:me-6">
-                  Login
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:underline">
-                  Logout
-                </a>
+              <li className="hover:underline">
+                <Link href="#" aria-label="Contact Us">
+                  Contact Us
+                </Link>
               </li>
             </ul>
           </div>
-          <hr className="my-6 border-gray-200 sm:mx-auto dark:border-gray-700 lg:my-8" />
-          <span className="block text-sm text-gray-900 sm:text-center text-gray-900">
-            © {new Date().getFullYear()}{" "}
-            <a href="https://flowbite.com/" className="hover:underline">
-              Hobbyist™
-            </a>
-            . All Rights Reserved.
-          </span>
+          <div className="mt-4 text-center text-sm text-gray-600">
+            © {new Date().getFullYear()} Hobbyist. All Rights Reserved.
+          </div>
         </div>
       </footer>
     </div>
