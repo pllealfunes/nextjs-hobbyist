@@ -196,13 +196,8 @@ export default function Home() {
           </div>
 
           {/* Slideshow for Mobile (Visible on Mobile Only) */}
-          {/* Image Section with responsive slideshow */}
-          <div className="flex justify-center w-full mt-10 sm:visible xl:invisible">
-            <div className="w-full max-w-md sm:max-w-lg lg:max-w-xl">
-              {" "}
-              {/* Adjust the max-width for different screen sizes */}
-              <CarouselPlugin cards={cards} />
-            </div>
+          <div className="flex justify-center mt-10 w-full sm:block xl:hidden">
+            <CarouselPlugin cards={cards} />
           </div>
         </div>
       </section>
