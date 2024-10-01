@@ -139,61 +139,69 @@ export default function Home() {
           >
             Blog. Explore. Discover.
           </p>
-          <div className="mt-28">
-            <div className="flex flex-row flex-wrap justify-center items-center">
-              {cards.map((card, index) => (
+          <div className="mt-28 hidden xl:flex flex-wrap justify-center items-center">
+            {cards.map((card, index) => (
+              <div
+                key={card.id}
+                className={`relative h-96 w-80 overflow-hidden rounded-lg shadow-lg shadow-rose-300 transition-all duration-700 ease-in-out transform ${
+                  isVisible
+                    ? `opacity-100 translate-y-0 rotate-0`
+                    : `opacity-0 translate-y-8 rotate-6`
+                }`}
+                style={{
+                  transitionDelay: `${index * 300}ms`,
+                  transform: `translateY(${
+                    index % 2 === 0 ? "-20px" : "20px"
+                  }) rotate(${index % 2 === 0 ? "-5deg" : "5deg"})`,
+                }}
+                role="article"
+              >
+                <div className="absolute inset-0 bg-black opacity-30 z-10" />
                 <div
-                  key={card.id}
-                  className={`relative h-96 w-80 overflow-hidden rounded-lg shadow-lg shadow-rose-300 transition-all duration-700 ease-in-out transform ${
-                    isVisible
-                      ? `opacity-100 translate-y-0 rotate-0`
-                      : `opacity-0 translate-y-8 rotate-6`
-                  }`}
-                  style={{
-                    transitionDelay: `${index * 300}ms`,
-                    transform: `translateY(${
-                      index % 2 === 0 ? "-20px" : "20px"
-                    }) rotate(${index % 2 === 0 ? "-5deg" : "5deg"})`,
-                  }}
-                  role="article" // Improved semantics for each card
+                  className="bg-cover bg-center h-full w-full flex flex-col justify-end p-4"
+                  style={{ backgroundImage: `url(${card.backgroundImage})` }}
+                  aria-label={`Background image for ${card.title}`}
                 >
-                  <div className="absolute inset-0 bg-black opacity-30 z-10" />
-                  <div
-                    className="bg-cover bg-center h-full w-full flex flex-col justify-end p-4"
-                    style={{ backgroundImage: `url(${card.backgroundImage})` }}
-                    aria-label={`Background image for ${card.title}`}
-                  >
-                    <div className="relative z-20 flex flex-col">
-                      <div className="flex items-center justify-between mt-2">
-                        <p
-                          className="text-white font-semibold mr-2"
-                          aria-label={`Published on ${card.date}`}
-                        >
-                          {card.date}
-                        </p>
-                        <div className="flex items-center">
-                          <Image
-                            src={card.user.image}
-                            alt={card.user.name}
-                            height={24}
-                            width={24}
-                            className="h-6 w-6 rounded-full mr-2"
-                          />
-                          <span className="text-white font-semibold">
-                            {card.user.name}
-                          </span>
-                        </div>
-                      </div>
-                      <h2
-                        className="mt-2 text-lg font-bold text-white text-left"
-                        aria-label={card.title}
+                  <div className="relative z-20 flex flex-col">
+                    <div className="flex items-center justify-between mt-2">
+                      <p
+                        className="text-white font-semibold mr-2"
+                        aria-label={`Published on ${card.date}`}
                       >
-                        {card.title}
-                      </h2>
+                        {card.date}
+                      </p>
+                      <div className="flex items-center">
+                        <Image
+                          src={card.user.image}
+                          alt={card.user.name}
+                          height={24}
+                          width={24}
+                          className="h-6 w-6 rounded-full mr-2"
+                        />
+                        <span className="text-white font-semibold">
+                          {card.user.name}
+                        </span>
+                      </div>
                     </div>
+                    <h2
+                      className="mt-2 text-lg font-bold text-white text-left"
+                      aria-label={card.title}
+                    >
+                      {card.title}
+                    </h2>
                   </div>
                 </div>
-              ))}
+              </div>
+            ))}
+          </div>
+
+          {/* Slideshow for Mobile (Visible on Mobile Only) */}
+          {/* Image Section with responsive slideshow */}
+          <div className="flex justify-center w-full mt-10 sm:visible xl:invisible">
+            <div className="w-full max-w-md sm:max-w-lg lg:max-w-xl">
+              {" "}
+              {/* Adjust the max-width for different screen sizes */}
+              <CarouselPlugin cards={cards} />
             </div>
           </div>
         </div>
