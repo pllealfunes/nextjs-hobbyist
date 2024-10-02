@@ -46,7 +46,7 @@ export default function Nav() {
           </Link>
 
           <Link
-            href="#"
+            href="/login"
             className="bg-rose-500 hover:bg-rose-600 text-white font-semibold py-2 px-3 sm:px-4 rounded-full transition duration-300 leading-6 shadow-rose-300 shadow-lg"
             aria-label="Login to your account"
           >

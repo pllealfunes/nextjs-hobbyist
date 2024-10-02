@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { CarouselPlugin } from "@/app/carousel";
 import Nav from "@/components/ui/nav";
 import Footer from "@/components/ui/footer";
@@ -291,20 +292,20 @@ export default function Home() {
             that matters to you.
           </p>
           <div className="mt-10 flex items-center justify-center gap-x-6 lg:justify-start">
-            <a
-              href="#"
+            <Link
+              href="/signup"
               className="bg-rose-500 hover:bg-rose-600 text-white font-semibold py-2 px-4 rounded-full shadow-md transition duration-300"
               aria-label="Get started with Hobbyist"
             >
               Get started
-            </a>
-            <a
-              href="#"
+            </Link>
+            <Link
+              href="/about"
               className="font-bold leading-6 text-gray-900"
               aria-label="Learn more about Hobbyist"
             >
               Learn more <span aria-hidden="true">→</span>
-            </a>
+            </Link>
           </div>
         </div>
       </section>
