@@ -54,7 +54,7 @@ export default function Nav() {
           </Link>
 
           <Link
-            href="#"
+            href="/signup"
             className="hidden sm:block font-semibold leading-6 text-gray-900"
             aria-label="Sign up for an account"
           >

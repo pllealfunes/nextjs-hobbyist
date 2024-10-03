@@ -53,28 +53,29 @@ export default function LoginPage() {
   return (
     <>
       <Nav />
-      <section className="bg-zinc-50 py-24 sm:py-32">
+      <section className="bg-zinc-50 py-24 sm:py-32 flex justify-center">
         <div className="container mx-auto px-6 lg:px-8">
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-16 xl:gap-32 items-center">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-16 items-center">
             {/* Image Section */}
-            <div className="flex justify-center">
+            <div className="hidden xl:block">
               <CarouselPlugin cards={cards} />
             </div>
 
-            <div className="flex flex-col gap-7">
-              <div>
+            {/* Form Section */}
+            <div className="flex flex-col justify-center">
+              <div className="max-w-md mx-auto">
                 <h1
-                  className="text-3xl font-bold text-gray-900 sm:text-4xl"
+                  className="text-3xl font-bold text-gray-900 sm:text-4xl mb-4"
                   role="heading"
                   aria-level={2}
                 >
                   Login to Start Exploring
                 </h1>
-                <h2 className="text-base font-semibold leading-7 text-rose-500">
+                <h2 className="text-base font-semibold leading-7 text-rose-500 mb-6">
                   Share and Discover with Ease
                 </h2>
+                <LoginForm />
               </div>
-              <LoginForm />
             </div>
           </div>
         </div>

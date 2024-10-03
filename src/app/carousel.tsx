@@ -1,6 +1,7 @@
 // CarouselPlugin.tsx
 import * as React from "react";
 import Autoplay from "embla-carousel-autoplay";
+import Image from "next/image";
 import {
   Carousel,
   CarouselContent,
@@ -44,7 +45,7 @@ export function CarouselPlugin({ cards }: CarouselPluginProps) {
         {/* Map over the cards prop and display them */}
         {cards.map((card) => (
           <CarouselItem key={card.id}>
-            <div className="p-4">
+            <div>
               <div
                 className="relative w-full h-[500px] bg-cover bg-center rounded-lg"
                 style={{ backgroundImage: `url(${card.backgroundImage})` }}
@@ -55,9 +56,11 @@ export function CarouselPlugin({ cards }: CarouselPluginProps) {
                   </h2>
                   <p className="text-white mt-2">{card.date}</p>
                   <div className="flex items-center mt-2">
-                    <img
+                    <Image
                       src={card.user.image}
                       alt={card.user.name}
+                      height={24}
+                      width={24}
                       className="w-10 h-10 rounded-full mr-2"
                     />
                     <span className="text-white">{card.user.name}</span>
