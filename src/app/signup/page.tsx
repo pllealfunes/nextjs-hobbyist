@@ -49,7 +49,7 @@ const cards = [
   },
 ];
 
-export default function LoginPage() {
+export default function SignUpPage() {
   return (
     <>
       <Nav />
@@ -69,7 +69,7 @@ export default function LoginPage() {
                   role="heading"
                   aria-level={2}
                 >
-                  Login to Start Exploring
+                  Signup to Start Exploring
                 </h1>
                 <h2 className="text-base font-semibold leading-7 text-rose-500 mb-6">
                   Share and Discover with Ease
