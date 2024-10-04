@@ -1,9 +1,9 @@
 "use client";
 
-import SignupForm from "@/components/ui/signup-form";
-import Nav from "@/components/ui/nav";
-import { CarouselPlugin } from "@/app/carousel";
-import Footer from "@/components/ui/footer";
+import SignupForm from "@/ui/forms/signupForm";
+import Nav from "@/ui/components/nav";
+import { CarouselPlugin } from "@/ui/components/carouselPlugin";
+import Footer from "@/ui/components/footer";
 
 const cards = [
   {

@@ -2,9 +2,9 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { CarouselPlugin } from "@/app/carousel";
-import Nav from "@/components/ui/nav";
-import Footer from "@/components/ui/footer";
+import { CarouselPlugin } from "@/ui/components/carouselPlugin";
+import Nav from "@/ui/components/nav";
+import Footer from "@/ui/components/footer";
 
 // Sample cards with data from JSONPlaceholder API
 const cards = [

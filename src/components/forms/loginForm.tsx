@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/ui/components/button";
 import {
   Form,
   FormControl,
@@ -13,15 +13,15 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+} from "@/ui/components/form";
+import { Input } from "@/ui/components/input";
 
 const formSchema = z.object({
   username: z.string().min(2, {
     message: "Username must be at least 2 characters.",
   }),
-  email: z.coerce.string().email().min(5, {
-    message: "Email must be at least 5 characters.",
+  password: z.coerce.string().min(5, {
+    message: "Password must be at least 5 characters.",
   }),
 });
 
@@ -31,7 +31,7 @@ export default function ProfileForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       username: "",
-      email: "",
+      password: "",
     },
   });
 
@@ -61,14 +61,14 @@ export default function ProfileForm() {
         />
         <FormField
           control={form.control}
-          name="email"
+          name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input placeholder="bobsburgers@email.com" {...field} />
+                <Input placeholder="Skittles123" {...field} />
               </FormControl>
-              <FormDescription>Enter your email.</FormDescription>
+              <FormDescription>Enter your password.</FormDescription>
               <FormMessage />
             </FormItem>
           )}

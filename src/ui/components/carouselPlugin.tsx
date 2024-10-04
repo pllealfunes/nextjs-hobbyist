@@ -8,7 +8,7 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "@/components/ui/carousel";
+} from "@/ui/components/carousel";
 
 // Define interfaces for user and card
 interface User {

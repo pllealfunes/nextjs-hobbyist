@@ -3,10 +3,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/ui/components/input";
+import { Textarea } from "@/ui/components/textarea";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/ui/components/button";
 import {
   Form,
   FormControl,
@@ -15,7 +15,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
+} from "@/ui/components/form";
 
 const formSchema = z.object({
   name: z
