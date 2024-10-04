@@ -1,5 +1,5 @@
-import Nav from "@/components/ui/nav";
-import Footer from "@/components/ui/footer";
+import Nav from "@/ui/components/nav";
+import Footer from "@/ui/components/footer";
 
 export default function About() {
   return (
