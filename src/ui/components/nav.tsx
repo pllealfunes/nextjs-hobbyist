@@ -22,7 +22,7 @@ export default function Nav() {
                 src="/images/feather.svg"
                 height={36}
                 width={36}
-                className="h-9 w-auto"
+                className="w-auto"
               />
             </Link>
             <Link
