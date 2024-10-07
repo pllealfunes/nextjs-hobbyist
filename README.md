@@ -10,7 +10,7 @@ https://nextjs-hobbyist.vercel.app/
 
 ## Project Tasks: https://nextjs-hobbyist.vercel.app/dashboard
 
-![Project Tasks Image](images/tasks.png)
+![Project Tasks Image](/public/images/tasks.png)
 
 ## Getting Started
 
