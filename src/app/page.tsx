@@ -45,7 +45,7 @@ const cards = [
     date: "Sept 25, 2024",
     user: {
       name: "Tina Fey",
-      image: "https://randomuser.me/api/portraits/men/2.jpg",
+      image: "https://randomuser.me/api/portraits/women/2.jpg",
     },
     backgroundImage: "https://picsum.photos/200/300", // Use a valid image URL
   },
