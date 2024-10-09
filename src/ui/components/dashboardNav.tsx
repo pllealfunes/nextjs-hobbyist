@@ -39,13 +39,19 @@ export default function Dashboard() {
       <nav className="flex items-center justify-between p-4 sm:p-6 lg:px-8 relative">
         <div className="flex lg:flex-1">
           <div className="flex items-center space-x-2 sm:space-x-4">
-            <Image
-              alt="Hobbyist"
-              src="/images/feather.svg"
-              height={36}
-              width={36}
-              className="h-8 w-auto"
-            />
+            <Link
+              href="/"
+              className="-m-1.5 p-1.5 flex justify-center items-center"
+              aria-label="Go to homepage"
+            >
+              <Image
+                alt="Hobbyist"
+                src="/images/feather.svg"
+                height={36}
+                width={36}
+                className="h-8 w-auto"
+              />
+            </Link>
           </div>
           <div className="hidden sm:ml-6 sm:block">
             <div className="flex space-x-4">
