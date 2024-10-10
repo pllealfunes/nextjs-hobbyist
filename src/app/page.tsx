@@ -5,6 +5,19 @@ import Link from "next/link";
 import { CarouselPlugin } from "@/ui/components/carouselPlugin";
 import Nav from "@/ui/components/nav";
 import Footer from "@/ui/components/footer";
+import {
+  MoveRight,
+  Dumbbell,
+  Palette,
+  Brain,
+  Utensils,
+  Music,
+  Box,
+  Puzzle,
+  NotebookPen,
+  Search,
+  MessagesSquare,
+} from "lucide-react";
 
 // Sample cards with data from JSONPlaceholder API
 const cards = [
@@ -52,13 +65,13 @@ const cards = [
 ];
 
 const categories = [
-  "Physical",
-  "Creative",
-  "Mental",
-  "Food",
-  "Musical",
-  "Collecting",
-  "Games + Puzzles",
+  { name: "Physical", icon: <Dumbbell className="w-5 h-5" /> },
+  { name: "Creative", icon: <Palette className="w-5 h-5" /> },
+  { name: "Mental", icon: <Brain className="w-5 h-5" /> },
+  { name: "Food", icon: <Utensils className="w-5 h-5" /> },
+  { name: "Musical", icon: <Music className="w-5 h-5" /> },
+  { name: "Collecting", icon: <Box className="w-5 h-5" /> },
+  { name: "Games + Puzzles", icon: <Puzzle className="w-5 h-5" /> },
 ];
 
 // Sample cards with data from JSONPlaceholder API
@@ -68,53 +81,21 @@ const features = [
     name: "Blog About Your Passions",
     description:
       "Share your Tips, Tricks, To Dos, How-To&apos;s, How Do I&apos;s? and I think I Got It&apos;s.",
-    icon: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="currentColor"
-        className="size-6"
-      >
-        <path d="M14.12 2.882a2 2 0 0 1 2.829 0l4.243 4.243a2 2 0 0 1 0 2.829l-1.586 1.586-6.072-6.072 1.586-1.586zM2.793 20.293a1 1 0 0 1 0-1.414l13.586-13.586 1.414 1.414-13.586 13.586a1 1 0 0 1-1.414 0zM16.243 8.05l1.414-1.414 2.828 2.828-1.414 1.414-2.828-2.828z" />
-      </svg>
-    ),
+    icon: <NotebookPen />,
   },
   {
     id: 2,
     name: "Discover New Hobbies",
     description:
       "Explore more about what you love. In the process, you might just find a new love or even an old one.",
-    icon: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="currentColor"
-        className="size-6"
-      >
-        <path
-          fillRule="evenodd"
-          d="M10.5 3a7.5 7.5 0 1 0 5.37 12.85l4.4 4.4a1 1 0 0 0 1.42-1.42l-4.4-4.4A7.5 7.5 0 0 0 10.5 3zM10.5 5a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11z"
-          clipRule="evenodd"
-        />
-      </svg>
-    ),
+    icon: <Search />,
   },
   {
     id: 3,
     name: "Connect with Communities",
     description:
       "Discover categroies and users that fuel your passions, and follow each others journey for inspiration.",
-    icon: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="currentColor"
-        className="size-6"
-      >
-        <path d="M4.913 2.658c2.075-.27 4.19-.408 6.337-.408 2.147 0 4.262.139 6.337.408 1.922.25 3.291 1.861 3.405 3.727a4.403 4.403 0 0 0-1.032-.211 50.89 50.89 0 0 0-8.42 0c-2.358.196-4.04 2.19-4.04 4.434v4.286a4.47 4.47 0 0 0 2.433 3.984L7.28 21.53A.75.75 0 0 1 6 21v-4.03a48.527 48.527 0 0 1-1.087-.128C2.905 16.58 1.5 14.833 1.5 12.862V6.638c0-1.97 1.405-3.718 3.413-3.979Z" />
-        <path d="M15.75 7.5c-1.376 0-2.739.057-4.086.169C10.124 7.797 9 9.103 9 10.609v4.285c0 1.507 1.128 2.814 2.67 2.94 1.243.102 2.5.157 3.768.165l2.782 2.781a.75.75 0 0 0 1.28-.53v-2.39l.33-.026c1.542-.125 2.67-1.433 2.67-2.94v-4.286c0-1.505-1.125-2.811-2.664-2.94A49.392 49.392 0 0 0 15.75 7.5Z" />
-      </svg>
-    ),
+    icon: <MessagesSquare />,
   },
 ];
 
@@ -215,11 +196,12 @@ export default function Home() {
           <div className="mt-10 flex flex-wrap justify-center gap-4">
             {categories.map((category) => (
               <button
-                key={category}
-                className="bg-rose-500 hover:bg-rose-600 text-white font-semibold py-2 px-4 rounded-full shadow-md transition duration-300"
-                aria-label={`Explore ${category} category`}
+                key={category.name}
+                className="bg-rose-500 hover:bg-rose-600 text-white font-semibold py-2 px-4 rounded-full shadow-md flex items-center gap-2 transition duration-300"
+                aria-label={`Explore ${category.name} category`}
               >
-                {category}
+                {category.icon}
+                <span>{category.name}</span>
               </button>
             ))}
           </div>
@@ -251,10 +233,10 @@ export default function Home() {
               <dl className="mt-10 max-w-xl space-y-8 text-base leading-7 text-gray-600 lg:max-w-none">
                 {features.map((feature) => (
                   <div key={feature.name} className="relative flex items-start">
-                    <div className="text-rose-300 flex-shrink-0 h-10 w-10 flex items-center justify-center">
-                      <div>{feature.icon}</div>
+                    <div className="text-rose-300 flex-shrink-0 flex items-center justify-center mt-1">
+                      {feature.icon}
                     </div>
-                    <div className="ml-1">
+                    <div className="ml-4">
                       <dt className="font-semibold text-rose-500">
                         {feature.name}
                       </dt>
@@ -301,15 +283,17 @@ export default function Home() {
             </Link>
             <Link
               href="/about"
-              className="font-bold leading-6 text-gray-900"
+              className="font-bold leading-6 text-gray-900 flex justify-center items-center"
               aria-label="Learn more about Hobbyist"
             >
-              Learn more <span aria-hidden="true">→</span>
+              Learn more
+              <span aria-hidden="true" className="m-1">
+                <MoveRight className="w-5 h-5 align-middle" />
+              </span>
             </Link>
           </div>
         </div>
       </section>
-
       <Footer />
     </div>
   );

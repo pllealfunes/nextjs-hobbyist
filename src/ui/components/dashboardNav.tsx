@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/ui/components/button";
+import { Feather, Bell, Plus } from "lucide-react";
 
 import {
   DropdownMenu,
@@ -44,13 +45,7 @@ export default function Dashboard() {
               className="-m-1.5 p-1.5 flex justify-center items-center"
               aria-label="Go to homepage"
             >
-              <Image
-                alt="Hobbyist"
-                src="/images/feather.svg"
-                height={36}
-                width={36}
-                className="h-8 w-auto"
-              />
+              <Feather className="w-7 h-7" />
             </Link>
           </div>
           <div className="hidden sm:ml-6 sm:block">
@@ -78,39 +73,13 @@ export default function Dashboard() {
         <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
           {/* Bell Icon - Hidden on small screens */}
           <Button className="bg-zinc-50 hover:bg-rose-600 hover:text-zinc-50 text-rose-400 mx-3 p-1 font-semibold">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="size-4 mx-1"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 4.5v15m7.5-7.5h-15"
-              />
-            </svg>
+            <Plus className="w-5 h-5 m-1" />
             <span className="mr-2">New Post</span>
           </Button>
 
           <Button className="hidden lg:block relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
             <span className="sr-only">View notifications</span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-              className="size-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"
-              />
-            </svg>
+            <Bell />
           </Button>
 
           {/* User Profile - Hidden on small screens */}

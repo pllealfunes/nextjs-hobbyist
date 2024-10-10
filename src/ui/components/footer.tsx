@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
+import { Feather } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -13,14 +13,8 @@ export default function Footer() {
               aria-label="Go to homepage"
             >
               <span className="sr-only">Hobbyist</span>
-              <Image
-                alt="Logo"
-                src="/images/feather.svg"
-                width={24}
-                height={24}
-                className="h-6 w-auto"
-              />
-              <span className="ml-2 text-lg font-bold text-rose-300">
+              <Feather />
+              <span className="ml-2 text-xl font-bold text-rose-300">
                 Hobbyist
               </span>
             </Link>

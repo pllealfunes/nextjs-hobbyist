@@ -1,5 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
+import { Feather } from "lucide-react";
 
 export default function Nav() {
   return (
@@ -17,13 +17,7 @@ export default function Nav() {
               aria-label="Go to homepage"
             >
               <span className="sr-only">Hobbyist</span>
-              <Image
-                alt="Logo"
-                src="/images/feather.svg"
-                height={36}
-                width={36}
-                className="w-auto"
-              />
+              <Feather className="w-7 h-7" />
             </Link>
             <Link
               href="/"
