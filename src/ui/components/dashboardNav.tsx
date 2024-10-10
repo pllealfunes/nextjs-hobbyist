@@ -21,12 +21,12 @@ import {
 
 export default function Dashboard() {
   const navigation = [
-    { name: "Dashboard", href: "#", current: true },
-    { name: "Published", href: "#", current: false },
-    { name: "Drafts", href: "#", current: false },
-    { name: "Following", href: "#", current: false },
-    { name: "Activity", href: "#", current: false },
-    { name: "Explore", href: "#", current: false },
+    { name: "Dashboard", href: "/dashboard", current: true },
+    { name: "Published", href: "/posts", current: false },
+    { name: "Drafts", href: "/drafts", current: false },
+    { name: "Following", href: "/following", current: false },
+    { name: "Activity", href: "/activity", current: false },
+    { name: "Explore", href: "/explore", current: false },
   ];
 
   function classNames(
