@@ -71,7 +71,6 @@ export default function TextEditor({
 
   return (
     <div>
-      {/* Title Input */}
       <input
         type="text"
         value={postTitle}
