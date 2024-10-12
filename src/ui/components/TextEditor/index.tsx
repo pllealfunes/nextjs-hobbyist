@@ -3,84 +3,104 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import TextAlign from "@tiptap/extension-text-align";
 import ToolBar from "@/ui/components/TextEditor/toolbar";
-import Heading from "@tiptap/extension-heading";
 import Highlight from "@tiptap/extension-highlight";
 import Image from "@tiptap/extension-image";
-import BulletList from "@tiptap/extension-bullet-list";
-import OrderedList from "@tiptap/extension-ordered-list";
-import TextStyle from "@tiptap/extension-text-style";
-import { useState } from "react";
+import DragHandle from "@tiptap-pro/extension-drag-handle-react";
+import CharacterCount from "@tiptap/extension-character-count";
+import { useEffect } from "react";
 
-// Define types for props
 interface TextEditorProps {
   content: string;
-  title?: string; // Optional title prop
-  onChange: (data: { content: string; title: string }) => void; // Callback with both title and content
+  onChange: (content: string) => void; // Only pass content now
 }
 
-export default function TextEditor({
-  content,
-  title = "",
-  onChange,
-}: TextEditorProps) {
-  const [postTitle, setPostTitle] = useState(title); // State for the post title
+const limit = 280;
 
+export default function TextEditor({ content, onChange }: TextEditorProps) {
   const editor = useEditor({
     extensions: [
-      StarterKit.configure(),
+      StarterKit,
       TextAlign.configure({
         types: ["heading", "paragraph"],
       }),
-      OrderedList.configure({
-        HTMLAttributes: {
-          class: "list-decimal ml-3",
-        },
-      }),
-      BulletList.configure({
-        HTMLAttributes: {
-          class: "list-disc ml-3",
-        },
-      }),
       Highlight,
       Image,
+      CharacterCount.configure({
+        limit,
+      }),
     ],
     content: content,
+    immediatelyRender: false,
     editorProps: {
       attributes: {
         class: "min-h-[156px] border rounded-md bg-slate-50 py-2 px-3",
       },
     },
     onUpdate: ({ editor }) => {
-      // Pass both content and title to the parent component
-      onChange({
-        content: editor.getHTML(),
-        title: postTitle, // Include the title in the callback
-      });
+      // Pass only content to the parent component
+      onChange(editor.getHTML());
     },
   });
 
-  // Handle title change
-  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newTitle = e.target.value;
-    setPostTitle(newTitle);
-    onChange({
-      content: editor?.getHTML() || content,
-      title: newTitle,
-    });
-  };
+  useEffect(() => {
+    if (editor) {
+      editor.commands.setContent(content);
+    }
+  }, [content, editor]);
+
+  if (!editor) {
+    return null;
+  }
+
+  const percentage = editor
+    ? Math.round((100 / limit) * editor.storage.characterCount.characters())
+    : 0;
 
   return (
-    <div>
-      <input
-        type="text"
-        value={postTitle}
-        onChange={handleTitleChange}
-        placeholder="Enter title"
-        className="mb-2 w-full border rounded-md p-2 text-lg"
-      />
+    <div className="tiptap">
       {/* Editor Toolbar and Content */}
       <ToolBar editor={editor} />
+      <DragHandle editor={editor}>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth="1.5"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M3.75 9h16.5m-16.5 6.75h16.5"
+          />
+        </svg>
+      </DragHandle>
       <EditorContent editor={editor} />
+      <div
+        className={`character-count ${
+          editor.storage.characterCount.characters() === limit
+            ? "character-count--warning"
+            : ""
+        }`}
+      >
+        <svg height="20" width="20" viewBox="0 0 20 20">
+          <circle r="10" cx="10" cy="10" fill="#e9ecef" />
+          <circle
+            r="5"
+            cx="10"
+            cy="10"
+            fill="transparent"
+            stroke="currentColor"
+            strokeWidth="10"
+            strokeDasharray={`calc(${percentage} * 31.4 / 100) 31.4`}
+            transform="rotate(-90) translate(-20)"
+          />
+          <circle r="6" cx="10" cy="10" fill="white" />
+        </svg>
+        {editor.storage.characterCount.characters()} / {limit} characters
+        <br />
+        {editor.storage.characterCount.words()} words
+      </div>
     </div>
   );
 }

@@ -27,7 +27,7 @@ const formSchema = z.object({
       return extractTextFromHTML(value).trim().length >= 5;
     },
     {
-      message: "The text must be at least 5 characters long after trimming",
+      message: "The text must be at least 500 characters long after trimming",
     }
   ),
   title: z.string().min(1, "Title is required"), // Title validation
@@ -86,7 +86,7 @@ export default function CreatePost() {
                 <FormControl>
                   <TextEditor
                     content={field.value}
-                    onChange={({ content }) => field.onChange(content)} // Accept the content part
+                    onChange={(value) => field.onChange(value)}
                   />
                 </FormControl>
                 <FormMessage />

@@ -1,5 +1,5 @@
 "use client";
-import { List, SquareSplitVertical } from "lucide-react";
+
 import { Toggle } from "@/ui/components/toggle";
 import {
   Heading1,
@@ -21,6 +21,8 @@ import {
   Redo,
   TextQuote,
   Space,
+  List,
+  SeparatorHorizontal,
 } from "lucide-react";
 import { ListOrdered } from "lucide-react";
 import { Editor } from "@tiptap/react"; // Import the correct type for editor
@@ -122,23 +124,18 @@ export default function ToolBar({ editor }: ToolBarProps) {
       preesed: editor.isActive("blockquote"),
     },
     {
-      icon: <SquareSplitVertical className="size-4" />,
+      icon: <SeparatorHorizontal className="size-4" />,
       onClick: () => editor.chain().focus().setHorizontalRule().run(),
       preesed: editor.isActive("horizontalrule"),
     },
     {
-      icon: <SquareSplitVertical className="size-4" />,
-      onClick: () => editor.chain().focus().setHardBreak().run(),
-      preesed: editor.isActive("horizontalrule"),
+      icon: <Space className="size-4" />,
+      onClick: () => editor.chain().focus().toggleHighlight().run(),
     },
     {
       icon: <Highlighter className="size-4" />,
       onClick: () => editor.chain().focus().toggleHighlight().run(),
       preesed: editor.isActive("highlight"),
-    },
-    {
-      icon: <Space className="size-4" />,
-      onClick: () => editor.chain().focus().toggleHighlight().run(),
     },
     {
       icon: <Upload className="size-4" />,
