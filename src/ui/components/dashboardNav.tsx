@@ -21,31 +21,13 @@ import {
 import {
   NavigationMenu,
   NavigationMenuContent,
-  NavigationMenuIndicator,
   NavigationMenuItem,
   NavigationMenuLink,
-  navigationMenuTriggerStyle,
   NavigationMenuList,
   NavigationMenuTrigger,
-  NavigationMenuViewport,
 } from "@/ui/components/navigation-menu";
 
 export default function Dashboard() {
-  const navigation = [
-    { name: "Dashboard", href: "/dashboard", current: true },
-    { name: "Published", href: "/posts", current: false },
-    { name: "Drafts", href: "/drafts", current: false },
-    { name: "Following", href: "/following", current: false },
-    { name: "Activity", href: "/activity", current: false },
-    { name: "Explore", href: "/explore", current: false },
-  ];
-
-  function classNames(
-    ...classes: (string | undefined | null | boolean)[]
-  ): string {
-    return classes.filter(Boolean).join(" ");
-  }
-
   return (
     <header className="bg-rose-400">
       <nav className="flex items-center justify-between p-4 sm:p-6 lg:px-8 relative">
@@ -64,6 +46,14 @@ export default function Dashboard() {
               <NavigationMenu>
                 <NavigationMenuList>
                   <NavigationMenuItem>
+                    <Link
+                      href="/"
+                      aria-label="Go to following page"
+                      className="text-zinc-50 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
+                    >
+                      Dashboard
+                    </Link>
+
                     <NavigationMenuTrigger>Posts</NavigationMenuTrigger>
                     <NavigationMenuContent>
                       <Link href="/posts" legacyBehavior passHref>
