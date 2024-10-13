@@ -18,6 +18,17 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/ui/components/dropdown-menu";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuIndicator,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  navigationMenuTriggerStyle,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  NavigationMenuViewport,
+} from "@/ui/components/navigation-menu";
 
 export default function Dashboard() {
   const navigation = [
@@ -48,23 +59,39 @@ export default function Dashboard() {
               <Feather className="w-7 h-7" />
             </Link>
           </div>
-          <div className="hidden sm:ml-6 sm:block">
+          <div className="hidden sm:ml-6 md:block">
             <div className="flex space-x-4">
-              {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  aria-current={item.current ? "page" : undefined}
-                  className={classNames(
-                    item.current
-                      ? "bg-gray-900 text-zinc-50"
-                      : "text-zinc-50 hover:bg-gray-700 hover:text-white",
-                    "rounded-md px-3 py-2 text-sm font-medium"
-                  )}
-                >
-                  {item.name}
-                </Link>
-              ))}
+              <NavigationMenu>
+                <NavigationMenuList>
+                  <NavigationMenuItem>
+                    <NavigationMenuTrigger>Posts</NavigationMenuTrigger>
+                    <NavigationMenuContent>
+                      <Link href="/posts" legacyBehavior passHref>
+                        <NavigationMenuLink>Drafts</NavigationMenuLink>
+                      </Link>
+                      <Link href="/tutorials" legacyBehavior passHref>
+                        <NavigationMenuLink>Published</NavigationMenuLink>
+                      </Link>
+                    </NavigationMenuContent>
+                  </NavigationMenuItem>
+                </NavigationMenuList>
+              </NavigationMenu>
+
+              <Link
+                href="/following"
+                aria-label="Go to following page"
+                className="text-zinc-50 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
+              >
+                Following
+              </Link>
+
+              <Link
+                href="/activity"
+                aria-label="Go to activity page"
+                className="text-zinc-50 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
+              >
+                Activity
+              </Link>
             </div>
           </div>
         </div>
@@ -77,13 +104,13 @@ export default function Dashboard() {
             <span className="mr-2">New Post</span>
           </Button>
 
-          <Button className="hidden lg:block relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+          <Button className="hidden md:block relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
             <span className="sr-only">View notifications</span>
             <Bell />
           </Button>
 
           {/* User Profile - Hidden on small screens */}
-          <div className="ml-3 hidden lg:block">
+          <div className="ml-3 hidden md:block">
             <DropdownMenu>
               <DropdownMenuTrigger asChild className="cursor-pointer">
                 <Image
@@ -107,7 +134,7 @@ export default function Dashboard() {
           </div>
 
           {/* Mobile Bars Icon - Visible only on small screens */}
-          <div className="sm:hidden">
+          <div className="md:hidden">
             <DropdownMenu>
               <DropdownMenuTrigger className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
                 <svg
