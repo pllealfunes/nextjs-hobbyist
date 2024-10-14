@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { CarouselPlugin } from "@/ui/components/carouselPlugin";
+import { CarouselPlugin } from "@/ui/components/carousel-plugin";
 import Nav from "@/ui/components/nav";
 import Footer from "@/ui/components/footer";
 import {

@@ -11,11 +11,7 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuPortal,
   DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/ui/components/dropdown-menu";
 
@@ -86,10 +82,12 @@ export default function Dashboard() {
         {/* Profile Menu */}
         <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
           {/* Bell Icon - Hidden on small screens */}
-          <Button className="bg-zinc-50 hover:bg-rose-600 hover:text-zinc-50 text-rose-400 mx-3 p-1 font-semibold">
-            <Plus className="w-5 h-5 m-1" />
-            <span className="mr-2">New Post</span>
-          </Button>
+          <Link href="/posts/createpost" passHref>
+            <Button className="bg-zinc-50 hover:bg-rose-600 hover:text-zinc-50 text-rose-400 mx-3 p-1 font-semibold">
+              <Plus className="w-5 h-5 m-1" />
+              <span className="mr-2">New Post</span>
+            </Button>
+          </Link>
 
           <Button className="hidden md:block relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
             <span className="sr-only">View notifications</span>

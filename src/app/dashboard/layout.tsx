@@ -1,4 +1,4 @@
-import Nav from "@/ui/components/dashboardNav";
+import Nav from "@/ui/components/login-nav";
 import Footer from "@/ui/components/footer";
 
 export default function Layout({ children }: { children: React.ReactNode }) {

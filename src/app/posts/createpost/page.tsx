@@ -30,7 +30,7 @@ const formSchema = z.object({
       message: "The text must be 200 to 12500 characters long after trimming",
     }
   ),
-  title: z.string().min(1, "Title is required"), // Title validation
+  title: z.string().min(10, "Title is required"), // Title validation
 });
 
 // Define the type for form data
@@ -61,7 +61,7 @@ export default function CreatePost() {
             name="title"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Title</FormLabel>
+                <FormLabel className="text-lg">Title</FormLabel>
                 <FormControl>
                   <input
                     type="text"
@@ -82,7 +82,7 @@ export default function CreatePost() {
             name="post"
             render={({ field }) => (
               <FormItem className="my-2">
-                <FormLabel>Post</FormLabel>
+                <FormLabel className="text-lg">Post</FormLabel>
                 <FormControl>
                   <TextEditor
                     content={field.value}

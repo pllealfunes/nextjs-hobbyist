@@ -2,7 +2,7 @@
 
 import LoginForm from "@/ui/forms/loginForm";
 import Nav from "@/ui/components/nav";
-import { CarouselPlugin } from "@/ui/components/carouselPlugin";
+import { CarouselPlugin } from "@/ui/components/carousel-plugin";
 import Footer from "@/ui/components/footer";
 
 const cards = [
