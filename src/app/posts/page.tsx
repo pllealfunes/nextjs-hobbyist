@@ -24,10 +24,10 @@ function extractTextFromHTML(html: string): string {
 const formSchema = z.object({
   post: z.string().refine(
     (value) => {
-      return extractTextFromHTML(value).trim().length >= 5;
+      return extractTextFromHTML(value).trim().length >= 200;
     },
     {
-      message: "The text must be at least 500 characters long after trimming",
+      message: "The text must be 200 to 12500 characters long after trimming",
     }
   ),
   title: z.string().min(1, "Title is required"), // Title validation
@@ -94,7 +94,14 @@ export default function CreatePost() {
             )}
           />
 
-          <Button className="mt-4">Submit</Button>
+          {/* Container for Word Count and Submit Button */}
+          <div className="flex justify-end items-end mt-4">
+            <div className="mr-4">
+              {/* Word Count component */}
+              {/* Assuming your word count is displayed inside the TextEditor */}
+            </div>
+            <Button className="ml-2">Submit</Button>
+          </div>
         </form>
       </Form>
     </div>

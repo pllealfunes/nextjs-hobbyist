@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/ui/components/button";
-import { Feather, Bell, Plus } from "lucide-react";
+import { Feather, Bell, Plus, ChevronDown } from "lucide-react";
 
 import {
   DropdownMenu,
@@ -18,14 +18,6 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/ui/components/dropdown-menu";
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/ui/components/navigation-menu";
 
 export default function Dashboard() {
   return (
@@ -42,31 +34,36 @@ export default function Dashboard() {
             </Link>
           </div>
           <div className="hidden sm:ml-6 md:block">
-            <div className="flex space-x-4">
-              <NavigationMenu>
-                <NavigationMenuList>
-                  <NavigationMenuItem>
-                    <Link
-                      href="/"
-                      aria-label="Go to following page"
-                      className="text-zinc-50 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
-                    >
-                      Dashboard
-                    </Link>
+            <div className="flex">
+              <Link
+                href="/dashboard"
+                aria-label="Go to following page"
+                className="text-zinc-50 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
+              >
+                Dashboard
+              </Link>
 
-                    <NavigationMenuTrigger>Posts</NavigationMenuTrigger>
-                    <NavigationMenuContent>
-                      <Link href="/posts" legacyBehavior passHref>
-                        <NavigationMenuLink>Drafts</NavigationMenuLink>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild className="cursor-pointer">
+                  <div className="flex justify-center items-center text-zinc-50 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">
+                    Posts <ChevronDown className="mt-1 w-4 h-4" />
+                  </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="ml-12">
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem>
+                      <Link href="/drafts" aria-label="Go to following page">
+                        Drafts
                       </Link>
-                      <Link href="/tutorials" legacyBehavior passHref>
-                        <NavigationMenuLink>Published</NavigationMenuLink>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <Link href="/published" aria-label="Go to following page">
+                        Published
                       </Link>
-                    </NavigationMenuContent>
-                  </NavigationMenuItem>
-                </NavigationMenuList>
-              </NavigationMenu>
-
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
               <Link
                 href="/following"
                 aria-label="Go to following page"
@@ -178,15 +175,8 @@ export default function Dashboard() {
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                   <DropdownMenuItem>Dashboard</DropdownMenuItem>
-                  <DropdownMenuSub>
-                    <DropdownMenuSubTrigger>Posts</DropdownMenuSubTrigger>
-                    <DropdownMenuPortal>
-                      <DropdownMenuSubContent>
-                        <DropdownMenuItem>Drafts</DropdownMenuItem>
-                        <DropdownMenuItem>Published</DropdownMenuItem>
-                      </DropdownMenuSubContent>
-                    </DropdownMenuPortal>
-                  </DropdownMenuSub>
+                  <DropdownMenuItem>Drafts</DropdownMenuItem>
+                  <DropdownMenuItem>Published</DropdownMenuItem>
                   <DropdownMenuItem>Following</DropdownMenuItem>
                   <DropdownMenuItem>Activity</DropdownMenuItem>
                   <DropdownMenuItem>Explore</DropdownMenuItem>

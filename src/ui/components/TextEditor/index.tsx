@@ -11,10 +11,10 @@ import { useEffect } from "react";
 
 interface TextEditorProps {
   content: string;
-  onChange: (content: string) => void; // Only pass content now
+  onChange: (content: string) => void;
 }
 
-const limit = 280;
+const limit = 12500;
 
 export default function TextEditor({ content, onChange }: TextEditorProps) {
   const editor = useEditor({
@@ -26,24 +26,23 @@ export default function TextEditor({ content, onChange }: TextEditorProps) {
       Highlight,
       Image,
       CharacterCount.configure({
-        limit,
+        limit: 12500,
       }),
     ],
-    content: content,
-    immediatelyRender: false,
+    content: content, // Set initial content
     editorProps: {
       attributes: {
-        class: "min-h-[156px] border rounded-md bg-slate-50 py-2 px-3",
+        class: "min-h-[400px] border rounded-md bg-slate-50 py-4 px-4 text-lg",
       },
     },
     onUpdate: ({ editor }) => {
-      // Pass only content to the parent component
       onChange(editor.getHTML());
     },
   });
 
+  // Only update the content if the prop changes from outside (e.g., loading content)
   useEffect(() => {
-    if (editor) {
+    if (editor && editor.getHTML() !== content) {
       editor.commands.setContent(content);
     }
   }, [content, editor]);
@@ -58,8 +57,9 @@ export default function TextEditor({ content, onChange }: TextEditorProps) {
 
   return (
     <div className="tiptap">
-      {/* Editor Toolbar and Content */}
+      {/* Editor Toolbar */}
       <ToolBar editor={editor} />
+      {/* Drag Handle for Reordering Blocks */}
       <DragHandle editor={editor}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -75,31 +75,32 @@ export default function TextEditor({ content, onChange }: TextEditorProps) {
           />
         </svg>
       </DragHandle>
+
+      {/* Make the editor bigger */}
       <EditorContent editor={editor} />
-      <div
-        className={`character-count ${
-          editor.storage.characterCount.characters() === limit
-            ? "character-count--warning"
-            : ""
-        }`}
-      >
-        <svg height="20" width="20" viewBox="0 0 20 20">
-          <circle r="10" cx="10" cy="10" fill="#e9ecef" />
-          <circle
-            r="5"
-            cx="10"
-            cy="10"
-            fill="transparent"
-            stroke="currentColor"
-            strokeWidth="10"
-            strokeDasharray={`calc(${percentage} * 31.4 / 100) 31.4`}
-            transform="rotate(-90) translate(-20)"
-          />
-          <circle r="6" cx="10" cy="10" fill="white" />
-        </svg>
-        {editor.storage.characterCount.characters()} / {limit} characters
-        <br />
-        {editor.storage.characterCount.words()} words
+
+      {/* Character and Word Count */}
+      <div className="flex justify-end items-center mt-4">
+        <div className="character-count flex items-center space-x-2">
+          {/* Character count as circle gauge */}
+          <svg height="40" width="40" viewBox="0 0 20 20">
+            <circle r="10" cx="10" fill="#e9ecef" />
+            <circle
+              r="5"
+              cx="10"
+              cy="10"
+              fill="transparent"
+              stroke="currentColor"
+              strokeWidth="10"
+              strokeDasharray={`calc(${percentage} * 31.4 / 100) 31.4`}
+              transform="rotate(-90) translate(-20)"
+            />
+            <circle r="6" cx="10" cy="10" fill="white" />
+          </svg>
+          {editor.storage.characterCount.characters()} / {limit} characters
+          <br />
+          {editor.storage.characterCount.words()} words
+        </div>
       </div>
     </div>
   );

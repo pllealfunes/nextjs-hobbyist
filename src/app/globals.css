@@ -125,6 +125,7 @@ body {
   line-height: 1.1;
   margin-top: 2.5rem;
   text-wrap: pretty;
+  font-weight: bold;
 }
 
 .tiptap h1,
