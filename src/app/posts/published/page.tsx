@@ -1,109 +1,47 @@
-"use client";
-import TextEditor from "@/ui/components/TextEditor";
-import { useForm, SubmitHandler } from "react-hook-form";
-import * as z from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@/ui/components/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/ui/components/form";
+import { Payment, columns } from "@/ui/components/table-columns";
+import { DataTable } from "@/ui/components/data-table";
 
-// Define the type for the 'html' parameter
-function extractTextFromHTML(html: string): string {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, "text/html");
-  return doc.body.textContent?.trim() || "";
-}
-
-// Validation schema
-const formSchema = z.object({
-  post: z.string().refine(
-    (value) => {
-      return extractTextFromHTML(value).trim().length >= 200;
+async function getData(): Promise<Payment[]> {
+  return [
+    {
+      id: "m5gr84i9",
+      amount: 316,
+      status: "success",
+      email: "ken99@yahoo.com",
     },
     {
-      message: "The text must be 200 to 12500 characters long after trimming",
-    }
-  ),
-  title: z.string().min(10, "Title is required"), // Title validation
-});
-
-// Define the type for form data
-type FormData = z.infer<typeof formSchema>;
-
-export default function CreatePost() {
-  const form = useForm<FormData>({
-    mode: "onTouched",
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      post: "",
-      title: "",
+      id: "3u1reuv4",
+      amount: 242,
+      status: "success",
+      email: "Abe45@gmail.com",
     },
-  });
+    {
+      id: "derv1ws0",
+      amount: 837,
+      status: "processing",
+      email: "Monserrat44@gmail.com",
+    },
+    {
+      id: "5kma53ae",
+      amount: 874,
+      status: "success",
+      email: "Silas22@gmail.com",
+    },
+    {
+      id: "bhqecj4p",
+      amount: 721,
+      status: "failed",
+      email: "carmella@hotmail.com",
+    },
+  ];
+}
 
-  // Define the type for 'data'
-  const onSubmit: SubmitHandler<FormData> = (data) => {
-    console.log(data);
-  };
+export default async function DemoPage() {
+  const data = await getData();
 
   return (
-    <div className="max-w-3xl mx-auto py-5">
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
-          {/* Title Field */}
-          <FormField
-            control={form.control}
-            name="title"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-lg">Title</FormLabel>
-                <FormControl>
-                  <input
-                    type="text"
-                    value={field.value}
-                    onChange={field.onChange}
-                    placeholder="Enter the title"
-                    className="mb-2 w-full border rounded-md p-2 text-lg"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Post Field */}
-          <FormField
-            control={form.control}
-            name="post"
-            render={({ field }) => (
-              <FormItem className="my-2">
-                <FormLabel className="text-lg">Post</FormLabel>
-                <FormControl>
-                  <TextEditor
-                    content={field.value}
-                    onChange={(value) => field.onChange(value)}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Container for Word Count and Submit Button */}
-          <div className="flex justify-end items-end mt-4">
-            <div className="mr-4">
-              {/* Word Count component */}
-              {/* Assuming your word count is displayed inside the TextEditor */}
-            </div>
-            <Button className="ml-2">Submit</Button>
-          </div>
-        </form>
-      </Form>
+    <div className="container mx-auto py-10">
+      <DataTable columns={columns} data={data} />
     </div>
   );
 }
