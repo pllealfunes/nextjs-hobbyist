@@ -17,7 +17,7 @@ import {
 
 export default function Dashboard() {
   return (
-    <header className="bg-rose-400">
+    <header className="bg-rose-400 shadow-md">
       <nav className="flex items-center justify-between p-4 sm:p-6 lg:px-8 relative">
         <div className="flex lg:flex-1">
           <div className="flex items-center space-x-2 sm:space-x-4">
