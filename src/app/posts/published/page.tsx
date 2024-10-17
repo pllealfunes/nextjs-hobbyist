@@ -1,37 +1,49 @@
-import { Payment, columns } from "@/ui/components/table-columns";
+import { Post, columns } from "@/ui/components/table-columns";
 import { DataTable } from "@/ui/components/data-table";
 
-async function getData(): Promise<Payment[]> {
+async function getData(): Promise<Post[]> {
   return [
     {
-      id: "m5gr84i9",
-      amount: 316,
-      status: "success",
-      email: "ken99@yahoo.com",
+      id: "1",
+      title: "From Couch Potato to a 5k",
+      category: "physical",
+      date: "March 14, 2022",
     },
     {
-      id: "3u1reuv4",
-      amount: 242,
-      status: "success",
-      email: "Abe45@gmail.com",
+      id: "2",
+      title: "How to Crochet a Dinosaur",
+      category: "creative",
+      date: "July 9, 2023",
     },
     {
-      id: "derv1ws0",
-      amount: 837,
-      status: "processing",
-      email: "Monserrat44@gmail.com",
+      id: "3",
+      title: "Great ways to Start Meditating",
+      category: "mental",
+      date: "October 27, 2021",
     },
     {
-      id: "5kma53ae",
-      amount: 874,
-      status: "success",
-      email: "Silas22@gmail.com",
+      id: "4",
+      title: "Cozy Delicious Beef Stew",
+      category: "food",
+      date: "January 5, 2024",
     },
     {
-      id: "bhqecj4p",
-      amount: 721,
-      status: "failed",
-      email: "carmella@hotmail.com",
+      id: "5",
+      title: "My First Week Learning Guitar",
+      category: "musical",
+      date: "September 18, 2022",
+    },
+    {
+      id: "6",
+      title: "30 Years of Coin Collecting",
+      category: "collecting",
+      date: "April 23, 2021",
+    },
+    {
+      id: "7",
+      title: "Great Games for a Saturday Night with Friends",
+      category: "games+puzzles",
+      date: "June 11, 2023",
     },
   ];
 }
