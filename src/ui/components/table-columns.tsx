@@ -4,15 +4,7 @@ import { ColumnDef } from "@tanstack/react-table";
 
 import { Button } from "@/ui/components/button";
 import { Checkbox } from "@/ui/components/checkbox";
-import {
-  DropdownMenu,
-  DropdownMenuSeparator,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-  DropdownMenuLabel,
-  DropdownMenuItem,
-} from "@/ui/components/dropdown-menu";
-import { ArrowUpDown, Ellipsis } from "lucide-react";
+import { ArrowUpDown, Trash2, Pencil } from "lucide-react";
 
 export type Post = {
   id: string;
@@ -48,7 +40,7 @@ export const columns: ColumnDef<Post>[] = [
     accessorKey: "title",
     header: "Title",
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("title")}</div>
+      <div className="capitalize cursor-pointer">{row.getValue("title")}</div>
     ),
   },
   {
@@ -87,7 +79,11 @@ export const columns: ColumnDef<Post>[] = [
     accessorKey: "actions",
     header: "Actions",
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("actions")}</div>
+      <div className="capitalize flex justify-evenly items-center gap-3 lg:gap-1">
+        {row.getValue("actions")}
+        <Pencil className="text-rose-400 cursor-pointer" />
+        <Trash2 className="text-red-500 cursor-pointer" />
+      </div>
     ),
   },
 ];
