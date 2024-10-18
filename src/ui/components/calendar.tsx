@@ -1,15 +1,32 @@
 "use client";
 
-import React from "react";
-import Calendar from "react-calendar";
-import "react-calendar/dist/Calendar.css"; // Import the default styles
+import { Calendar, momentLocalizer, View, Views } from "react-big-calendar";
+import moment from "moment";
+import { postEvents } from "@/lib/data";
+import "react-big-calendar/lib/css/react-big-calendar.css";
+import { useState } from "react";
 
-const CalendarComponent = () => {
+const localizer = momentLocalizer(moment);
+
+const PostCalendar = () => {
+  const [view, setView] = useState<View>(Views.MONTH);
+
+  const handleOnChangeView = (selectedView: View) => {
+    setView(selectedView);
+  };
+
   return (
-    <div className="calendar-container">
-      <Calendar />
-    </div>
+    <Calendar
+      localizer={localizer}
+      events={postEvents}
+      startAccessor="start"
+      endAccessor="end"
+      views={["month"]}
+      view={view}
+      style={{ height: 500, width: 500 }}
+      onView={handleOnChangeView}
+    />
   );
 };
 
-export default CalendarComponent;
+export default PostCalendar;
