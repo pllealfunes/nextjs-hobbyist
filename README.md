@@ -36,3 +36,4 @@ bun dev
 - Shadcn UI
 - Lucide React
 - ChatGPT
+- React Big Calendar Crash Course in 30 minutes [Usman Abdur Rehman](https://www.youtube.com/watch?v=ZFhDJAOd9Tg)

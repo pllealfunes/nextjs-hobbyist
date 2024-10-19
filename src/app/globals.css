@@ -261,6 +261,12 @@ body {
   }
 }
 
+@media (min-width: 768px) {
+  .rbc-calendar {
+    display: block !important;
+  }
+}
+
 .rbc-event {
   background-color: #f43f5e !important;
   color: #fafafa;
