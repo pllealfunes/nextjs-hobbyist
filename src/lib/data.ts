@@ -115,8 +115,8 @@ export const postEvents = [
   {
     id: 13,
     title: "Multi-day Event",
-    start: new Date(2024, 3, 20, 19, 30, 0),
-    end: new Date(2024, 3, 22, 2, 0, 0),
+    start: new Date(new Date().setHours(new Date().getHours() - 3)),
+    end: new Date(new Date().setHours(new Date().getHours() + 3)),
   },
   {
     id: 14,
@@ -133,7 +133,7 @@ export const postEvents = [
   {
     id: 16,
     title: "Video Record",
-    start: new Date(new Date().setHours(new Date().getHours() - 6)),
-    end: new Date(new Date().setHours(new Date().getHours() + 6)),
+    start: new Date(new Date().setHours(new Date().getHours() - 3)),
+    end: new Date(new Date().setHours(new Date().getHours() + 3)),
   },
 ];

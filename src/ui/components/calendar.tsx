@@ -21,10 +21,11 @@ const PostCalendar = () => {
       events={postEvents}
       startAccessor="start"
       endAccessor="end"
-      views={["month"]}
+      views={["month", "day"]}
       view={view}
       style={{ height: 500, width: 500 }}
       onView={handleOnChangeView}
+      popup
     />
   );
 };
