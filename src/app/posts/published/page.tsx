@@ -1,6 +1,7 @@
 import { Post, columns } from "@/ui/components/table-columns";
 import { DataTable } from "@/ui/components/data-table";
 import PostCalendar from "@/ui/components/calendar";
+import { LikesCommentsChart } from "@/ui/components/likescomments-chart";
 
 async function getData(): Promise<Post[]> {
   return [
@@ -55,7 +56,7 @@ export default async function Published() {
   return (
     <div className="container mx-auto py-10">
       <div className="flex flex-wrap justify-around items-center gap-11 mb-11">
-        <div className="w-80 h-80 p-14 bg-rose-400"> Total Post</div>
+        <LikesCommentsChart />
         <PostCalendar />
       </div>
       <DataTable columns={columns} data={data} />
