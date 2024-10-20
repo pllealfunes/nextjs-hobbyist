@@ -55,7 +55,7 @@ export default async function Published() {
 
   return (
     <div className="container mx-auto py-10">
-      <div className="flex flex-wrap justify-around items-center gap-11 mb-11">
+      <div className="flex flex-wrap justify-around items-center gap-11 mb-24">
         <LikesCommentsChart />
         <PostCalendar />
       </div>

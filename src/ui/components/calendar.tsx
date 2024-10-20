@@ -10,6 +10,7 @@ const localizer = momentLocalizer(moment);
 
 const PostCalendar = () => {
   const [view, setView] = useState<View>(Views.MONTH);
+  const [date, setDate] = useState(new Date());
 
   const handleOnChangeView = (selectedView: View) => {
     setView(selectedView);
@@ -17,13 +18,17 @@ const PostCalendar = () => {
 
   return (
     <Calendar
+      date={date}
+      onNavigate={(date) => {
+        setDate(new Date(date));
+      }}
       localizer={localizer}
       events={postEvents}
       startAccessor="start"
       endAccessor="end"
       views={["month", "day"]}
       view={view}
-      style={{ height: 500, width: 500, display: "none" }}
+      style={{ height: 500, width: 520, display: "none" }}
       onView={handleOnChangeView}
       popup
     />

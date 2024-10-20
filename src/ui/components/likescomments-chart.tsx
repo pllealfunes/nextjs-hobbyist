@@ -18,8 +18,6 @@ import {
   ChartTooltipContent,
 } from "@/ui/components/charts";
 
-export const description = "A multiple bar chart";
-
 const chartData = [
   { month: "January", desktop: 186, mobile: 80 },
   { month: "February", desktop: 305, mobile: 200 },
@@ -31,21 +29,24 @@ const chartData = [
 
 const chartConfig = {
   desktop: {
-    label: "Desktop",
+    label: "Likes",
     color: "hsl(var(--chart-1))",
   },
   mobile: {
-    label: "Mobile",
+    label: "Comments",
     color: "hsl(var(--chart-2))",
   },
 } satisfies ChartConfig;
 
 export function LikesCommentsChart() {
   return (
-    <Card style={{ height: 500, width: 500 }}>
+    <Card
+      className="flex flex-col justify-evenly"
+      style={{ height: 500, width: 500 }}
+    >
       <CardHeader>
-        <CardTitle>Bar Chart - Multiple</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+        <CardTitle>Likes and Comments</CardTitle>
+        <CardDescription>January - June</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
@@ -60,7 +61,9 @@ export function LikesCommentsChart() {
             />
             <ChartTooltip
               cursor={false}
-              content={<ChartTooltipContent indicator="dashed" />}
+              content={
+                <ChartTooltipContent indicator="dashed" className="bg-white" />
+              }
             />
             <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
             <Bar dataKey="mobile" fill="var(--color-mobile)" radius={4} />

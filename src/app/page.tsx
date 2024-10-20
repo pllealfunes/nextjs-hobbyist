@@ -184,7 +184,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="bg-gradient-to-br from-rose-100 to-rose-500 py-24 sm:py-32">
+      <section className="bg-gradient-to-br from-rose-100 to-rose-500 py-24 sm:py-32 rounded-3xl">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <h2
             className="text-center text-3xl font-bold tracking-tight text-gray-900"
@@ -257,7 +257,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="bg-gradient-to-br from-rose-100 to-rose-500 p-24 sm:p-32 flex justify-center items-center">
+      <section className="bg-gradient-to-br from-rose-100 to-rose-500 p-24 sm:p-32 flex justify-center items-center rounded-3xl">
         <div className="mx-auto max-w-2xl lg:mx-0">
           <h2
             className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl"
