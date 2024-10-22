@@ -41,19 +41,19 @@ export default function About() {
             <li>Ability to follow users and categories</li>
             <li>Personalized feeds</li>
             <li>Enhanced search functionality</li>
+            <li>User to User chat</li>
             <li>Improved UI/UX design</li>
             <li>Responsive layout for all devices</li>
-            {/* Add more features here as you implement them */}
           </ul>
         </section>
 
         <section className="mb-6">
           <h2 className="text-xl font-semibold">What’s Next?</h2>
           <p>
-            As I continue to develop this project the list of features will
-            increase. I aim to expand its capabilities, ensuring a seamless and
-            engaging experience for users. Follow the project by visiting the
-            GitHub repo!
+            As I continue to develop this project the list of features and/or
+            technologies will increase. I aim to expand its capabilities,
+            ensuring a seamless and engaging experience for users. Follow the
+            project by visiting the GitHub repo!
           </p>
         </section>
       </div>

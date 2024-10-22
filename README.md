@@ -12,7 +12,11 @@ https://nextjs-hobbyist.vercel.app/
 
 ## Project Tasks:
 
-![Project Tasks Image](/public/images/tasks.png)
+User Profile Page
+
+- [x] create profile page folder and file
+- [ ] create layout -> with fake placeholder data
+- [ ] add styling
 
 ## Getting Started
 
