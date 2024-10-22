@@ -42,7 +42,7 @@ export function LikesCommentsChart() {
   return (
     <Card
       className="flex flex-col justify-evenly"
-      style={{ height: 500, width: 500 }}
+      style={{ height: 575, width: 575 }}
     >
       <CardHeader>
         <CardTitle>Likes and Comments</CardTitle>

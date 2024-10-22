@@ -28,7 +28,7 @@ const PostCalendar = () => {
       endAccessor="end"
       views={["month", "day"]}
       view={view}
-      style={{ height: 500, width: 520, display: "none" }}
+      style={{ height: 575, width: 575, display: "none" }}
       onView={handleOnChangeView}
       popup
     />
