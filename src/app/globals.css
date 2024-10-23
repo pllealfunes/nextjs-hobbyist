@@ -57,6 +57,9 @@ body {
     --chart-3: 350 80% 72%;
     --chart-4: 351 83% 82%;
     --chart-5: 349 77% 62%;
+    --calendar-link: #111827;
+    --calendar-btn: #111827;
+    --calendar-bg: #111827;
   }
 
   .dark {
@@ -84,6 +87,9 @@ body {
     --chart-3: 350 80% 72%;
     --chart-4: 351 83% 82%;
     --chart-5: 352 83% 91%;
+    --calendar-link: #fafafa;
+    --calendar-btn: #fafafa;
+    --calendar-bg: #fafafa;
   }
 }
 
@@ -279,15 +285,17 @@ body {
 
 .rbc-toolbar-label {
   font-size: 18px;
-  color: #111827 !important;
+  color: var(--calendar-link) !important;
   font-weight: 900;
 }
 
-.rbc-btn-group > button {
+.rbc-btn-group > button:not(.rbc-active) {
   border: none !important;
+  color: var(--calendar-btn) !important;
 }
 
 .rbc-active {
+  border: none !important;
   background-color: #f43f5e !important;
   border-radius: 6px !important;
   color: #fafafa !important;
@@ -301,5 +309,9 @@ body {
 
 .rbc-button-link,
 .rbc-show-more {
-  color: #111827 !important;
+  color: var(--calendar-btn) !important;
+}
+
+.rbc-overlay {
+  background-color: var(--calendar-bg) !important;
 }

@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { Feather } from "lucide-react";
+import { ThemeToggle } from "../theme-toggle";
 
 export default function Nav() {
   return (
-    <header className="bg-zinc-50">
+    <header className="light:bg-zinc-50">
       <nav
         aria-label="Global"
         className="flex items-center justify-between p-4 sm:p-6 lg:px-8"
@@ -33,7 +34,7 @@ export default function Nav() {
         <div className="flex gap-x-4 sm:gap-x-6 items-center">
           <Link
             href="#"
-            className="font-semibold leading-6 text-gray-900"
+            className="font-semibold leading-6 light:text-gray-900"
             aria-label="Explore content"
           >
             Explore
@@ -49,11 +50,12 @@ export default function Nav() {
 
           <Link
             href="/signup"
-            className="hidden sm:block font-semibold leading-6 text-gray-900"
+            className="hidden sm:block font-semibold leading-6 light:text-gray-900"
             aria-label="Sign up for an account"
           >
             Signup
           </Link>
+          <ThemeToggle />
         </div>
       </nav>
     </header>

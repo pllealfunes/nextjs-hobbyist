@@ -12,14 +12,14 @@ import DashboardPosts from "@/ui/components/dashboard-posts";
 
 export default function Dashboard() {
   return (
-    <section className="bg-zinc-50 min-h-screen">
+    <section className="light:bg-zinc-50 min-h-screen">
       <div className="mx-auto justify-evenly items-center">
         <div className="mb-8">
           <h2 className="text-4xl md:text-5xl font-bold text-center mb-2">
             Feed
           </h2>
           <div className="h-1 w-1/4 bg-rose-500 mx-auto mb-6"></div>
-          <p className="text-center text-gray-600 text-lg mb-6">
+          <p className="text-center light:text-gray-600 text-lg mb-6">
             Stay updated with the latest posts and insights from our community.
           </p>
           <div className="mb-6 flex justify-center items-center gap-2">

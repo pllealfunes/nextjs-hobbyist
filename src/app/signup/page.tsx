@@ -53,7 +53,7 @@ export default function SignUpPage() {
   return (
     <>
       <Nav />
-      <section className="bg-zinc-50 py-24 sm:py-32 flex justify-center">
+      <section className="light:bg-zinc-50 py-24 sm:py-32 flex justify-center">
         <div className="container mx-auto px-6 lg:px-8">
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-16 items-center">
             {/* Image Section */}
@@ -65,7 +65,7 @@ export default function SignUpPage() {
             <div className="flex flex-col justify-center">
               <div className="max-w-md mx-auto">
                 <h1
-                  className="text-3xl font-bold text-gray-900 sm:text-4xl mb-4"
+                  className="text-3xl font-bold light:text-gray-900 sm:text-4xl mb-4"
                   role="heading"
                   aria-level={2}
                 >

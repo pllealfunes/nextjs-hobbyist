@@ -112,10 +112,10 @@ export default function Home() {
   return (
     <div>
       <Nav />
-      <section className="relative isolate px-6 lg:px-8 bg-zinc-50">
+      <section className="relative isolate px-6 lg:px-8 light:bg-zinc-50">
         <div className="mx-auto py-32 sm:py-48 lg:py-48 flex flex-col justify-evenly items-center">
           <p
-            className="text-6xl font-semibold text-gray-600 text-center"
+            className="text-6xl font-semibold light:text-gray-600 text-center"
             role="heading"
             aria-level={1}
           >
@@ -208,7 +208,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="bg-zinc-50 py-24 sm:py-32">
+      <section className="light:bg-zinc-50 py-24 sm:py-32">
         <div className="container mx-auto px-6 lg:px-8">
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-16 xl:gap-32 items-center">
             {/* Text Section */}
@@ -217,20 +217,20 @@ export default function Home() {
                 Share and Discover with Ease
               </h2>
               <p
-                className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl"
+                className="mt-2 text-3xl font-bold tracking-tight light:text-gray-900 sm:text-4xl"
                 role="heading"
                 aria-level={2}
               >
                 Everything You Need to Bring Your Hobbies and Passions to the
                 World.
               </p>
-              <p className="mt-6 text-lg leading-8 text-gray-600">
+              <p className="mt-6 text-lg leading-8 light:text-gray-600">
                 Whether you&apos;re sharing your expertise or exploring new
                 ideas, our platform empowers you to blog effortlessly. Discover
                 new hobbies, connect with like-minded individuals, and ignite
                 your passions—all in one place.
               </p>
-              <dl className="mt-10 max-w-xl space-y-8 text-base leading-7 text-gray-600 lg:max-w-none">
+              <dl className="mt-10 max-w-xl space-y-8 text-base leading-7 light:text-gray-600 lg:max-w-none">
                 {features.map((feature) => (
                   <div key={feature.name} className="relative flex items-start">
                     <div className="text-rose-300 flex-shrink-0 flex items-center justify-center mt-1">
@@ -240,7 +240,7 @@ export default function Home() {
                       <dt className="font-semibold text-rose-500">
                         {feature.name}
                       </dt>
-                      <dd className="mt-2 text-gray-600">
+                      <dd className="mt-2 light:text-gray-600">
                         {feature.description}
                       </dd>
                     </div>

@@ -14,6 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/ui/components/dropdown-menu";
+import { ThemeToggle } from "@/ui/theme-toggle";
 
 export default function Dashboard() {
   return (
@@ -26,7 +27,7 @@ export default function Dashboard() {
               className="-m-1.5 p-1.5 flex justify-center items-center"
               aria-label="Go to homepage"
             >
-              <Feather className="w-7 h-7" />
+              <Feather className="w-7 h-7 text-gray-900" />
             </Link>
           </div>
           <div className="hidden sm:ml-6 md:block">
@@ -41,7 +42,7 @@ export default function Dashboard() {
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild className="cursor-pointer">
-                  <div className="flex justify-center items-center text-zinc-50 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">
+                  <div className="flex justify-center items-center text-zinc-50  hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">
                     Posts <ChevronDown className="mt-1 w-4 h-4" />
                   </div>
                 </DropdownMenuTrigger>
@@ -95,7 +96,7 @@ export default function Dashboard() {
           </Button>
 
           {/* User Profile - Hidden on small screens */}
-          <div className="ml-3 hidden md:block">
+          <div className="pr-2 ml-3 hidden md:block">
             <DropdownMenu>
               <DropdownMenuTrigger asChild className="cursor-pointer">
                 <Image
@@ -118,10 +119,12 @@ export default function Dashboard() {
             </DropdownMenu>
           </div>
 
+          <ThemeToggle />
+
           {/* Mobile Bars Icon - Visible only on small screens */}
-          <div className="md:hidden">
+          <div className="ml-2 md:hidden">
             <DropdownMenu>
-              <DropdownMenuTrigger className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+              <DropdownMenuTrigger className="inline-flex items-center justify-center rounded-md p-2 text-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"

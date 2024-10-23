@@ -121,14 +121,14 @@ export default function DashboardPosts() {
             />
           </div>
           <div className="p-4">
-            <div className="text-gray-500 text-sm mb-4 flex items-center justify-between">
+            <div className="light:text-gray-500 text-sm mb-4 flex items-center justify-between">
               <span>{card.date}</span>
               <span className="bg-gray-200 text-gray-700 px-2 py-1 rounded-full text-xs">
                 Creative
               </span>
             </div>
             <h3 className="font-bold text-lg mb-4">{card.title}</h3>
-            <p className="text-gray-600 text-sm mb-6">
+            <p className="light:text-gray-600 text-sm mb-6">
               Lorem ipsum dolor sit amet consectetur adipisicing elit. Sed, non!
             </p>
 
@@ -143,7 +143,9 @@ export default function DashboardPosts() {
                   width={40}
                   className="h-10 w-10 rounded-full"
                 />
-                <p className="text-gray-800 font-semibold">{card.user.name}</p>
+                <p className="light:text-gray-800 font-semibold">
+                  {card.user.name}
+                </p>
               </div>
 
               {/* Like Section */}
@@ -163,7 +165,7 @@ export default function DashboardPosts() {
                     d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
                   />
                 </svg>
-                <span className="text-gray-600 text-sm">50</span>
+                <span className="light:text-gray-600 text-sm">50</span>
               </div>
             </div>
           </div>
