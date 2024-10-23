@@ -10,6 +10,15 @@ This project is being built with Next.js, TypeScript, Tailwind, Zod, Shadcn, Pri
 
 https://nextjs-hobbyist.vercel.app/
 
+## Available Pages
+
+- Home (/)
+- Login (/login)
+- Signup (/signup)
+- Dashboard (/dashboard)
+- Published (/posts/published)
+- Drafts (/posts/drafts)
+
 ## Project Tasks:
 
 User Profile Page
