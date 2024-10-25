@@ -108,27 +108,40 @@ export default function DashboardPosts() {
   ];
 
   return (
-    <div className="grid gap-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 p-4">
+    <div className="grid gap-6 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 p-6">
       {cards.map((card) => (
-        <div key={card.id} className="mb-4 overflow-hidden mx-auto">
+        <div
+          key={card.id}
+          className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform transform hover:scale-105 duration-300"
+        >
+          {/* Card Image */}
           <div className="relative">
             <Image
               src={card.backgroundImage}
               alt={card.title}
               width={200}
               height={200}
-              className="w-full h-64 object-cover rounded-lg"
+              className="w-full h-64 object-cover rounded-t-lg"
             />
           </div>
-          <div className="p-4">
-            <div className="light:text-gray-500 text-sm mb-4 flex items-center justify-between">
+
+          {/* Card Content */}
+          <div className="p-5">
+            {/* Date and Tag */}
+            <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
               <span>{card.date}</span>
-              <span className="bg-gray-200 text-gray-700 px-2 py-1 rounded-full text-xs">
+              <span className="bg-rose-100 text-rose-700 px-3 py-1 rounded-full text-xs">
                 Creative
               </span>
             </div>
-            <h3 className="font-bold text-lg mb-4">{card.title}</h3>
-            <p className="light:text-gray-600 text-sm mb-6">
+
+            {/* Title */}
+            <h3 className="font-semibold text-xl text-gray-900 mb-3">
+              {card.title}
+            </h3>
+
+            {/* Description */}
+            <p className="text-gray-700 text-sm mb-6">
               Lorem ipsum dolor sit amet consectetur adipisicing elit. Sed, non!
             </p>
 
@@ -143,20 +156,18 @@ export default function DashboardPosts() {
                   width={40}
                   className="h-10 w-10 rounded-full"
                 />
-                <p className="light:text-gray-800 font-semibold">
-                  {card.user.name}
-                </p>
+                <p className="text-gray-800 font-semibold">{card.user.name}</p>
               </div>
 
               {/* Like Section */}
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1 text-red-500">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
                   strokeWidth="1.5"
                   stroke="currentColor"
-                  className="h-6 w-6 text-red-500"
+                  className="h-6 w-6"
                   aria-hidden="true"
                 >
                   <path
@@ -165,7 +176,7 @@ export default function DashboardPosts() {
                     d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
                   />
                 </svg>
-                <span className="light:text-gray-600 text-sm">50</span>
+                <span className="text-gray-600 text-sm">50</span>
               </div>
             </div>
           </div>

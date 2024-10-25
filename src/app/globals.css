@@ -3,24 +3,17 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --purple-light: #e0e0ff;
-  --black: #000;
-  --white: #fff;
-  --gray-2: #ccc;
-  --gray-3: #999;
+  color: var(--foreground);
+  background: var(--background);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    color: var(--foreground);
+    background: var(--background);
   }
 }
 body {
-  /* color: var(--foreground);
-  background: var(--background); */
   font-family: Arial, Helvetica, sans-serif;
 }
 
@@ -32,7 +25,7 @@ body {
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: rgb(244 244 245);
     --foreground: 240 10% 3.9%;
     --card: 0 0% 100%;
     --card-foreground: 240 10% 3.9%;
@@ -87,9 +80,9 @@ body {
     --chart-3: 350 80% 72%;
     --chart-4: 351 83% 82%;
     --chart-5: 352 83% 91%;
-    --calendar-link: #fafafa;
-    --calendar-btn: #fafafa;
-    --calendar-bg: #fafafa;
+    --calendar-link: rgb(244 244 245);
+    --calendar-btn: rgb(244 244 245);
+    --calendar-bg: rgb(244 244 245);
   }
 }
 
@@ -275,7 +268,7 @@ body {
 
 .rbc-event {
   background-color: #f43f5e !important;
-  color: #fafafa;
+  color: rgb(244 244 245);
 }
 
 .rbc-day-slot,
@@ -298,13 +291,13 @@ body {
   border: none !important;
   background-color: #f43f5e !important;
   border-radius: 6px !important;
-  color: #fafafa !important;
+  color: rgb(244 244 245) !important;
 }
 
 .rbc-btn-group > button:hover {
   background-color: #f43f5e !important;
   border-radius: 6px !important;
-  color: #fafafa !important;
+  color: rgb(244 244 245) !important;
 }
 
 .rbc-button-link,
