@@ -18,6 +18,8 @@ https://nextjs-hobbyist.vercel.app/
 - Dashboard (/dashboard)
 - Published (/posts/published)
 - Drafts (/posts/drafts)
+- Profiles (/profiles)
+- Explore (/explore)
 
 ## Project Tasks:
 
