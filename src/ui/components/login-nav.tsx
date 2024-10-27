@@ -16,7 +16,7 @@ import {
 } from "@/ui/components/dropdown-menu";
 import { ThemeToggle } from "@/ui/theme-toggle";
 
-export default function Dashboard() {
+export default function LoginNav() {
   return (
     <header className="bg-rose-400 shadow-md rounded-b-lg">
       <nav className="flex items-center justify-between p-4 sm:p-6 lg:px-8 relative">
@@ -75,6 +75,14 @@ export default function Dashboard() {
                 className="text-zinc-50 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
               >
                 Activity
+              </Link>
+
+              <Link
+                href="/explore"
+                aria-label="Go to activity page"
+                className="text-zinc-50 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
+              >
+                Explore
               </Link>
             </div>
           </div>
