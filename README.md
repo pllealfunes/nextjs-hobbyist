@@ -23,11 +23,32 @@ https://nextjs-hobbyist.vercel.app/
 
 ## Project Tasks:
 
-User Profile Page
+Update Dashboard Page
 
-- [x] create profile page folder and file
-- [ ] create layout -> with fake placeholder data
-- [ ] add styling
+- [ ] change dashboard filt to feed, and create new dashboard page
+- [ ] add dashboard component from shadcn ui
+- [ ] update routes
+
+Activity Page
+
+- [ ] create route
+- [ ] create one view for user Likes along with dumby data
+- [ ] create second view for user comments with dummy data -> table?
+
+Single Post Page
+
+- [ ] create route
+- [ ] create ui with dumby data
+- [ ] create comment section ui
+
+Settings Page
+
+- [ ] create route
+- [ ] add shadcn ui component
+
+Nav Indication
+
+- [ ] mkae sure nav tracks which page the user is on
 
 ## Getting Started
 
