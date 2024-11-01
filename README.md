@@ -20,14 +20,15 @@ https://nextjs-hobbyist.vercel.app/
 - Drafts (/posts/drafts)
 - Profiles (/profiles)
 - Explore (/explore)
+- Feed (/feed)
 
 ## Project Tasks:
 
 Update Dashboard Page
 
-- [ ] change dashboard filt to feed, and create new dashboard page
-- [ ] add dashboard component from shadcn ui
-- [ ] update routes
+- [x] change dashboard folder to feed, and create new dashboard page
+- [x] add dashboard component from shadcn ui
+- [x] update routes
 
 Activity Page
 
@@ -46,9 +47,11 @@ Settings Page
 - [ ] create route
 - [ ] add shadcn ui component
 
-Nav Indication
+Leftovers
 
-- [ ] mkae sure nav tracks which page the user is on
+- [ ] make sure nav tracks which page the user is on
+- [ ] fix layout of calendar and chart in pblished and drafts pages
+- [ ] fix how chart looks on md screens in dashboard
 
 ## Getting Started
 

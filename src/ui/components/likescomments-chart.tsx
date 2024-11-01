@@ -40,10 +40,7 @@ const chartConfig = {
 
 export function LikesCommentsChart() {
   return (
-    <Card
-      className="flex flex-col justify-evenly"
-      style={{ height: 575, width: 575 }}
-    >
+    <Card className="flex flex-col flex-grow justify-evenly w-full h-full bg-white dark:bg-transparent dark:border dark:border-gray-600">
       <CardHeader>
         <CardTitle>Likes and Comments</CardTitle>
         <CardDescription>January - June</CardDescription>

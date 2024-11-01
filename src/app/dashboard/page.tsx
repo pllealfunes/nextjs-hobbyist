@@ -1,55 +1,37 @@
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/ui/components/select";
-import DashboardPosts from "@/ui/components/dashboard-posts";
+import { LikesCommentsChart } from "@/ui/components/likescomments-chart";
+import RecentStats from "@/ui/components/recent-stats";
+import StatCard from "@/ui/components/stat-card";
+import { FileText, ThumbsUp, MessageCircle } from "lucide-react";
 
-export default function Dashboard() {
+export default function Feed() {
   return (
-    <section className="light:bg-zinc-50 min-h-screen">
-      <div className="mx-auto justify-evenly items-center">
-        {/* Title Section */}
-        <div>
-          <h2 className="text-4xl md:text-5xl font-bold text-center mb-2">
-            Feed
-          </h2>
-          <div className="h-1 w-1/4 bg-rose-500 mx-auto mb-6"></div>
-          <p className="text-center light:text-gray-600 text-lg mb-6">
-            Stay updated with the latest posts and insights from our community.
-          </p>
-        </div>
-
-        {/* Form Section */}
-        <div className="mb-6 flex justify-center items-center gap-2">
-          <label htmlFor="search" className="sr-only">
-            Search posts
-          </label>
-          <input
-            id="search"
-            type="text"
-            placeholder="Search posts..."
-            className="md:w-1/3 p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <label htmlFor="filter" className="sr-only">
-            Filter posts
-          </label>
-          <Select>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filter" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="latest">Latest</SelectItem>
-              <SelectItem value="category1">Category 1</SelectItem>
-              <SelectItem value="category2">Category 2</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Posts Section */}
-        <DashboardPosts />
+    <section className="p-8 min-h-screen">
+      <div className="flex items-center justify-between p-4">
+        <h1 className="text-2xl font-bold">Dashboard</h1>
+      </div>
+      <div className="grid grid-cols-3 gap-3 my-3">
+        <StatCard
+          title="Total Posts This Month"
+          value="150"
+          description="+10% from last month"
+          icon={<FileText size={24} />}
+        />
+        <StatCard
+          title="Total Likes This Month"
+          value="4,500"
+          description="+25% from last month"
+          icon={<ThumbsUp size={24} />}
+        />
+        <StatCard
+          title="Total Comments Received This Month"
+          value="1,200"
+          description="+30% from last month"
+          icon={<MessageCircle size={24} />}
+        />
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 my-2">
+        <LikesCommentsChart />
+        <RecentStats />
       </div>
     </section>
   );

@@ -18,7 +18,7 @@ import { ThemeToggle } from "@/ui/theme-toggle";
 
 export default function LoginNav() {
   return (
-    <header className="bg-rose-400 shadow-md rounded-b-lg">
+    <header className="bg-rose-400 dark:bg-transparent dark:border-b dark:border-gray-600 shadow-md rounded-b-lg">
       <nav className="flex items-center justify-between p-4 sm:p-6 lg:px-8 relative">
         <div className="flex lg:flex-1">
           <div className="flex items-center space-x-2 sm:space-x-4">
@@ -27,14 +27,14 @@ export default function LoginNav() {
               className="-m-1.5 p-1.5 flex justify-center items-center"
               aria-label="Go to homepage"
             >
-              <Feather className="w-7 h-7 text-gray-900" />
+              <Feather className="w-7 h-7 light:text-gray-900" />
             </Link>
           </div>
           <div className="hidden sm:ml-6 md:block">
             <div className="flex">
               <Link
                 href="/dashboard"
-                aria-label="Go to following page"
+                aria-label="Go to dashboard page"
                 className="text-zinc-50 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
               >
                 Dashboard
@@ -49,12 +49,15 @@ export default function LoginNav() {
                 <DropdownMenuContent className="ml-12">
                   <DropdownMenuGroup>
                     <DropdownMenuItem>
-                      <Link href="/drafts" aria-label="Go to following page">
+                      <Link href="/posts/drafts" aria-label="Go to drafts page">
                         Drafts
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem>
-                      <Link href="/published" aria-label="Go to following page">
+                      <Link
+                        href="/posts/published"
+                        aria-label="Go to published page"
+                      >
                         Published
                       </Link>
                     </DropdownMenuItem>
@@ -63,7 +66,7 @@ export default function LoginNav() {
               </DropdownMenu>
 
               <Link
-                href="/explore"
+                href="/activity"
                 aria-label="Go to activity page"
                 className="text-zinc-50 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
               >
@@ -71,8 +74,16 @@ export default function LoginNav() {
               </Link>
 
               <Link
+                href="/feed"
+                aria-label="Go to feed page"
+                className="text-zinc-50 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
+              >
+                Feed
+              </Link>
+
+              <Link
                 href="/explore"
-                aria-label="Go to activity page"
+                aria-label="Go to explore page"
                 className="text-zinc-50 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
               >
                 Explore
@@ -85,13 +96,13 @@ export default function LoginNav() {
         <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
           {/* Bell Icon - Hidden on small screens */}
           <Link href="/posts/createpost" passHref>
-            <Button className="bg-zinc-50 hover:bg-rose-600 hover:text-zinc-50 text-rose-400 mx-3 p-1 font-semibold">
+            <Button className="bg-zinc-50 hover:bg-rose-600 hover:text-zinc-50 text-rose-500 mx-3 p-1 font-semibold">
               <Plus className="w-5 h-5 m-1" />
               <span className="mr-2">New Post</span>
             </Button>
           </Link>
 
-          <Button className="hidden md:block relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+          <Button className="hidden md:block relative rounded-full light:bg-gray-800 p-1 light:text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
             <span className="sr-only">View notifications</span>
             <Bell />
           </Button>
@@ -113,7 +124,6 @@ export default function LoginNav() {
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                   <DropdownMenuItem>
-                    {" "}
                     <Link href="/profiles">Profile</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem>Settings</DropdownMenuItem>
@@ -165,15 +175,48 @@ export default function LoginNav() {
                 </div>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                  <DropdownMenuItem>Dashboard</DropdownMenuItem>
-                  <DropdownMenuItem>Drafts</DropdownMenuItem>
-                  <DropdownMenuItem>Published</DropdownMenuItem>
-                  <DropdownMenuItem>Activity</DropdownMenuItem>
-                  <DropdownMenuItem>Explore</DropdownMenuItem>
+                  <DropdownMenuItem>
+                    {" "}
+                    <Link href="/dashboard" aria-label="Go to dashboard page">
+                      Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link href="/drafts" aria-label="Go to drafts page">
+                      Drafts
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link
+                      href="/posts/published"
+                      aria-label="Go to published page"
+                    >
+                      Published
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link href="/activity" aria-label="Go to following page">
+                      Activity
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link href="/feed" aria-label="Go to feed page">
+                      Feed
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link href="/posts/drafts" aria-label="Go to drafts page">
+                      Explore
+                    </Link>
+                  </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                  <DropdownMenuItem>Profile</DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link href="/profiles" aria-label="Go to profile page">
+                      Profile
+                    </Link>
+                  </DropdownMenuItem>
                   <DropdownMenuItem>Settings</DropdownMenuItem>
                   <DropdownMenuItem>Logout</DropdownMenuItem>
                 </DropdownMenuGroup>
