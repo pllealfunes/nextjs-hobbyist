@@ -50,7 +50,7 @@ Settings Page
 Leftovers
 
 - [ ] make sure nav tracks which page the user is on
-- [ ] fix layout of calendar and chart in pblished and drafts pages
+- [x] fix layout of calendar and chart in pblished and drafts pages
 - [ ] fix how chart looks on md screens in dashboard
 
 ## Getting Started
