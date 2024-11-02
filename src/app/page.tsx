@@ -94,11 +94,10 @@ const features = [
     id: 3,
     name: "Connect with Communities",
     description:
-      "Discover categroies and users that fuel your passions, and follow each others journey for inspiration.",
+      "Discover categories and users that fuel your passions, and follow each other&apos;s journey for inspiration.",
     icon: <MessagesSquare />,
   },
 ];
-
 export default function Home() {
   const [isVisible, setIsVisible] = useState(false);
 

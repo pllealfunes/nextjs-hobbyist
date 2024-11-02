@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/ui/components/button";
-import { PenLine, Bell, Plus, ChevronDown, PencilLine } from "lucide-react";
+import { Bell, Plus, ChevronDown, PencilLine } from "lucide-react";
 
 import {
   DropdownMenu,

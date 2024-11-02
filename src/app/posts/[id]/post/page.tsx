@@ -5,13 +5,10 @@ import { Card, CardContent } from "@/ui/components/card";
 import { Separator } from "@/ui/components/separator";
 import { Textarea } from "@/ui/components/textarea";
 import {
-  PenLine,
   Calendar,
   Clock,
   ThumbsUp,
   MessageCircle,
-  Share2,
-  Bookmark,
   ChevronLeft,
   Send,
 } from "lucide-react";
@@ -84,22 +81,22 @@ export default function BlogPost() {
                 </p>
                 <h2>Choosing Your First Bonsai</h2>
                 <p>
-                  When starting your bonsai journey, it's important to choose a
-                  tree species that is suitable for beginners and your local
-                  climate. Some popular choices include:
+                  When starting your bonsai journey, it&apos;s important to
+                  choose a tree species that is suitable for beginners and your
+                  local climate. Some popular choices include:
                 </p>
                 <ul>
                   <li>Japanese Maple (Acer palmatum)</li>
                   <li>Chinese Elm (Ulmus parvifolia)</li>
                   <li>Ficus species (such as Ficus retusa)</li>
-                  <li>Juniper (Juniperus procumbens 'Nana')</li>
+                  <li>Juniper (Juniperus procumbens &apos;Nana&apos;)</li>
                 </ul>
                 <h2>Basic Bonsai Care</h2>
                 <p>Caring for your bonsai involves several key aspects:</p>
                 <ol>
                   <li>Watering: Keep the soil moist but not waterlogged</li>
                   <li>
-                    Sunlight: Provide adequate light based on your tree's
+                    Sunlight: Provide adequate light based on your tree&apos;s
                     species
                   </li>
                   <li>
@@ -111,8 +108,8 @@ export default function BlogPost() {
                     and size
                   </li>
                   <li>
-                    Repotting: Repot every 1-5 years, depending on the tree's
-                    growth rate
+                    Repotting: Repot every 1-5 years, depending on the
+                    tree&apos;s growth rate
                   </li>
                 </ol>
                 <h2>Conclusion</h2>
@@ -147,14 +144,14 @@ export default function BlogPost() {
                   avatar: "/placeholder.svg?height=40&width=40",
                   date: "June 1, 2023",
                   content:
-                    "Great article! I've been interested in starting bonsai as a hobby, and this guide is really helpful. Do you have any recommendations for good bonsai workshops or classes for beginners?",
+                    "Great article! I&apos;ve been interested in starting bonsai as a hobby, and this guide is really helpful. Do you have any recommendations for good bonsai workshops or classes for beginners?",
                 },
                 {
                   author: "Bob Smith",
                   avatar: "/placeholder.svg?height=40&width=40",
                   date: "June 2, 2023",
                   content:
-                    "I've been practicing bonsai for a few years now, and I can attest to how rewarding it is. One tip I'd add is to join a local bonsai club if possible. It's a great way to learn from experienced practitioners and get hands-on guidance.",
+                    "I&apos;ve been practicing bonsai for a few years now, and I can attest to how rewarding it is. One tip I&apos;d add is to join a local bonsai club if possible. It&apos;s a great way to learn from experienced practitioners and get hands-on guidance.",
                 },
               ].map((comment, index) => (
                 <div key={index} className="bg-white rounded-lg shadow p-4">
