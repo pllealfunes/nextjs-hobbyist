@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Feather } from "lucide-react";
+import { PenLine } from "lucide-react";
 import { ThemeToggle } from "../theme-toggle";
 
 export default function Nav() {
@@ -18,7 +18,7 @@ export default function Nav() {
               aria-label="Go to homepage"
             >
               <span className="sr-only">Hobbyist</span>
-              <Feather className="w-7 h-7" />
+              <PenLine className="w-7 h-7" />
             </Link>
             <Link
               href="/"

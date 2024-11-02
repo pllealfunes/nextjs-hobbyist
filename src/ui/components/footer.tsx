@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Feather } from "lucide-react";
+import { PencilLine } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -13,7 +13,7 @@ export default function Footer() {
               aria-label="Go to homepage"
             >
               <span className="sr-only">Hobbyist</span>
-              <Feather className="light:text-gray-900" />
+              <PencilLine className="light:text-gray-900" />
               <span className="ml-2 text-xl font-bold text-rose-300">
                 Hobbyist
               </span>

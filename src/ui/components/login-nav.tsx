@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/ui/components/button";
-import { Feather, Bell, Plus, ChevronDown } from "lucide-react";
+import { PenLine, Bell, Plus, ChevronDown, PencilLine } from "lucide-react";
 
 import {
   DropdownMenu,
@@ -27,7 +27,7 @@ export default function LoginNav() {
               className="-m-1.5 p-1.5 flex justify-center items-center"
               aria-label="Go to homepage"
             >
-              <Feather className="w-7 h-7 light:text-gray-900" />
+              <PencilLine className="w-7 h-7 light:text-gray-900" />
             </Link>
           </div>
           <div className="hidden sm:ml-6 md:block">
@@ -102,7 +102,7 @@ export default function LoginNav() {
             </Button>
           </Link>
 
-          <Button className="hidden md:block relative rounded-full light:bg-gray-800 p-1 light:text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+          <Button className="hidden md:block relative rounded-full bg-gray-800 p-1 text-zinc-50 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
             <span className="sr-only">View notifications</span>
             <Bell />
           </Button>
