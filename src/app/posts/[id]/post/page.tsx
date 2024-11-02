@@ -69,7 +69,7 @@ export default function BlogPost() {
                 </Badge>
               </div>
               <h1 className="text-3xl font-bold mb-4">
-                The Art of Bonsai: A Beginner's Guide
+                The Art of Bonsai: A Beginner&apos;s Guide
               </h1>
               <div className="prose max-w-none">
                 <h2>Introduction to Bonsai</h2>
