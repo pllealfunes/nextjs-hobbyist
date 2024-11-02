@@ -38,9 +38,9 @@ Activity Page
 
 Single Post Page
 
-- [ ] create route
-- [ ] create ui with dumby data
-- [ ] create comment section ui
+- [x] create route
+- [x] create ui with dumby data
+- [x] create comment section ui
 
 Settings Page
 
