@@ -33,7 +33,7 @@ export default function Nav() {
         {/* Navigation links */}
         <div className="flex gap-x-4 sm:gap-x-6 items-center">
           <Link
-            href="#"
+            href="/explore"
             className="font-semibold leading-6 light:text-gray-900"
             aria-label="Explore content"
           >

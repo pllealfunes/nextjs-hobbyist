@@ -124,9 +124,15 @@ export default function LoginNav() {
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                   <DropdownMenuItem>
-                    <Link href="/profiles">Profile</Link>
+                    <Link href="/profiles" aria-label="Go to profiles page">
+                      Profile
+                    </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>Settings</DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link href="/usersettings" aria-label="Go to settings page">
+                      Settings
+                    </Link>
+                  </DropdownMenuItem>
                   <DropdownMenuItem>Log out</DropdownMenuItem>
                 </DropdownMenuGroup>
               </DropdownMenuContent>
@@ -217,7 +223,11 @@ export default function LoginNav() {
                       Profile
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>Settings</DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link href="/usersettings" aria-label="Go to settings page">
+                      Settings
+                    </Link>
+                  </DropdownMenuItem>
                   <DropdownMenuItem>Logout</DropdownMenuItem>
                 </DropdownMenuGroup>
               </DropdownMenuContent>
