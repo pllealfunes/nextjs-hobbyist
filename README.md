@@ -44,8 +44,8 @@ Single Post Page
 
 Settings Page
 
-- [ ] create route
-- [ ] add shadcn ui component
+- [x] create route
+- [x] add shadcn ui component
 
 Leftovers
 
