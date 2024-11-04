@@ -32,9 +32,9 @@ Update Dashboard Page
 
 Activity Page
 
-- [ ] create route
-- [ ] create one view for user Likes along with dumby data
-- [ ] create second view for user comments with dummy data -> table?
+- [x] create route
+- [x] create one view for user Likes along with dumby data
+- [x] create second view for user comments with dummy data -> table?
 
 Single Post Page
 
@@ -49,8 +49,8 @@ Settings Page
 
 Leftovers
 
-- [ ] make sure nav tracks which page the user is on
-- [x] fix layout of calendar and chart in pblished and drafts pages
+- [x] make sure nav tracks which page the user is on
+- [ ] fix layout of calendar and chart in pblished and drafts pages
 - [ ] fix how chart looks on md screens in dashboard
 
 ## Getting Started
@@ -76,3 +76,4 @@ bun dev
 - Lucide React
 - ChatGPT
 - React Big Calendar Crash Course in 30 minutes [Usman Abdur Rehman](https://www.youtube.com/watch?v=ZFhDJAOd9Tg)
+- V0

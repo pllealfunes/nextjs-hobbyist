@@ -61,7 +61,7 @@ const fetchActivities = async (
         date: new Date(Date.now() - Math.random() * 10000000000).toISOString(),
         avatar: "/placeholder.svg?height=40&width=40",
         comment:
-          "These advanced techniques are game-changing! I've been struggling with my cascade bonsai, but your tips on wire training have really helped. Thank you!",
+          "These advanced techniques are game-changing! Ive been struggling with my cascade bonsai, but your tips on wire training have really helped. Thank you!",
       },
       // Additional comment objects can go here
     ];
@@ -135,7 +135,9 @@ export default function Activity() {
               <Card>
                 <CardHeader>
                   <CardTitle>Your Likes</CardTitle>
-                  <CardDescription>Posts you've liked recently</CardDescription>
+                  <CardDescription>
+                    Posts you&apos;ve liked recently
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-4">
@@ -179,7 +181,9 @@ export default function Activity() {
               <Card>
                 <CardHeader>
                   <CardTitle>Your Comments</CardTitle>
-                  <CardDescription>Recent comments you've made</CardDescription>
+                  <CardDescription>
+                    Recent comments you&apos;ve made
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-4">

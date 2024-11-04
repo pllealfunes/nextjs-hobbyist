@@ -50,7 +50,7 @@ async function getData(): Promise<Post[]> {
   ];
 }
 
-export default async function Published() {
+export default async function Drafts() {
   const data = await getData();
 
   return (

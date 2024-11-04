@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Button } from "@/ui/components/button";
 import { Bell, Plus, ChevronDown, PencilLine } from "lucide-react";
 
@@ -16,7 +17,11 @@ import {
 } from "@/ui/components/dropdown-menu";
 import { ThemeToggle } from "@/ui/theme-toggle";
 
+import clsx from "clsx";
+
 export default function LoginNav() {
+  const pathname = usePathname();
+
   return (
     <header className="bg-rose-400 dark:bg-transparent dark:border-b dark:border-gray-600 shadow-md rounded-b-lg">
       <nav className="flex items-center justify-between p-4 sm:p-6 lg:px-8 relative">
@@ -35,21 +40,42 @@ export default function LoginNav() {
               <Link
                 href="/dashboard"
                 aria-label="Go to dashboard page"
-                className="text-zinc-50 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
+                className={clsx(
+                  "text-zinc-50 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium",
+                  {
+                    "bg-gray-700": pathname === "/dashboard",
+                  }
+                )}
               >
                 Dashboard
               </Link>
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild className="cursor-pointer">
-                  <div className="flex justify-center items-center text-zinc-50  hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">
+                  <div
+                    className={clsx(
+                      "flex justify-center items-center text-zinc-50 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium",
+                      {
+                        "bg-gray-700": pathname.startsWith("/posts"),
+                      }
+                    )}
+                  >
                     Posts <ChevronDown className="mt-1 w-4 h-4" />
                   </div>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="ml-12">
                   <DropdownMenuGroup>
                     <DropdownMenuItem>
-                      <Link href="/posts/drafts" aria-label="Go to drafts page">
+                      <Link
+                        href="/posts/drafts"
+                        aria-label="Go to drafts page"
+                        className={clsx(
+                          "flex justify-center items-center text-zinc-50 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium",
+                          {
+                            "bg-gray-700": pathname === "/posts/drafts",
+                          }
+                        )}
+                      >
                         Drafts
                       </Link>
                     </DropdownMenuItem>
@@ -57,6 +83,12 @@ export default function LoginNav() {
                       <Link
                         href="/posts/published"
                         aria-label="Go to published page"
+                        className={clsx(
+                          "flex justify-center items-center text-zinc-50 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium",
+                          {
+                            "bg-gray-700": pathname === "/posts/published",
+                          }
+                        )}
                       >
                         Published
                       </Link>
@@ -68,7 +100,12 @@ export default function LoginNav() {
               <Link
                 href="/activity"
                 aria-label="Go to activity page"
-                className="text-zinc-50 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
+                className={clsx(
+                  "text-zinc-50 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium",
+                  {
+                    "bg-gray-700": pathname === "/activity",
+                  }
+                )}
               >
                 Activity
               </Link>
@@ -76,7 +113,12 @@ export default function LoginNav() {
               <Link
                 href="/feed"
                 aria-label="Go to feed page"
-                className="text-zinc-50 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
+                className={clsx(
+                  "text-zinc-50 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium",
+                  {
+                    "bg-gray-700": pathname === "/feed",
+                  }
+                )}
               >
                 Feed
               </Link>
@@ -84,7 +126,12 @@ export default function LoginNav() {
               <Link
                 href="/explore"
                 aria-label="Go to explore page"
-                className="text-zinc-50 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
+                className={clsx(
+                  "text-zinc-50 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium",
+                  {
+                    "bg-gray-700": pathname === "/explore",
+                  }
+                )}
               >
                 Explore
               </Link>
