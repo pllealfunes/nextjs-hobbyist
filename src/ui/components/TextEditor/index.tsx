@@ -32,7 +32,7 @@ export default function TextEditor({ content, onChange }: TextEditorProps) {
     content: content, // Set initial content
     editorProps: {
       attributes: {
-        class: "min-h-[400px] border rounded-md bg-slate-50 py-4 px-4 text-lg",
+        class: "min-h-[400px] border rounded-md py-4 px-4 text-lg",
       },
     },
     onUpdate: ({ editor }) => {
@@ -89,7 +89,7 @@ export default function TextEditor({ content, onChange }: TextEditorProps) {
               r="5"
               cx="10"
               cy="10"
-              fill="transparent"
+              fill="green"
               stroke="currentColor"
               strokeWidth="10"
               strokeDasharray={`calc(${percentage} * 31.4 / 100) 31.4`}

@@ -4,6 +4,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/ui/components/button";
+import { Input } from "@/ui/components/input";
 import {
   Form,
   FormControl,
@@ -63,13 +64,7 @@ export default function CreatePost() {
               <FormItem>
                 <FormLabel className="text-lg">Edit Title</FormLabel>
                 <FormControl>
-                  <input
-                    type="text"
-                    value={field.value}
-                    onChange={field.onChange}
-                    placeholder="Edit the title"
-                    className="mb-2 w-full border rounded-md p-2 text-lg"
-                  />
+                  <Input {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
