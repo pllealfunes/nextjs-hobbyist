@@ -38,6 +38,7 @@ export default function TextEditor({ content, onChange }: TextEditorProps) {
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
     },
+    immediatelyRender: false,
   });
 
   // Only update the content if the prop changes from outside (e.g., loading content)

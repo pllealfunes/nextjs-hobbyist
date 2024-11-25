@@ -24,7 +24,7 @@ const nextConfig = {
       },
     ],
   },
-  experimental: { serverComponentsExternalPackages: ["yjs"] },
+  serverExternalPackages: ["yjs"],
 };
 
 export default nextConfig;

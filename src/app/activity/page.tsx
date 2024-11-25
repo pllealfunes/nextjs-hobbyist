@@ -55,7 +55,7 @@ const fetchActivities = async (
   } else {
     return [
       {
-        id: startIndex + 1,
+        id: startIndex + 3,
         postTitle: `The Art of Bonsai: Advanced Techniques (Page ${page})`,
         author: "Jane Doe",
         date: new Date(Date.now() - Math.random() * 10000000000).toISOString(),
