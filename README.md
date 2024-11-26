@@ -52,6 +52,8 @@ Leftovers
 - [x] make sure nav tracks which page the user is on
 - [ ] fix layout of calendar and chart in pblished and drafts pages
 - [ ] fix how chart looks on md screens in dashboard
+- [x] Update to Nextjs 15 and React 19
+- [ ] work on dependency issues with upgrade
 
 ## Getting Started
 
