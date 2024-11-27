@@ -24,28 +24,32 @@ https://nextjs-hobbyist.vercel.app/
 
 ## Project Tasks:
 
-Update Dashboard Page
+CRUD Posts
 
-- [x] change dashboard folder to feed, and create new dashboard page
-- [x] add dashboard component from shadcn ui
-- [x] update routes
+- [ ] create database schemas (Posts, Comments, Users, Categories)
 
-Activity Page
+- [ ] create new post
+- [ ] create new post with photo
+- [ ] create new post with video
+- [ ] create new post with/out photo
+- [ ] create new post with/out video
+- [ ] view new post on profile
+- [ ] check new post format
+- [ ] check post under category
 
-- [x] create route
-- [x] create one view for user Likes along with dumby data
-- [x] create second view for user comments with dummy data -> table?
+- [ ] update database schemas
+- [ ] update post
+- [ ] update post with photo
+- [ ] update post with video
+- [ ] update post with/out photo
+- [ ] update post with/out video
+- [ ] view updated post on profile
+- [ ] check updated post format
+- [ ] check post under category
 
-Single Post Page
-
-- [x] create route
-- [x] create ui with dumby data
-- [x] create comment section ui
-
-Settings Page
-
-- [x] create route
-- [x] add shadcn ui component
+- [ ] check database
+- [ ] check profile
+- [ ] check category
 
 Leftovers
 
@@ -53,7 +57,7 @@ Leftovers
 - [ ] fix layout of calendar and chart in pblished and drafts pages
 - [ ] fix how chart looks on md screens in dashboard
 - [x] Update to Nextjs 15 and React 19
-- [ ] work on dependency issues with upgrade
+- [x] work on dependency issues with upgrade
 
 ## Getting Started
 
