@@ -26,7 +26,7 @@ https://nextjs-hobbyist.vercel.app/
 
 CRUD Posts
 
-- [ ] create database schemas (Posts, Comments, Users, Categories)
+- [x] create database models (Posts, Comments, Users, Categories, Likes, Messages)
 
 - [ ] create new post
 - [ ] create new post with photo
