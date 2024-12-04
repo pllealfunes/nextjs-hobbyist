@@ -3,6 +3,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+
+import { createClient } from "@/utils/supabase/server";
 
 import { Button } from "@/ui/components/button";
 import {
@@ -17,29 +21,33 @@ import {
 import { Input } from "@/ui/components/input";
 
 const formSchema = z.object({
-  username: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
+  email: z.string().min(2, {
+    message: "Enter a valid email.",
   }),
   password: z.coerce.string().min(5, {
     message: "Password must be at least 5 characters.",
   }),
 });
 
-export default function ProfileForm() {
-  // 1. Define your form.
+export default function LoginForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: "",
+      email: "",
       password: "",
     },
   });
 
-  // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    const supabase = await createClient();
+    const { error } = await supabase.auth.signInWithPassword(values);
+
+    if (error) {
+      redirect("/error");
+    }
+
+    revalidatePath("/", "layout");
+    redirect("/");
   }
 
   return (
@@ -47,14 +55,14 @@ export default function ProfileForm() {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
-          name="username"
+          name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Username</FormLabel>
+              <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="BobsBurgers" {...field} />
+                <Input placeholder="bobsburgers@exampl.com" {...field} />
               </FormControl>
-              <FormDescription>Enter your username.</FormDescription>
+              <FormDescription>Enter your email.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
