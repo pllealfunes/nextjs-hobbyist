@@ -1,5 +1,3 @@
-"use client";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -21,10 +19,10 @@ import {
 import { Input } from "@/ui/components/input";
 
 const formSchema = z.object({
-  email: z.string().min(2, {
+  email: z.string().email({
     message: "Enter a valid email.",
   }),
-  password: z.coerce.string().min(5, {
+  password: z.string().min(5, {
     message: "Password must be at least 5 characters.",
   }),
 });
@@ -43,7 +41,7 @@ export default function LoginForm() {
     const { error } = await supabase.auth.signInWithPassword(values);
 
     if (error) {
-      redirect("/error");
+      console.log(error);
     }
 
     revalidatePath("/", "layout");
