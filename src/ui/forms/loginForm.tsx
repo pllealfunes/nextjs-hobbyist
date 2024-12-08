@@ -1,10 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
-
-import { createClient } from "@/utils/supabase/server";
 
 import { Button } from "@/ui/components/button";
 import {
@@ -17,6 +13,8 @@ import {
   FormMessage,
 } from "@/ui/components/form";
 import { Input } from "@/ui/components/input";
+
+import { login } from "@/app/login/actions";
 
 const formSchema = z.object({
   email: z.string().email({
@@ -37,15 +35,10 @@ export default function LoginForm() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const supabase = await createClient();
-    const { error } = await supabase.auth.signInWithPassword(values);
-
-    if (error) {
-      console.log(error);
-    }
-
-    revalidatePath("/", "layout");
-    redirect("/");
+    const formData = new FormData();
+    formData.append("email", values.email);
+    formData.append("password", values.password);
+    await login(formData);
   }
 
   return (
