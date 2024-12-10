@@ -5,6 +5,10 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Input } from "@/ui/components/input";
 import { Textarea } from "@/ui/components/textarea";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+
+import { createClient } from "@/utils/supabase/server";
 
 import { Button } from "@/ui/components/button";
 import {
@@ -54,10 +58,19 @@ export default function ProfileForm() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    const supabase = await createClient();
+    const { data, error } = await supabase.auth.signInWithPassword(values);
+    console.log({ data, error });
+
+    if (error) {
+      console.log(error.message); // Only pass a string
+    } else if (data?.session) {
+      console.log("Session data:", data.session); // Ensure session is serializable
+    }
+
+    revalidatePath("/", "layout");
+    redirect("/dashboard");
   }
   return (
     <Form {...form}>

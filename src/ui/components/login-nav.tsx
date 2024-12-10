@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/ui/components/button";
 import { Bell, Plus, ChevronDown, PencilLine } from "lucide-react";
+import { handleLogout } from "@/utils/logout";
 
 import {
   DropdownMenu,
@@ -180,7 +181,9 @@ export default function LoginNav() {
                       Settings
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>Log out</DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleLogout}>
+                    Log out
+                  </DropdownMenuItem>
                 </DropdownMenuGroup>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -275,7 +278,9 @@ export default function LoginNav() {
                       Settings
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>Logout</DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleLogout}>
+                    Logout
+                  </DropdownMenuItem>
                 </DropdownMenuGroup>
               </DropdownMenuContent>
             </DropdownMenu>
