@@ -8,8 +8,6 @@ import { Textarea } from "@/ui/components/textarea";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { createClient } from "@/utils/supabase/server";
-
 import { Button } from "@/ui/components/button";
 import {
   Form,
@@ -59,18 +57,7 @@ export default function ProfileForm() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const supabase = await createClient();
-    const { data, error } = await supabase.auth.signInWithPassword(values);
-    console.log({ data, error });
-
-    if (error) {
-      console.log(error.message); // Only pass a string
-    } else if (data?.session) {
-      console.log("Session data:", data.session); // Ensure session is serializable
-    }
-
-    revalidatePath("/", "layout");
-    redirect("/dashboard");
+    console.log(values);
   }
   return (
     <Form {...form}>
