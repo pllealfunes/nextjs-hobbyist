@@ -28,11 +28,11 @@ CRUD Posts
 
 - [x] create database models (Posts, Comments, Users, Categories, Likes, Messages)
 
-- [ ] add supabase login
+- [ ] add next auth.js login
 - [ ] protected routes
-- [ ] add supabase signup
+- [ ] add next auth.js signup
 - [ ] logout
-- [ ] fix model: required info to create profile
+- [ ] fix model: required info to create profile?
 
 - [ ] create new post
 - [ ] create new post with photo

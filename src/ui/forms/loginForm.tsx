@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
+import { LoginSchema } from "@/app/schemas";
 import { Button } from "@/ui/components/button";
 import {
   Form,
@@ -14,31 +14,31 @@ import {
 } from "@/ui/components/form";
 import { Input } from "@/ui/components/input";
 
-import { login } from "@/app/login/actions";
-
-const formSchema = z.object({
-  email: z.string().email({
-    message: "Enter a valid email.",
-  }),
-  password: z.string().min(5, {
-    message: "Password must be at least 5 characters.",
-  }),
-});
+import { signIn } from "next-auth/react";
 
 export default function LoginForm() {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof LoginSchema>>({
+    resolver: zodResolver(LoginSchema),
     defaultValues: {
       email: "",
       password: "",
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    const formData = new FormData();
-    formData.append("email", values.email);
-    formData.append("password", values.password);
-    await login(formData);
+  async function onSubmit(values: z.infer<typeof LoginSchema>) {
+    const result = signIn("credentials", {
+      //redirect: false,
+      email: values.email,
+      password: values.password,
+    });
+    console.log(result);
+    if (result && "error" in result && result.error) {
+      // Handle error, e.g., show a toast or error message
+      console.error(result.error);
+    } else {
+      // Handle successful login
+      console.log("Successfully logged in!");
+    }
   }
 
   return (

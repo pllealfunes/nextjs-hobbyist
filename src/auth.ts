@@ -1,11 +1,17 @@
 import NextAuth, { type DefaultSession } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 // Your own logic for dealing with plaintext password strings; be careful!
-import { saltAndHashPassword } from "@/utils/password";
-import { getUserFromDb } from "@/utils/db";
-import { login } from "./app/login/actions";
+import { User, PrismaClient } from "@prisma/client";
+import bcrypt from "bcryptjs";
+import prisma from "./lib/prisma";
+import { LoginSchema } from "@/app/schemas";
+import { PrismaAdapter } from "@auth/prisma-adapter";
 
 declare module "next-auth" {
+  interface Credentials {
+    email: string;
+    password: string;
+  }
   /**
    * Returned by `auth`, `useSession`, `getSession` and received as a prop on the `SessionProvider` React Context
    */
@@ -24,33 +30,56 @@ declare module "next-auth" {
 }
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  adapter: PrismaAdapter(prisma),
   providers: [
     Credentials({
       // You can specify which fields should be submitted, by adding keys to the `credentials` object.
       // e.g. domain, username, password, 2FA token, etc.
       credentials: {
-        email: {},
-        password: {},
+        email: { label: "Email", type: "text" },
+        password: { label: "Password", type: "password" },
       },
       authorize: async (credentials) => {
-        let user = null;
-
-        const { email, password } = await login.parseAsync(credentials);
-
-        // logic to salt and hash password
-        const pwHash = saltAndHashPassword(credentials.password);
-
-        // logic to verify if the user exists
-        user = await getUserFromDb(credentials.email, pwHash);
-
-        if (!user) {
-          // No user found, so this is their first attempt to login
-          // Optionally, this is also the place you could do a user registration
-          throw new Error("Invalid credentials.");
+        if (!credentials || !credentials.email || !credentials.password) {
+          console.log("Invalid credentials");
+          return null;
         }
 
-        // return user object with their profile data
-        return user;
+        const validatedFields = LoginSchema.safeParse(credentials);
+
+        if (!validatedFields.success) {
+          console.log("Validation failed");
+          return null;
+        }
+
+        const { email, password } = validatedFields.data;
+
+        // ERROR LOOKING FOR USER -> PRISMA FAILED CONNECTTION?
+        const user = await prisma.user.findUnique({
+          where: { email: email },
+        });
+
+        if (!user) {
+          console.log("User not found");
+          return null;
+        }
+
+        // ERROR AROUND HERE
+        const isValidPassword = user.password
+          ? await bcrypt.compare(password, user.password)
+          : false;
+
+        if (!isValidPassword) {
+          console.log("Invalid password");
+          return null;
+        }
+
+        // Return user object without sensitive data
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+        } as User;
       },
     }),
   ],
