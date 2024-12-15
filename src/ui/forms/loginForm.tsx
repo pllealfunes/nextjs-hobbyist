@@ -27,11 +27,9 @@ export default function LoginForm() {
 
   async function onSubmit(values: z.infer<typeof LoginSchema>) {
     const result = signIn("credentials", {
-      //redirect: false,
       email: values.email,
       password: values.password,
     });
-    console.log(result);
     if (result && "error" in result && result.error) {
       // Handle error, e.g., show a toast or error message
       console.error(result.error);

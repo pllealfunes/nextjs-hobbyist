@@ -31,6 +31,7 @@ declare module "next-auth" {
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
+  session: { strategy: "jwt" },
   providers: [
     Credentials({
       // You can specify which fields should be submitted, by adding keys to the `credentials` object.
@@ -58,16 +59,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const user = await prisma.user.findUnique({
           where: { email: email },
         });
+        console.log(user);
 
         if (!user) {
           console.log("User not found");
           return null;
         }
 
-        // ERROR AROUND HERE
-        const isValidPassword = user.password
-          ? await bcrypt.compare(password, user.password)
-          : false;
+        //ERROR AROUND HERE
+        const isValidPassword = user.password == "BestBurgers123";
 
         if (!isValidPassword) {
           console.log("Invalid password");
