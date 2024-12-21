@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { LoginSchema } from "@/app/schemas";
 import { Button } from "@/ui/components/button";
+import { LoginAction } from "@/app/login/actions";
 import {
   Form,
   FormControl,
@@ -14,8 +15,6 @@ import {
 } from "@/ui/components/form";
 import { Input } from "@/ui/components/input";
 
-import { signIn } from "next-auth/react";
-
 export default function LoginForm() {
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
@@ -26,17 +25,10 @@ export default function LoginForm() {
   });
 
   async function onSubmit(values: z.infer<typeof LoginSchema>) {
-    const result = signIn("credentials", {
-      email: values.email,
-      password: values.password,
-    });
-    if (result && "error" in result && result.error) {
-      // Handle error, e.g., show a toast or error message
-      console.error(result.error);
-    } else {
-      // Handle successful login
-      console.log("Successfully logged in!");
-    }
+    const formData = new FormData();
+    formData.append("email", values.email);
+    formData.append("password", values.password);
+    await LoginAction(formData);
   }
 
   return (

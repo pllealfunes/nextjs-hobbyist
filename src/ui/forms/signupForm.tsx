@@ -1,10 +1,14 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/ui/components/input";
 import { Textarea } from "@/ui/components/textarea";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { createClient } from "@/utils/supabase/server";
+import { SignUpSchema } from "@/app/schemas";
 import { Button } from "@/ui/components/button";
 import {
   Form,
@@ -15,34 +19,11 @@ import {
   FormLabel,
   FormMessage,
 } from "@/ui/components/form";
+import { SignupAction } from "@/app/signup/actions";
 
-const formSchema = z.object({
-  name: z
-    .string()
-    .min(5, { message: "Name must be at least 5 characters." })
-    .max(15),
-  username: z
-    .string()
-    .min(5, { message: "Username must be at least 2 characters." })
-    .max(15),
-  email: z
-    .string()
-    .email()
-    .min(5, { message: "Email must be at least 5 characters." }),
-  password: z
-    .string()
-    .min(5, { message: "Please choose a strong password." })
-    .max(15),
-  passConfirmation: z
-    .string()
-    .min(5, { message: "Please confirm the password by typing it again." })
-    .max(15),
-  description: z.string().optional(),
-});
-
-export default function ProfileForm() {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+export default function SignupForm() {
+  const form = useForm<z.infer<typeof SignUpSchema>>({
+    resolver: zodResolver(SignUpSchema),
     defaultValues: {
       username: "",
       name: "",
@@ -53,8 +34,14 @@ export default function ProfileForm() {
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof SignUpSchema>) {
+    const formData = new FormData();
+    formData.append("name", values.password);
+    formData.append("username", values.password);
+    formData.append("email", values.email);
+    formData.append("password", values.password);
+    formData.append("bio", values.password);
+    await SignupAction(formData);
   }
   return (
     <Form {...form}>

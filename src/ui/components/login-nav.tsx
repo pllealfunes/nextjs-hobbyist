@@ -2,11 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, redirect } from "next/navigation";
 import { Button } from "@/ui/components/button";
 import { Bell, Plus, ChevronDown, PencilLine } from "lucide-react";
 import { handleLogout } from "@/utils/logout";
-
 import {
   DropdownMenu,
   DropdownMenuContent,
