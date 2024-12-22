@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/ui/components/button";
 import { Bell, Plus, ChevronDown, PencilLine } from "lucide-react";
-import { signOut } from "@/app/auth/signout/route";
+import { signOut } from "@/app/auth/signout/signout";
 import {
   DropdownMenu,
   DropdownMenuContent,
