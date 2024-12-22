@@ -1,15 +1,12 @@
 "use client";
-
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/ui/components/input";
 import { Textarea } from "@/ui/components/textarea";
-import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
-import { createClient } from "@/utils/supabase/server";
 import { SignUpSchema } from "@/app/schemas";
 import { Button } from "@/ui/components/button";
+import { useRouter } from "next/navigation";
 import {
   Form,
   FormControl,
@@ -20,6 +17,8 @@ import {
   FormMessage,
 } from "@/ui/components/form";
 import { SignupAction } from "@/app/signup/actions";
+
+const router = useRouter();
 
 export default function SignupForm() {
   const form = useForm<z.infer<typeof SignUpSchema>>({
@@ -35,13 +34,18 @@ export default function SignupForm() {
   });
 
   async function onSubmit(values: z.infer<typeof SignUpSchema>) {
-    const formData = new FormData();
-    formData.append("name", values.password);
-    formData.append("username", values.password);
-    formData.append("email", values.email);
-    formData.append("password", values.password);
-    formData.append("bio", values.password);
-    await SignupAction(formData);
+    try {
+      const formData = new FormData();
+      formData.append("name", values.password);
+      formData.append("username", values.password);
+      formData.append("email", values.email);
+      formData.append("password", values.password);
+      formData.append("bio", values.password);
+      await SignupAction(formData);
+      router.push("/dashboard");
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
   }
   return (
     <Form {...form}>

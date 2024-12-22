@@ -2,10 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, redirect } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { Button } from "@/ui/components/button";
 import { Bell, Plus, ChevronDown, PencilLine } from "lucide-react";
-import { handleLogout } from "@/utils/logout";
+import { signOut } from "@/app/auth/signout/route";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,6 +21,14 @@ import clsx from "clsx";
 
 export default function LoginNav() {
   const pathname = usePathname();
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
+  };
 
   return (
     <header className="bg-rose-400 dark:bg-transparent dark:border-b dark:border-gray-600 shadow-md rounded-b-lg">

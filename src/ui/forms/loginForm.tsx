@@ -1,3 +1,4 @@
+"use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -25,10 +26,14 @@ export default function LoginForm() {
   });
 
   async function onSubmit(values: z.infer<typeof LoginSchema>) {
-    const formData = new FormData();
-    formData.append("email", values.email);
-    formData.append("password", values.password);
-    await LoginAction(formData);
+    try {
+      const formData = new FormData();
+      formData.append("email", values.email);
+      formData.append("password", values.password);
+      await LoginAction(formData);
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
   }
 
   return (
