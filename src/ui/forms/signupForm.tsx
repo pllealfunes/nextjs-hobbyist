@@ -6,7 +6,6 @@ import { Input } from "@/ui/components/input";
 import { Textarea } from "@/ui/components/textarea";
 import { SignUpSchema } from "@/app/schemas";
 import { Button } from "@/ui/components/button";
-import { useRouter } from "next/navigation";
 import {
   Form,
   FormControl,
@@ -17,8 +16,6 @@ import {
   FormMessage,
 } from "@/ui/components/form";
 import { SignupAction } from "@/app/signup/actions";
-
-const router = useRouter();
 
 export default function SignupForm() {
   const form = useForm<z.infer<typeof SignUpSchema>>({
@@ -42,7 +39,6 @@ export default function SignupForm() {
       formData.append("password", values.password);
       formData.append("bio", values.password);
       await SignupAction(formData);
-      router.push("/dashboard");
     } catch (error) {
       console.error("Error logging out:", error);
     }
