@@ -29,5 +29,4 @@ export const SignUpSchema = z.object({
     .string()
     .min(5, { message: "Please confirm the password by typing it again." })
     .max(15),
-  description: z.string().optional(),
 });

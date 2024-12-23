@@ -3,7 +3,6 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/ui/components/input";
-import { Textarea } from "@/ui/components/textarea";
 import { SignUpSchema } from "@/app/schemas";
 import { Button } from "@/ui/components/button";
 import {
@@ -21,23 +20,21 @@ export default function SignupForm() {
   const form = useForm<z.infer<typeof SignUpSchema>>({
     resolver: zodResolver(SignUpSchema),
     defaultValues: {
-      username: "",
       name: "",
+      username: "",
       email: "",
       password: "",
       passConfirmation: "",
-      description: "",
     },
   });
 
   async function onSubmit(values: z.infer<typeof SignUpSchema>) {
     try {
       const formData = new FormData();
-      formData.append("name", values.password);
-      formData.append("username", values.password);
+      formData.append("name", values.name);
+      formData.append("username", values.username);
       formData.append("email", values.email);
       formData.append("password", values.password);
-      formData.append("bio", values.password);
       await SignupAction(formData);
     } catch (error) {
       console.error("Error logging out:", error);
@@ -116,24 +113,6 @@ export default function SignupForm() {
                 <Input placeholder="BestBurgers1" {...field} />
               </FormControl>
               <FormDescription>Enter your password again.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem className="flex flex-col justify-center">
-              <FormLabel>Bio</FormLabel>
-              <FormControl>
-                <Textarea
-                  {...field}
-                  placeholder="Crochet Enthusiast. Looking to Share and Learn from Others."
-                />
-              </FormControl>
-              <FormDescription>Describe yourself</FormDescription>
               <FormMessage />
             </FormItem>
           )}
