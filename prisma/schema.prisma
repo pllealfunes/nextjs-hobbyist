@@ -10,14 +10,47 @@ datasource db {
   directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connectionurl
 }
 
+model User {
+  id               String @id @default(uuid()) @db.Uuid
+  name             String?
+  username         String?   @unique
+  email            String?   @unique
+  password         String?
+  role             Role      @default(USER)
+  createdAt        DateTime  @default(now()) @map(name: "created_at")
+  updatedAt        DateTime  @updatedAt @map(name: "updated_at")
+  private          Boolean @default(false)
+  posts            Post[]
+  comments         Comment[]
+  likes            Like[]
+  profile          Profile?  @relation("UserProfile")
+  sentMessages     Message[] @relation("sentMessages")
+  receivedMessages Message[] @relation("receivedMessages")
+  threads          Thread[]  @relation("threadUsers") // Threads the user is participating in
+  createdThreads   Thread[]  @relation("createdThreads") // Threads the user has created
+}
+
+model Profile {
+  id        Int      @id @default(autoincrement())
+  bio       String?
+  photo     String?
+  links     Json?
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @updatedAt @map(name: "updated_at")
+  user      User     @relation(fields: [userId], references: [id], name: "UserProfile")
+  userId    String   @unique @db.Uuid // Ensure type matches `User.id`
+}
+
 model Post {
-  id        String     @id @default(uuid())
+  id        String     @id @default(uuid()) @db.Uuid // Ensure UUID type
   title     String
   content   String?
-  category  Category[]
+  category  Category @relation(fields: [categoryId], references: [id])
+  categoryId Int     // Foreign key to Category
   published Boolean    @default(false)
+  private   Boolean @default(false)
   author    User?      @relation(fields: [authorId], references: [id])
-  authorId  String?
+  authorId  String?    @db.Uuid
   createdAt DateTime   @default(now()) @map(name: "created_at")
   updatedAt DateTime   @updatedAt @map(name: "updated_at")
   comments  Comment[]
@@ -31,81 +64,50 @@ model Category {
 }
 
 model Comment {
-  id        String   @id @default(uuid())
+  id        String   @id @default(uuid()) @db.Uuid
   content   String?
   createdAt DateTime @default(now()) @map(name: "created_at")
   updatedAt DateTime @updatedAt @map(name: "updated_at")
   post      Post?    @relation(fields: [postId], references: [id])
-  postId    String?
+  postId    String?  @db.Uuid // Ensure UUID type
   author    User     @relation(fields: [authorId], references: [id])
-  authorId  String
+  authorId  String   @db.Uuid
 }
 
 model Like {
   id        String   @id @default(uuid())
   user      User     @relation(fields: [userId], references: [id])
-  userId    String
+  userId    String   @db.Uuid
   post      Post     @relation(fields: [postId], references: [id])
-  postId    String
+  postId    String   @db.Uuid
   createdAt DateTime @default(now()) @map(name: "created_at")
-}
-
-model Profile {
-  id        Int      @id @default(autoincrement())
-  bio       String?
-  photo     String? // URL to the user's profile picture
-  links     Json? // Array of links to websites or social media
-  createdAt DateTime @default(now()) @map(name: "created_at")
-  updatedAt DateTime @updatedAt @map(name: "updated_at")
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String   @unique
-}
-
-model User {
-  id               String    @id @default(uuid())
-  name             String?
-  username         String?   @unique
-  email            String?   @unique
-  emailVerified    DateTime?
-  password         String?
-  role             Role      @default(USER)
-  createdAt        DateTime  @default(now()) @map(name: "created_at")
-  updatedAt        DateTime  @updatedAt @map(name: "updated_at")
-  posts            Post[]
-  comments         Comment[]
-  likes            Like[]
-  profile          Profile?
-  sentMessages     Message[] @relation("sentMessages")
-  receivedMessages Message[] @relation("receivedMessages")
-  threads          Thread[]  @relation("threadUsers")
-  Thread           Thread[]
 }
 
 model Message {
-  id            String    @id @default(uuid())
+  id            String    @id @default(uuid()) @db.Uuid
   sender        User      @relation("sentMessages", fields: [senderId], references: [id])
-  senderId      String
+  senderId      String    @db.Uuid
   recipient     User      @relation("receivedMessages", fields: [recipientId], references: [id])
-  recipientId   String
+  recipientId   String    @db.Uuid
   content       String
   attachmentUrl String? // Nullable, URL of the attached file
   sentAt        DateTime  @default(now())
   readAt        DateTime? // Nullable, stores when the recipient read the message
   deletedAt     DateTime? // Nullable, for soft-deletion of the message
-  Thread        Thread?   @relation(fields: [threadId], references: [id])
-  threadId      String?
+  thread        Thread?   @relation(fields: [threadId], references: [id])
+  threadId      String?   @db.Uuid // Ensure UUID type
 }
 
 model Thread {
-  id          String    @id @default(uuid())
-  users       User[]    @relation("threadUsers") // Many-to-many relation for participants
-  messages    Message[]
+  id          String    @id @default(uuid()) @db.Uuid // Ensure UUID type
+  users       User[]    @relation("threadUsers")
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  createdBy   User?     @relation(fields: [createdById], references: [id])
-  createdById String?
+  createdBy   User?     @relation("createdThreads", fields: [createdById], references: [id])
+  createdById String?   @db.Uuid
+  messages    Message[]
 }
- 
+
 enum Role {
   ADMIN
   USER

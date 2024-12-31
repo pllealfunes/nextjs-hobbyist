@@ -18,11 +18,12 @@ export async function SignupAction(formData: FormData) {
 
   const { error } = await supabase.auth.signUp(data);
 
-  if (error) {
-    console.log(error);
+  // if (error) {
+  //   console.log(error);
 
-    return redirect("/error");
-  }
+  //   return redirect("/error");
+  // }
 
-  return redirect("/dashboard");
+  // return redirect("/dashboard");
+  console.log(error);
 }
