@@ -1,13 +1,15 @@
 // schema.prisma
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]  // Enable the multiSchema preview feature
 }
 
 datasource db {
   provider  = "postgresql"
   url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
   directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connectionurl
+  schemas = ["public", "auth"] 
 }
 
 model User {
@@ -15,19 +17,21 @@ model User {
   name             String?
   username         String?   @unique
   email            String?   @unique
-  password         String?
+  emailVerified    DateTime?
   role             Role      @default(USER)
   createdAt        DateTime  @default(now()) @map(name: "created_at")
   updatedAt        DateTime  @updatedAt @map(name: "updated_at")
-  private          Boolean @default(false)
+  private          Boolean   @default(false)
   posts            Post[]
   comments         Comment[]
   likes            Like[]
   profile          Profile?  @relation("UserProfile")
   sentMessages     Message[] @relation("sentMessages")
   receivedMessages Message[] @relation("receivedMessages")
-  threads          Thread[]  @relation("threadUsers") // Threads the user is participating in
-  createdThreads   Thread[]  @relation("createdThreads") // Threads the user has created
+  threads          Thread[]  @relation("threadUsers")
+  createdThreads   Thread[]  @relation("createdThreads")
+
+  @@schema("public")  // Add schema attribute
 }
 
 model Profile {
@@ -38,29 +42,35 @@ model Profile {
   createdAt DateTime @default(now()) @map(name: "created_at")
   updatedAt DateTime @updatedAt @map(name: "updated_at")
   user      User     @relation(fields: [userId], references: [id], name: "UserProfile")
-  userId    String   @unique @db.Uuid // Ensure type matches `User.id`
+  userId    String   @unique @db.Uuid
+
+  @@schema("public")  // Add schema attribute
 }
 
 model Post {
-  id        String     @id @default(uuid()) @db.Uuid // Ensure UUID type
+  id        String     @id @default(uuid()) @db.Uuid
   title     String
   content   String?
   category  Category @relation(fields: [categoryId], references: [id])
-  categoryId Int     // Foreign key to Category
+  categoryId Int
   published Boolean    @default(false)
-  private   Boolean @default(false)
+  private   Boolean    @default(false)
   author    User?      @relation(fields: [authorId], references: [id])
   authorId  String?    @db.Uuid
   createdAt DateTime   @default(now()) @map(name: "created_at")
   updatedAt DateTime   @updatedAt @map(name: "updated_at")
   comments  Comment[]
   likes     Like[]
+
+  @@schema("public")  // Add schema attribute
 }
 
 model Category {
   id    Int    @id @default(autoincrement())
   name  String @unique
   posts Post[]
+
+  @@schema("public")  // Add schema attribute
 }
 
 model Comment {
@@ -69,9 +79,11 @@ model Comment {
   createdAt DateTime @default(now()) @map(name: "created_at")
   updatedAt DateTime @updatedAt @map(name: "updated_at")
   post      Post?    @relation(fields: [postId], references: [id])
-  postId    String?  @db.Uuid // Ensure UUID type
+  postId    String?  @db.Uuid
   author    User     @relation(fields: [authorId], references: [id])
   authorId  String   @db.Uuid
+
+  @@schema("public")  // Add schema attribute
 }
 
 model Like {
@@ -81,6 +93,8 @@ model Like {
   post      Post     @relation(fields: [postId], references: [id])
   postId    String   @db.Uuid
   createdAt DateTime @default(now()) @map(name: "created_at")
+
+  @@schema("public")  // Add schema attribute
 }
 
 model Message {
@@ -90,25 +104,31 @@ model Message {
   recipient     User      @relation("receivedMessages", fields: [recipientId], references: [id])
   recipientId   String    @db.Uuid
   content       String
-  attachmentUrl String? // Nullable, URL of the attached file
+  attachmentUrl String?
   sentAt        DateTime  @default(now())
-  readAt        DateTime? // Nullable, stores when the recipient read the message
-  deletedAt     DateTime? // Nullable, for soft-deletion of the message
+  readAt        DateTime?
+  deletedAt     DateTime?
   thread        Thread?   @relation(fields: [threadId], references: [id])
-  threadId      String?   @db.Uuid // Ensure UUID type
+  threadId      String?   @db.Uuid
+
+  @@schema("public")  // Add schema attribute
 }
 
 model Thread {
-  id          String    @id @default(uuid()) @db.Uuid // Ensure UUID type
+  id          String    @id @default(uuid()) @db.Uuid
   users       User[]    @relation("threadUsers")
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   createdBy   User?     @relation("createdThreads", fields: [createdById], references: [id])
   createdById String?   @db.Uuid
   messages    Message[]
+
+  @@schema("public")  // Add schema attribute
 }
 
 enum Role {
   ADMIN
   USER
+
+  @@schema("public")  // Add schema attribute
 }
