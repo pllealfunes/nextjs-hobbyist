@@ -2,14 +2,12 @@
 
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["multiSchema"]  // Enable the multiSchema preview feature
 }
 
 datasource db {
   provider  = "postgresql"
   url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
   directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connectionurl
-  schemas = ["public", "auth"] 
 }
 
 model User {
@@ -17,7 +15,6 @@ model User {
   name             String?
   username         String?   @unique
   email            String?   @unique
-  emailVerified    DateTime?
   role             Role      @default(USER)
   createdAt        DateTime  @default(now()) @map(name: "created_at")
   updatedAt        DateTime  @updatedAt @map(name: "updated_at")
@@ -31,7 +28,6 @@ model User {
   threads          Thread[]  @relation("threadUsers")
   createdThreads   Thread[]  @relation("createdThreads")
 
-  @@schema("public")  // Add schema attribute
 }
 
 model Profile {
@@ -44,7 +40,6 @@ model Profile {
   user      User     @relation(fields: [userId], references: [id], name: "UserProfile")
   userId    String   @unique @db.Uuid
 
-  @@schema("public")  // Add schema attribute
 }
 
 model Post {
@@ -62,7 +57,6 @@ model Post {
   comments  Comment[]
   likes     Like[]
 
-  @@schema("public")  // Add schema attribute
 }
 
 model Category {
@@ -70,7 +64,6 @@ model Category {
   name  String @unique
   posts Post[]
 
-  @@schema("public")  // Add schema attribute
 }
 
 model Comment {
@@ -83,7 +76,6 @@ model Comment {
   author    User     @relation(fields: [authorId], references: [id])
   authorId  String   @db.Uuid
 
-  @@schema("public")  // Add schema attribute
 }
 
 model Like {
@@ -94,7 +86,6 @@ model Like {
   postId    String   @db.Uuid
   createdAt DateTime @default(now()) @map(name: "created_at")
 
-  @@schema("public")  // Add schema attribute
 }
 
 model Message {
@@ -111,7 +102,6 @@ model Message {
   thread        Thread?   @relation(fields: [threadId], references: [id])
   threadId      String?   @db.Uuid
 
-  @@schema("public")  // Add schema attribute
 }
 
 model Thread {
@@ -123,12 +113,10 @@ model Thread {
   createdById String?   @db.Uuid
   messages    Message[]
 
-  @@schema("public")  // Add schema attribute
 }
 
 enum Role {
   ADMIN
   USER
 
-  @@schema("public")  // Add schema attribute
 }
