@@ -16,11 +16,12 @@ import {
   DropdownMenuTrigger,
 } from "@/ui/components/dropdown-menu";
 import { ThemeToggle } from "@/ui/theme-toggle";
-
 import clsx from "clsx";
+import { useAuth } from "@/contexts/authContext";
 
 export default function LoginNav() {
   const pathname = usePathname();
+  const user = useAuth();
 
   const handleLogout = async () => {
     try {
@@ -229,7 +230,7 @@ export default function LoginNav() {
                         width={32}
                       />
                     </Link>
-                    <p>BobsBurgers</p>
+                    <p>{user?.email || "User"}</p>
                   </div>
                   <Button className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                     <span className="sr-only">View notifications</span>
