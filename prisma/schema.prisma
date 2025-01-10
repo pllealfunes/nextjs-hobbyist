@@ -2,12 +2,14 @@
 
 generator client {
   provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
 }
 
 datasource db {
   provider  = "postgresql"
   url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
   directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connectionurl
+   schemas = ["public", "auth"] 
 }
 
 model User {
@@ -22,11 +24,12 @@ model User {
   posts            Post[]
   comments         Comment[]
   likes            Like[]
-  profile          Profile?  @relation("UserProfile")
   sentMessages     Message[] @relation("sentMessages")
   receivedMessages Message[] @relation("receivedMessages")
   threads          Thread[]  @relation("threadUsers")
   createdThreads   Thread[]  @relation("createdThreads")
+
+  @@schema("public")
 
 }
 
@@ -37,9 +40,8 @@ model Profile {
   links     Json?
   createdAt DateTime @default(now()) @map(name: "created_at")
   updatedAt DateTime @updatedAt @map(name: "updated_at")
-  user      User     @relation(fields: [userId], references: [id], name: "UserProfile")
-  userId    String   @unique @db.Uuid
 
+  @@schema("public")
 }
 
 model Post {
@@ -57,6 +59,7 @@ model Post {
   comments  Comment[]
   likes     Like[]
 
+@@schema("public")
 }
 
 model Category {
@@ -64,6 +67,7 @@ model Category {
   name  String @unique
   posts Post[]
 
+@@schema("public")
 }
 
 model Comment {
@@ -76,6 +80,7 @@ model Comment {
   author    User     @relation(fields: [authorId], references: [id])
   authorId  String   @db.Uuid
 
+@@schema("public")
 }
 
 model Like {
@@ -86,6 +91,7 @@ model Like {
   postId    String   @db.Uuid
   createdAt DateTime @default(now()) @map(name: "created_at")
 
+@@schema("public")
 }
 
 model Message {
@@ -102,6 +108,7 @@ model Message {
   thread        Thread?   @relation(fields: [threadId], references: [id])
   threadId      String?   @db.Uuid
 
+@@schema("public")
 }
 
 model Thread {
@@ -113,10 +120,12 @@ model Thread {
   createdById String?   @db.Uuid
   messages    Message[]
 
+@@schema("public")
 }
 
 enum Role {
   ADMIN
   USER
 
+@@schema("public")
 }

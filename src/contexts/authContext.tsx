@@ -1,5 +1,3 @@
-"use client";
-
 import {
   createContext,
   useContext,
@@ -8,26 +6,32 @@ import {
   ReactNode,
 } from "react";
 import { createClient } from "@/utils/supabase/client";
-import prisma from "@/lib/prisma";
 
-type User = {
+interface User {
   id: string;
-  name: string | null;
-  username: string | null;
-  email: string | null;
+  name?: string;
+  username?: string;
+  email: string;
   role: string;
   createdAt: Date;
   updatedAt: Date;
   private: boolean;
-};
+}
+interface AuthContextType {
+  name: any;
+  user: User | null;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
+}
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const AuthContext = createContext<User | null>(null);
+interface AuthProviderProps {
+  children: ReactNode;
+}
 
 const supabase = createClient();
 
-export function AuthProvider({ children }: { children: ReactNode }) {
+export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
-
   useEffect(() => {
     const fetchUser = async () => {
       const {
@@ -35,9 +39,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } = await supabase.auth.getSession();
       if (session?.user) {
         try {
-          const userData = await prisma.user.findUnique({
-            where: { id: session.user.id },
-          });
+          const response = await fetch(`/api/user?userId=${session.user.id}`);
+          const userData = await response.json();
           setUser(userData);
         } catch (error) {
           console.error("Error fetching user data:", error);
@@ -46,23 +49,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(null);
       }
     };
-
     fetchUser();
-
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         fetchUser();
       }
     );
-
     return () => {
-      authListener.subscription.unsubscribe();
+      authListener.subscription?.unsubscribe();
     };
   }, []);
-
-  return <AuthContext.Provider value={user}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ user, setUser }}>
+      {" "}
+      {children}{" "}
+    </AuthContext.Provider>
+  );
 }
-
 export function useAuth() {
-  return useContext(AuthContext);
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
 }
