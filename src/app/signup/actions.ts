@@ -25,5 +25,5 @@ export async function SignupAction(formData: FormData) {
     return redirect("/error");
   }
 
-  return redirect("/dashboard");
+  return redirect("/verify-email");
 }

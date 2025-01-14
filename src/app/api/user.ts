@@ -8,21 +8,26 @@ export default async function handler(
 ) {
   const { userId } = req.query;
 
-  if (!userId) {
-    return res.status(400).json({ error: "User ID is required" });
+  if (!userId || typeof userId !== "string") {
+    console.error("Invalid User ID:", userId);
+    return res
+      .status(400)
+      .json({ error: "User ID is required and must be a string" });
   }
 
   try {
-    const user = await prisma.user.findUnique({
-      where: { id: String(userId) },
+    const userData = await prisma.user.findUnique({
+      where: { id: userId },
     });
 
-    if (!user) {
+    if (!userData) {
+      console.error("User not found for ID:", userId);
       return res.status(404).json({ error: "User not found" });
     }
 
-    res.status(200).json(user);
+    res.status(200).json(userData);
   } catch (error) {
+    console.error("Error fetching user data:", error);
     res.status(500).json({ error: "Error fetching user data" });
   }
 }
