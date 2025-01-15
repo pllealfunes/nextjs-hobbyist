@@ -24,12 +24,12 @@ export default function VerifyEmailPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-center text-muted-foreground">
-              We've sent a verification link to your email address. Please check
-              your inbox and click the link to verify your account.
+              We have sent a verification link to your email address. Please
+              check your inbox and click the link to verify your account.
             </p>
             <div className="p-4 rounded-lg">
               <p className="text-sm text-center font-medium">
-                If you don't see the email, check your spam folder.
+                If you don not see the email, check your spam folder.
               </p>
             </div>
           </CardContent>

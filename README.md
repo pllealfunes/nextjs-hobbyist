@@ -28,11 +28,12 @@ CRUD Posts
 
 - [x] create database models (Posts, Comments, Users, Categories, Likes, Messages)
 
-- [ ] add next auth.js login
+- [x] add next auth.js login
 - [ ] protected routes
-- [ ] add next auth.js signup
-- [ ] logout
-- [ ] fix model: required info to create profile?
+- [x] add next auth.js signup
+- [x] logout
+- [x] fix model: required info to create profile?
+- [ ] get and display user info
 
 - [ ] create new post
 - [ ] create new post with photo
