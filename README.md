@@ -22,18 +22,13 @@ https://nextjs-hobbyist.vercel.app/
 - Explore (/explore)
 - Feed (/feed)
 
-## Project Tasks:
+## Current Tasks:
 
-CRUD Posts
-
-- [x] create database models (Posts, Comments, Users, Categories, Likes, Messages)
-
-- [x] add next auth.js login
+- [ ] add followers, following, and category following counts to user schema to track
+- [ ] get and display user info - starting to do
 - [ ] protected routes
-- [x] add next auth.js signup
-- [x] logout
-- [x] fix model: required info to create profile?
-- [ ] get and display user info
+
+## Project Tasks:
 
 - [ ] create new post
 - [ ] create new post with photo
