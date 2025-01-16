@@ -70,7 +70,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       const response = await fetch(`/api/user?userId=${userId}`);
       if (!response.ok) {
-        throw new Error(`Error: ${response.statusText}`);
+        console.error("Failed to fetch user data:", response.statusText);
+        setUser(null);
+        return;
       }
       const userData: User = await response.json();
       setUser(userData);

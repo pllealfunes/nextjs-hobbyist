@@ -34,7 +34,7 @@ model User {
 }
 
 model Profile {
-  id        Int      @id @default(autoincrement())
+  id               String @id @default(uuid()) @db.Uuid
   bio       String?
   photo     String?
   links     Json?

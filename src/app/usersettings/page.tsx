@@ -15,11 +15,13 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/components/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/ui/components/avatar";
 import { Camera } from "lucide-react";
+import { useAuth } from "@/contexts/authContext";
 
 export default function UserSettings() {
   const [name, setName] = useState("John Doe");
   const [email, setEmail] = useState("john.doe@example.com");
   const [bio, setBio] = useState("Passionate hobbyist and lifelong learner.");
+  const user = useAuth();
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -103,7 +105,7 @@ export default function UserSettings() {
                     <Input
                       id="email"
                       type="email"
-                      value={email}
+                      value={user.user?.email}
                       onChange={(e) => setEmail(e.target.value)}
                     />
                   </div>
