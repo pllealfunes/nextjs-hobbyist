@@ -28,6 +28,9 @@ model User {
   receivedMessages Message[] @relation("receivedMessages")
   threads          Thread[]  @relation("threadUsers")
   createdThreads   Thread[]  @relation("createdThreads")
+ followers Follows[] @relation("follower") 
+ following Follows[] @relation("following") 
+ followedCategories CategoryFollows[] @relation("userCategories")
 
   @@schema("public")
 
@@ -66,6 +69,7 @@ model Category {
   id    Int    @id @default(autoincrement())
   name  String @unique
   posts Post[]
+  followers CategoryFollows[] @relation("categoryFollowers")
 
 @@schema("public")
 }
@@ -122,6 +126,28 @@ model Thread {
 
 @@schema("public")
 }
+
+model Follows { 
+id String @id @default(uuid()) @db.Uuid 
+follower User @relation("follower", fields: [followerId], references: [id]) 
+followerId String @db.Uuid 
+following User @relation("following", fields: [followingId], references: [id]) 
+followingId String @db.Uuid 
+createdAt DateTime @default(now()) @map(name: "created_at") 
+
+@@schema("public") 
+} 
+
+model CategoryFollows { 
+id String @id @default(uuid()) @db.Uuid 
+user User @relation("userCategories", fields: [userId], references: [id]) 
+userId String @db.Uuid 
+category Category @relation("categoryFollowers", fields: [categoryId], references: [id]) 
+categoryId Int 
+createdAt DateTime @default(now()) @map(name: "created_at") 
+
+@@schema("public") 
+} 
 
 enum Role {
   ADMIN

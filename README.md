@@ -24,7 +24,7 @@ https://nextjs-hobbyist.vercel.app/
 
 ## Current Tasks:
 
-- [ ] add followers, following, and category following counts to user schema to track
+- [x] add followers, following, and category following counts to user schema to track
 - [ ] get and display user info - starting to do
 - [ ] protected routes
 
