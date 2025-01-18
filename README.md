@@ -24,11 +24,7 @@ https://nextjs-hobbyist.vercel.app/
 
 ## Current Tasks:
 
-- [x] add followers, following, and category following counts to user schema to track
-- [ ] get and display user info - starting to do
-- [ ] protected routes
-
-## Project Tasks:
+- [ ] 500 after user sign up and logged in after first time?
 
 - [ ] create new post
 - [ ] create new post with photo
@@ -38,6 +34,8 @@ https://nextjs-hobbyist.vercel.app/
 - [ ] view new post on profile
 - [ ] check new post format
 - [ ] check post under category
+
+## Project Tasks:
 
 - [ ] update database schemas
 - [ ] update post
@@ -53,13 +51,17 @@ https://nextjs-hobbyist.vercel.app/
 - [ ] check profile
 - [ ] check category
 
+- [ ] upload user photo
+- [ ] update user photo
+- [ ] update user info
+- [ ] search posts
+
 Leftovers
 
-- [x] make sure nav tracks which page the user is on
+- [ ] protected routes
 - [ ] fix layout of calendar and chart in pblished and drafts pages
 - [ ] fix how chart looks on md screens in dashboard
-- [x] Update to Nextjs 15 and React 19
-- [x] work on dependency issues with upgrade
+- [ ] fix charts display - does not show bars
 
 ## Getting Started
 

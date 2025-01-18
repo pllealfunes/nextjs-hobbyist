@@ -23,6 +23,14 @@ export default function UserSettings() {
   const [bio, setBio] = useState("Passionate hobbyist and lifelong learner.");
   const user = useAuth();
 
+  const getUserInitials = (name?: string | null) => {
+    if (!name) return "N/A";
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("");
+  };
+
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     // Here you would typically send the updated data to your backend
@@ -58,13 +66,16 @@ export default function UserSettings() {
                     <Avatar className="w-20 h-20">
                       <AvatarImage
                         src="/placeholder.svg?height=80&width=80"
-                        alt={name}
+                        alt={
+                          user.user?.name || getUserInitials(user.user?.name)
+                        }
                       />
                       <AvatarFallback>
-                        {name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
+                        {user ? (
+                          <p>{getUserInitials(user.user?.name)}</p>
+                        ) : (
+                          <p>Loading...</p>
+                        )}
                       </AvatarFallback>
                     </Avatar>
                     <Button variant="outline">
@@ -76,7 +87,7 @@ export default function UserSettings() {
                     <Label htmlFor="name">Name</Label>
                     <Input
                       id="name"
-                      value={name}
+                      value={user.user?.name || ""}
                       onChange={(e) => setName(e.target.value)}
                     />
                   </div>
@@ -87,6 +98,11 @@ export default function UserSettings() {
                       value={bio}
                       onChange={(e) => setBio(e.target.value)}
                     />
+                    {/* <Textarea
+                      id="bio"
+                      value={user.user?.bio || ""}
+                      onChange={(e) => setBio(e.target.value)}
+                    /> */}
                   </div>
                 </CardContent>
               </Card>
@@ -105,13 +121,19 @@ export default function UserSettings() {
                     <Input
                       id="email"
                       type="email"
-                      value={user.user?.email}
+                      value={user.user?.email || ""}
                       onChange={(e) => setEmail(e.target.value)}
                     />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="current-password">Current Password</Label>
                     <Input id="current-password" type="password" />
+                    {/* <Input
+                      id="current-password"
+                      type="password"
+                      value={user.user?.password || ""}
+                      onChange={(e) => setEmail(e.target.value)}
+                    /> */}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="new-password">New Password</Label>
