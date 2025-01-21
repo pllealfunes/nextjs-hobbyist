@@ -24,16 +24,16 @@ https://nextjs-hobbyist.vercel.app/
 
 ## Current Tasks:
 
-- [ ] 500 after user sign up and logged in after first time?
-
 - [ ] create new post
+- [ ] check new post format
+- [ ] view new post on profile
+- [ ] check post under category
+- [ ] look into cloudinary and connect to db to save media (photos + videos
 - [ ] create new post with photo
 - [ ] create new post with video
 - [ ] create new post with/out photo
 - [ ] create new post with/out video
-- [ ] view new post on profile
-- [ ] check new post format
-- [ ] check post under category
+- [ ] check added media in database and cloudinary
 
 ## Project Tasks:
 
@@ -46,18 +46,44 @@ https://nextjs-hobbyist.vercel.app/
 - [ ] view updated post on profile
 - [ ] check updated post format
 - [ ] check post under category
+- [ ] check updated media in database and cloudinary
 
-- [ ] check database
-- [ ] check profile
-- [ ] check category
+- [ ] mark posts as published and unpublished
+- [ ] display unpublished posts
+- [ ] display published and unpublished posts on calendar
+
+- [ ] check database for posts
+- [ ] check profile for posts
+- [ ] check category for posts
+
+- [ ] create new comment
+- [ ] check new comment format
+- [ ] view new comment
+
+- [ ] update new comment
+- [ ] update check new comment format
+- [ ] view updated comment
 
 - [ ] upload user photo
+- [ ] check media in database and cloudinary
 - [ ] update user photo
+- [ ] check updated media in database and cloudinary
 - [ ] update user info
+
 - [ ] search posts
+- [ ] create user like functionality
+- [ ] display data in charts
+
+- [ ] follow and unfollow users
+- [ ] follow and unfollow categories
+
+- [ ] display real time updates/notifications
+
+- [ ] chat/dms between users
 
 Leftovers
 
+- [ ] 500 after user sign up and logged in after first time - check again with new user
 - [ ] protected routes
 - [ ] fix layout of calendar and chart in pblished and drafts pages
 - [ ] fix how chart looks on md screens in dashboard
