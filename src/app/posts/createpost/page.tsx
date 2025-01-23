@@ -1,4 +1,5 @@
 "use client";
+import { useState, useEffect } from "react";
 import TextEditor from "@/ui/components/TextEditor";
 import { useForm, SubmitHandler } from "react-hook-form";
 import * as z from "zod";
@@ -6,8 +7,17 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/ui/components/button";
 import { Input } from "@/ui/components/input";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/ui/components/select";
+
+import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -23,33 +33,79 @@ function extractTextFromHTML(html: string): string {
 
 // Validation schema
 const formSchema = z.object({
-  post: z.string().refine(
+  content: z.string().refine(
     (value) => {
       return extractTextFromHTML(value).trim().length >= 200;
     },
     {
-      message: "The text must be 200 to 12500 characters long after trimming",
+      message: "A post must be 200 to 12500 characters long after trimming",
     }
   ),
-  title: z.string().min(10, "Title is required"), // Title validation
+  title: z.string().min(10, "A Title of at least 10 characters is required"),
+  category: z.string().min(1, "Category is required"),
 });
 
 // Define the type for form data
 type FormData = z.infer<typeof formSchema>;
+
+type Category = {
+  id: number;
+  name: string;
+};
 
 export default function CreatePost() {
   const form = useForm<FormData>({
     mode: "onTouched",
     resolver: zodResolver(formSchema),
     defaultValues: {
-      post: "",
+      content: "",
+      category: "",
       title: "",
     },
   });
 
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    async function loadCategories() {
+      try {
+        const response = await fetch("/api/categories");
+        const data = await response.json();
+        setCategories(data);
+      } catch (error) {
+        console.error("Error fetching categories", error);
+      }
+    }
+
+    loadCategories();
+  }, []);
+
   // Define the type for 'data'
-  const onSubmit: SubmitHandler<FormData> = (data) => {
+  const onSubmit: SubmitHandler<FormData> = async (data) => {
     console.log(data);
+
+    try {
+      const response = await fetch("/api/posts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: data.title,
+          categoryId: parseInt(data.category),
+          content: data.content,
+        }),
+      });
+
+      if (response.ok) {
+        const post = await response.json();
+        console.log("Post created successfully", post);
+      } else {
+        console.error("Error creating post");
+      }
+    } catch (error) {
+      console.error("Error creating post", error);
+    }
   };
 
   return (
@@ -73,11 +129,44 @@ export default function CreatePost() {
               </FormItem>
             )}
           />
-
+          {/* Category Field */}
+          <FormField
+            control={form.control}
+            name="category"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel htmlFor="category" className="text-lg">
+                  Category
+                </FormLabel>
+                <FormControl>
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    required
+                  >
+                    <SelectTrigger id="category">
+                      <SelectValue placeholder="Select a category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.map((category) => (
+                        <SelectItem
+                          key={category.id}
+                          value={category.id.toString()}
+                        >
+                          {category.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           {/* Post Field */}
           <FormField
             control={form.control}
-            name="post"
+            name="content"
             render={({ field }) => (
               <FormItem className="my-2">
                 <FormLabel className="text-lg">Post</FormLabel>
@@ -91,7 +180,8 @@ export default function CreatePost() {
               </FormItem>
             )}
           />
-
+          <FormMessage />
+          <FormDescription>Use The Form to Freate a New Post</FormDescription>
           {/* Container for Word Count and Submit Button */}
           <div className="flex justify-end items-end mt-4">
             <div className="mr-4">
