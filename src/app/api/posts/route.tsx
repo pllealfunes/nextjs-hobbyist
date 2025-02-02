@@ -1,6 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
+export async function GET(request: NextRequest) {
+  try {
+    const posts = await prisma.post.findMany();
+    return NextResponse.json(posts, { status: 200 });
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Error fetching posts" },
+      { status: 500 }
+    );
+  }
+}
+
 export async function POST(req: NextRequest) {
   if (req.method === "POST") {
     try {

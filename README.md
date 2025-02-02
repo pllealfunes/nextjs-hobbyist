@@ -24,9 +24,9 @@ https://nextjs-hobbyist.vercel.app/
 
 ## Current Tasks:
 
-- [ ] create new post
+- [x] create new post
 - [ ] check new post format
-- [ ] view new post on profile
+- [x] view new post on profile
 - [ ] check post under category
 - [ ] look into cloudinary and connect to db to save media (photos + videos
 - [ ] create new post with photo
