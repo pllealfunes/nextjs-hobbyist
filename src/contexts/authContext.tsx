@@ -11,13 +11,13 @@ import { createClient } from "@/utils/supabase/client";
 
 interface User {
   id: string;
-  name?: string | null; // Allow `null` for name
-  username?: string | null; // Allow `null` for username
-  email: string;
+  name?: string | null;
+  username?: string | null;
+  email?: string; // Allow undefined
   role: string;
-  createdAt: Date;
-  updatedAt: Date;
-  private: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+  private?: boolean;
 }
 
 interface AuthContextType {
@@ -33,65 +33,42 @@ interface AuthProviderProps {
 
 const supabase = createClient();
 
-export function AuthProvider({ children }: AuthProviderProps) {
+export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (user) {
-        await fetchUserData(user.id);
-      } else {
-        setUser(null);
+    const getUser = async () => {
+      const { data, error } = await supabase.auth.getUser();
+      if (!error && data?.user) {
+        setUser({
+          id: data.user.id,
+          name: data.user.user_metadata?.name ?? null,
+          username: data.user.user_metadata?.username ?? null,
+          email: data.user.email ?? "", // Ensure email is never undefined
+          role: data.user.user_metadata?.role ?? "user",
+          createdAt: data.user.created_at
+            ? new Date(data.user.created_at)
+            : undefined,
+          updatedAt: data.user.updated_at
+            ? new Date(data.user.updated_at)
+            : undefined,
+          private: data.user.user_metadata?.private ?? false,
+        });
       }
     };
-
-    // Call the async function
-    fetchUser();
-
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (session?.user) {
-          fetchUserData(session.user.id);
-        } else {
-          setUser(null);
-        }
-      }
-    );
-
-    return () => {
-      authListener.subscription?.unsubscribe();
-    };
+    getUser();
   }, []);
-
-  const fetchUserData = async (userId: string) => {
-    try {
-      const response = await fetch(`/api/user?userId=${userId}`);
-      if (!response.ok) {
-        console.error("Failed to fetch user data:", response.statusText);
-        setUser(null);
-        return;
-      }
-      const userData: User = await response.json();
-      setUser(userData);
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-      setUser(null);
-    }
-  };
 
   return (
     <AuthContext.Provider value={{ user, setUser }}>
       {children}
     </AuthContext.Provider>
   );
-}
+};
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
