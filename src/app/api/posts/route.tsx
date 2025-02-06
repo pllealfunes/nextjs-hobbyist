@@ -1,13 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { createClient } from "@/utils/supabase/client";
+
+const supabase = createClient();
 
 export async function GET(request: NextRequest) {
   try {
-    const posts = await prisma.post.findMany();
+    console.log("Fetching posts...");
+    let { data: posts, error } = await supabase
+      .from("Post")
+      .select("*")
+      .order("createdAt", { ascending: false });
+
+    if (error) throw error;
+
+    console.log("Posts fetched:", posts);
     return NextResponse.json(posts, { status: 200 });
   } catch (error) {
+    console.error("Error fetching posts:", error);
     return NextResponse.json(
-      { error: "Error fetching posts" },
+      { error: "Error fetching posts", details: error },
       { status: 500 }
     );
   }
@@ -16,6 +28,7 @@ export async function GET(request: NextRequest) {
 export async function POST(req: NextRequest) {
   if (req.method === "POST") {
     try {
+      console.log("Creating a new post...");
       const { title, categoryId, content } = await req.json();
       const post = await prisma.post.create({
         data: {
@@ -24,6 +37,7 @@ export async function POST(req: NextRequest) {
           content,
         },
       });
+      console.log("Post created:", post);
       return NextResponse.json(post, { status: 201 });
     } catch (error: unknown) {
       let errorMessage = "Unknown error";

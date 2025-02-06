@@ -50,11 +50,12 @@ const CategoryPage = () => {
     const fetchPosts = async () => {
       try {
         console.log("Fetching posts for category:", categoryName);
+
+        const categoriesResponse = await fetch("/api/categories");
+
         const response = await fetch(
           `/api/categories/category?category=${categoryName}`
         );
-
-        const categoriesResponse = await fetch("/api/categories");
 
         if (!response.ok) {
           throw new Error(`Failed to fetch posts: ${response.statusText}`);
@@ -83,7 +84,6 @@ const CategoryPage = () => {
   }, [categoryName]);
 
   if (loading) return <p>Loading...</p>;
-  if (error) return <p>{error}</p>;
 
   return (
     <div>
