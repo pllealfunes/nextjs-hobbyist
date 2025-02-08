@@ -6,11 +6,13 @@ const supabase = createClient();
 
 export async function GET(request: NextRequest) {
   try {
+    const supabase = createClient();
+
     console.log("Fetching posts...");
     let { data: posts, error } = await supabase
       .from("Post")
       .select("*")
-      .order("createdAt", { ascending: false });
+      .order("created_at", { ascending: false });
 
     if (error) throw error;
 

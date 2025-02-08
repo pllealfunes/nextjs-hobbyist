@@ -8,12 +8,12 @@ interface Post {
   id: string;
   title: string;
   content: string | null;
-  categoryId: number;
+  category_id: number;
   published: boolean;
   private: boolean;
   authorId: string | null;
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: Date;
+  updated_at: Date;
 }
 
 interface Category {

@@ -1,5 +1,4 @@
 "use server";
-
 import { redirect } from "next/navigation";
 
 import { createClient } from "@/utils/supabase/server";
@@ -17,11 +16,11 @@ export async function SignupAction(formData: FormData) {
       },
     },
   };
+
   const { error } = await supabase.auth.signUp(data);
 
   if (error) {
-    console.log(error);
-
+    console.error("Signup error: ", error.message);
     return redirect("/error");
   }
 

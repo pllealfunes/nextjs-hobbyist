@@ -6,12 +6,12 @@ interface Post {
   id: string;
   title: string;
   content: string | null;
-  categoryId: number;
+  category_id: number;
   published: boolean;
   private: boolean;
   authorId: string | null;
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: Date;
+  updated_at: Date;
 }
 
 interface Category {
@@ -38,6 +38,7 @@ export default function DashboardPosts({ post, categories }: PostCardProps) {
     const category = categories.find((cat) => cat.id === categoryId);
     return category ? category.name : "Unknown";
   };
+
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform transform hover:scale-105 duration-300 cursor-pointer">
       {/* Card Image */}
@@ -55,12 +56,14 @@ export default function DashboardPosts({ post, categories }: PostCardProps) {
       <div className="p-5">
         {/* Date and Tag */}
         <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-          <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+          <span>{new Date(post.created_at).toLocaleDateString()}</span>
           <Link
-            href={`/category/${getCategoryName(post.categoryId).toLowerCase()}`}
+            href={`/category/${encodeURIComponent(
+              getCategoryName(post.category_id).toLowerCase()
+            )}`}
           >
             <span className="bg-rose-600 hover:bg-gray-700 text-white shadow-lg font-bold px-3 py-1 rounded-full text-xs cursor-pointer">
-              {getCategoryName(post.categoryId)}
+              {getCategoryName(post.category_id)}
             </span>
           </Link>
         </div>

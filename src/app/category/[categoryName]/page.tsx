@@ -5,30 +5,17 @@ import { useEffect, useState } from "react";
 import DashboardPosts from "@/ui/components/dashboard-posts";
 import NoResults from "@/ui/components/no-category";
 import Link from "next/link";
-import {
-  MoveRight,
-  Dumbbell,
-  Palette,
-  Brain,
-  Utensils,
-  Music,
-  Box,
-  Puzzle,
-  NotebookPen,
-  Search,
-  MessagesSquare,
-} from "lucide-react";
 
 interface Post {
   id: string;
   title: string;
   content: string | null;
-  categoryId: number;
+  category_id: number;
   published: boolean;
   private: boolean;
   authorId: string | null;
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: Date;
+  updated_at: Date;
 }
 
 interface Category {
@@ -56,16 +43,6 @@ const CategoryPage = () => {
         const response = await fetch(
           `/api/categories/category?category=${categoryName}`
         );
-
-        if (!response.ok) {
-          throw new Error(`Failed to fetch posts: ${response.statusText}`);
-        }
-
-        if (!categoriesResponse.ok) {
-          throw new Error(
-            `Failed to fetch categories: ${categoriesResponse.statusText}`
-          );
-        }
 
         const data = await response.json();
         const categoriesData: Category[] = await categoriesResponse.json();
@@ -96,7 +73,9 @@ const CategoryPage = () => {
             {categories.map((category) => (
               <Link
                 key={category.name}
-                href={`/category/${category.name}`}
+                href={`/category/${encodeURIComponent(
+                  category.name.toLowerCase()
+                )}`}
                 className="bg-rose-500 hover:bg-rose-600 text-white font-semibold py-2 px-4 rounded-full shadow-md flex items-center gap-2 transition duration-300"
                 aria-label={`Explore ${category.name} category`}
               >

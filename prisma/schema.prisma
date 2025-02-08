@@ -1,5 +1,3 @@
-// schema.prisma
-
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["multiSchema"]
@@ -7,151 +5,157 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
-  url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
-  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connectionurl
-   schemas = ["public", "auth"] 
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+  schemas   = ["auth", "public"]
 }
 
 model User {
-  id               String @id @default(uuid()) @db.Uuid
-  name             String?
-  username         String?   @unique
-  email            String?   @unique
-  role             Role      @default(USER)
-  createdAt        DateTime  @default(now()) @map(name: "created_at")
-  updatedAt        DateTime  @updatedAt @map(name: "updated_at")
-  private          Boolean   @default(false)
-  posts            Post[]
-  comments         Comment[]
-  likes            Like[]
-  sentMessages     Message[] @relation("sentMessages")
-  receivedMessages Message[] @relation("receivedMessages")
-  threads          Thread[]  @relation("threadUsers")
-  createdThreads   Thread[]  @relation("createdThreads")
- followers Follows[] @relation("follower") 
- following Follows[] @relation("following") 
- followedCategories CategoryFollows[] @relation("userCategories")
+  id                 String            @id @default(uuid()) @db.Uuid
+  name               String?
+  username           String?           @unique
+  email              String?           @unique
+  role               Role              @default(USER)
+  createdAt          DateTime          @default(now()) @map("created_at")
+  updatedAt          DateTime          @updatedAt @map("updated_at")
+  private            Boolean           @default(false)
+  followedCategories CategoryFollows[] @relation("userCategories")
+  comments           Comment[]
+  followers          Follows[]         @relation("follower")
+  following          Follows[]         @relation("following")
+  likes              Like[]
+  receivedMessages   Message[]         @relation("receivedMessages")
+  sentMessages       Message[]         @relation("sentMessages")
+  posts              Post[]
+  createdThreads     Thread[]          @relation("createdThreads")
+  profile            Profile?          @relation("UserProfile")
+  threads            Thread[]          @relation("threadUsers")
 
   @@schema("public")
-
 }
 
 model Profile {
-  id               String @id @default(uuid()) @db.Uuid
+  id        String  @id @default(uuid()) @db.Uuid
   bio       String?
   photo     String?
-  links     Json?
-  createdAt DateTime @default(now()) @map(name: "created_at")
-  updatedAt DateTime @updatedAt @map(name: "updated_at")
+  links     Json?   @db.Json
+  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime? @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  user      User      @relation("UserProfile", fields: [userId], references: [id])
+  userId    String    @unique @db.Uuid
+
+   @@schema("public")
+}
+
+
+model Post {
+  id         String    @id @default(uuid()) @db.Uuid
+  title      String
+  content    String?
+  categoryId Int
+  published  Boolean   @default(false)
+  private    Boolean   @default(false)
+  authorId   String?   @db.Uuid
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+  comments   Comment[]
+  likes      Like[]
+  author     User?     @relation(fields: [authorId], references: [id])
+  category   Category  @relation(fields: [categoryId], references: [id])
 
   @@schema("public")
 }
 
-model Post {
-  id        String     @id @default(uuid()) @db.Uuid
-  title     String
-  content   String?
-  category  Category @relation(fields: [categoryId], references: [id])
-  categoryId Int
-  published Boolean    @default(false)
-  private   Boolean    @default(false)
-  author    User?      @relation(fields: [authorId], references: [id])
-  authorId  String?    @db.Uuid
-  createdAt DateTime   @default(now()) @map(name: "created_at")
-  updatedAt DateTime   @updatedAt @map(name: "updated_at")
-  comments  Comment[]
-  likes     Like[]
 
-@@schema("public")
-}
 
 model Category {
-  id    Int    @id @default(autoincrement())
-  name  String @unique
-  posts Post[]
+  id        Int               @id @default(autoincrement())
+  name      String            @unique
   followers CategoryFollows[] @relation("categoryFollowers")
+  posts     Post[]
 
-@@schema("public")
+  @@schema("public")
 }
 
 model Comment {
   id        String   @id @default(uuid()) @db.Uuid
   content   String?
-  createdAt DateTime @default(now()) @map(name: "created_at")
-  updatedAt DateTime @updatedAt @map(name: "updated_at")
-  post      Post?    @relation(fields: [postId], references: [id])
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
   postId    String?  @db.Uuid
-  author    User     @relation(fields: [authorId], references: [id])
   authorId  String   @db.Uuid
+  author    User     @relation(fields: [authorId], references: [id])
+  post      Post?    @relation(fields: [postId], references: [id])
 
-@@schema("public")
+  @@schema("public")
 }
 
 model Like {
   id        String   @id @default(uuid())
-  user      User     @relation(fields: [userId], references: [id])
   userId    String   @db.Uuid
-  post      Post     @relation(fields: [postId], references: [id])
   postId    String   @db.Uuid
-  createdAt DateTime @default(now()) @map(name: "created_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  post      Post     @relation(fields: [postId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 
-@@schema("public")
+  @@schema("public")
 }
 
 model Message {
   id            String    @id @default(uuid()) @db.Uuid
-  sender        User      @relation("sentMessages", fields: [senderId], references: [id])
   senderId      String    @db.Uuid
-  recipient     User      @relation("receivedMessages", fields: [recipientId], references: [id])
   recipientId   String    @db.Uuid
   content       String
   attachmentUrl String?
   sentAt        DateTime  @default(now())
   readAt        DateTime?
   deletedAt     DateTime?
-  thread        Thread?   @relation(fields: [threadId], references: [id])
   threadId      String?   @db.Uuid
+  recipient     User      @relation("receivedMessages", fields: [recipientId], references: [id])
+  sender        User      @relation("sentMessages", fields: [senderId], references: [id])
+  thread        Thread?   @relation(fields: [threadId], references: [id])
 
-@@schema("public")
+  @@schema("public")
 }
 
 model Thread {
   id          String    @id @default(uuid()) @db.Uuid
-  users       User[]    @relation("threadUsers")
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  createdBy   User?     @relation("createdThreads", fields: [createdById], references: [id])
   createdById String?   @db.Uuid
   messages    Message[]
+  createdBy   User?     @relation("createdThreads", fields: [createdById], references: [id])
+  users       User[]    @relation("threadUsers")
 
-@@schema("public")
+  @@schema("public")
 }
 
-model Follows { 
-id String @id @default(uuid()) @db.Uuid 
-follower User @relation("follower", fields: [followerId], references: [id]) 
-followerId String @db.Uuid 
-following User @relation("following", fields: [followingId], references: [id]) 
-followingId String @db.Uuid 
-createdAt DateTime @default(now()) @map(name: "created_at") 
+model Follows {
+  id          String   @id @default(uuid()) @db.Uuid
+  followerId  String   @db.Uuid
+  followingId String   @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at")
+  follower    User     @relation("follower", fields: [followerId], references: [id])
+  following   User     @relation("following", fields: [followingId], references: [id])
 
-@@schema("public") 
-} 
+  @@schema("public")
+}
 
-model CategoryFollows { 
-id String @id @default(uuid()) @db.Uuid 
-user User @relation("userCategories", fields: [userId], references: [id]) 
-userId String @db.Uuid 
-category Category @relation("categoryFollowers", fields: [categoryId], references: [id]) 
-categoryId Int 
-createdAt DateTime @default(now()) @map(name: "created_at") 
+model CategoryFollows {
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String   @db.Uuid
+  categoryId Int
+  createdAt  DateTime @default(now()) @map("created_at")
+  category   Category @relation("categoryFollowers", fields: [categoryId], references: [id])
+  user       User     @relation("userCategories", fields: [userId], references: [id])
 
-@@schema("public") 
-} 
+  @@schema("public")
+}
+
 
 enum Role {
   ADMIN
   USER
 
-@@schema("public")
+  @@schema("public")
 }

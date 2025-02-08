@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/utils/supabase/client";
-
-const supabase = createClient();
+import { createClient } from "@/utils/supabase/server";
 
 export async function GET(req: NextRequest) {
   try {
+    const supabase = await createClient();
     const { searchParams } = new URL(req.url);
     const category = searchParams.get("category");
 
@@ -18,10 +17,18 @@ export async function GET(req: NextRequest) {
       );
     }
 
+    const capitalizeFirstLetter = (str?: string) => {
+      return str ? str.charAt(0).toUpperCase() + str.slice(1) : "This category";
+    };
+
+    // const decodedCategoryName = decodeURIComponent(category);
+
+    const searchCategory = capitalizeFirstLetter(category);
+
     const { data: categoryData, error: categoryError } = await supabase
       .from("Category")
       .select("*")
-      .eq("name", category)
+      .eq("name", searchCategory)
       .single();
 
     if (categoryError) throw categoryError;
@@ -29,7 +36,7 @@ export async function GET(req: NextRequest) {
     console.log("📌 Found category data:", categoryData);
 
     if (!categoryData) {
-      console.error(`❌ Category '${category}' not found!`);
+      console.error(`❌ Category '${searchCategory}' not found!`);
       return NextResponse.json(
         { error: "Category not found" },
         { status: 404 }
@@ -40,12 +47,14 @@ export async function GET(req: NextRequest) {
     const { data: posts, error: postsError } = await supabase
       .from("Post")
       .select("*")
-      .eq("categoryId", categoryData.id)
-      .order("createdAt", { ascending: false });
+      .eq("category_id", categoryData.id)
+      .order("created_at", { ascending: false });
 
     if (postsError) throw postsError;
 
-    console.log(`✅ Found ${posts.length} posts for category '${category}'`);
+    console.log(
+      `✅ Found ${posts.length} posts for category '${searchCategory}'`
+    );
 
     return NextResponse.json(posts, { status: 200 });
   } catch (error) {
