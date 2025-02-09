@@ -57,7 +57,7 @@ export default function Explore() {
           </div>
 
           {/* Posts Section */}
-          <DashboardPosts />
+          {/* <DashboardPosts /> */}
         </div>
       </section>
     </>

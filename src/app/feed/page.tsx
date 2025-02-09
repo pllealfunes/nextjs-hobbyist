@@ -49,7 +49,7 @@ export default function Feed() {
         </div>
 
         {/* Posts Section */}
-        <DashboardPosts />
+        {/* <DashboardPosts /> */}
       </div>
     </section>
   );
