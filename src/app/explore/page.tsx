@@ -1,4 +1,4 @@
-import DashboardPosts from "@/ui/components/dashboard-posts";
+//import DashboardPosts from "@/ui/components/dashboard-posts";
 import { Input } from "@/ui/components/input";
 import { Label } from "@/ui/components/label";
 import {

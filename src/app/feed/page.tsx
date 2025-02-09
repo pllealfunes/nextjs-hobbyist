@@ -5,7 +5,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/ui/components/select";
-import DashboardPosts from "@/ui/components/dashboard-posts";
+//import DashboardPosts from "@/ui/components/dashboard-posts";
 
 export default function Feed() {
   return (
