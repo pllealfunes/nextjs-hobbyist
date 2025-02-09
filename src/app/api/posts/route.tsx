@@ -4,7 +4,7 @@ import { createClient } from "@/utils/supabase/client";
 
 const supabase = createClient();
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     console.log("Fetching posts...");
     const { data: posts, error } = await supabase

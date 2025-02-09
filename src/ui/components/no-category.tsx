@@ -35,8 +35,8 @@ export default function NoResults({
         ))}
       </div>
       <p className="m-9 text-xl">
-        We couldn't find any posts in this category. Check out some of our other
-        categories or come back later!
+        We couldn&apos;t find any posts in this category. Check out some of our
+        other categories or come back later!
       </p>
       <Link
         href="/"
