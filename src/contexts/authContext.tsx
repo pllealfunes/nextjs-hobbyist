@@ -13,7 +13,7 @@ interface User {
   id: string;
   name?: string | null;
   username?: string | null;
-  email?: string; // Allow undefined
+  email?: string;
   role: string;
   createdAt?: Date;
   updatedAt?: Date;

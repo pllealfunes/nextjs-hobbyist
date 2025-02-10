@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/utils/supabase/client";
-
-const supabase = createClient();
+import { createClient } from "@/utils/supabase/server";
 
 export async function GET() {
   try {
     console.log("Fetching categories...");
 
-    const { data: categories, error } = await supabase
+    // Move the client creation inside the GET function
+    const supabase = await createClient();
+
+    let { data: categories, error } = await supabase
       .from("Category")
       .select("*");
 
@@ -19,7 +20,7 @@ export async function GET() {
   } catch (error) {
     console.error("Error fetching categories:", error);
     return NextResponse.json(
-      { error: "Error fetching categories", details: error },
+      { error: "Error fetching categories" },
       { status: 500 }
     );
   }

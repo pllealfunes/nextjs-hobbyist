@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 
+// Ensure that createClient is called within an async context
 export async function GET(req: NextRequest) {
   try {
     const supabase = await createClient();
@@ -21,10 +22,9 @@ export async function GET(req: NextRequest) {
       return str ? str.charAt(0).toUpperCase() + str.slice(1) : "This category";
     };
 
-    // const decodedCategoryName = decodeURIComponent(category);
-
     const searchCategory = capitalizeFirstLetter(category);
 
+    // Fetch category data
     const { data: categoryData, error: categoryError } = await supabase
       .from("Category")
       .select("*")
@@ -60,7 +60,7 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     console.error("❌ Supabase error:", error);
     return NextResponse.json(
-      { error: "Error fetching posts", details: error },
+      { error: "Error fetching posts" },
       { status: 500 }
     );
   }

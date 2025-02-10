@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import DashboardPosts from "@/ui/components/dashboard-posts";
 import UserProfile from "@/ui/components/userprofile";
+import { useAuth } from "@/contexts/authContext";
 
 interface Post {
   id: string;
@@ -11,7 +12,7 @@ interface Post {
   category_id: number;
   published: boolean;
   private: boolean;
-  authorId: string | null;
+  author_id: string | null;
   created_at: Date;
   updated_at: Date;
 }
@@ -24,6 +25,7 @@ interface Category {
 export default function Profile() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const { user } = useAuth();
 
   useEffect(() => {
     async function getPosts() {
@@ -57,18 +59,21 @@ export default function Profile() {
     <div>
       <UserProfile />
       {/* Posts Section */}
-      <section className="mt-14">
-        <div className="grid gap-6 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 p-6">
-          {Array.isArray(posts) &&
-            posts.map((post) => (
+      {user &&
+      Array.isArray(posts) &&
+      posts.some((post) => post.author_id === user.id) ? (
+        <section className="mt-14">
+          <div className="grid gap-6 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 p-6">
+            {posts.map((post) => (
               <DashboardPosts
                 key={post.id}
                 post={post}
                 categories={categories}
               />
             ))}
-        </div>
-      </section>
+          </div>
+        </section>
+      ) : null}
     </div>
   );
 }

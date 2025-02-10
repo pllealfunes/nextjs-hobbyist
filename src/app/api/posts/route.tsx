@@ -1,16 +1,19 @@
 import { NextResponse } from "next/server";
 //import prisma from "@/lib/prisma";
-import { createClient } from "@/utils/supabase/client";
-
-const supabase = createClient();
+import { createClient } from "@/utils/supabase/server";
 
 export async function GET() {
   try {
     console.log("Fetching posts...");
+
+    // Initialize the Supabase client
+    const supabase = await createClient();
+
     const { data: posts, error } = await supabase
       .from("Post")
       .select("*")
       .order("created_at", { ascending: false });
+    console.log(posts);
 
     if (error) throw error;
 
@@ -19,7 +22,7 @@ export async function GET() {
   } catch (error) {
     console.error("Error fetching posts:", error);
     return NextResponse.json(
-      { error: "Error fetching posts", details: error },
+      { error: "Error fetching posts" },
       { status: 500 }
     );
   }

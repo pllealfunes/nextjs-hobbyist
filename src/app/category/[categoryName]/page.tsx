@@ -13,7 +13,7 @@ interface Post {
   category_id: number;
   published: boolean;
   private: boolean;
-  authorId: string | null;
+  author_id: string | null;
   created_at: Date;
   updated_at: Date;
 }
@@ -61,7 +61,6 @@ const CategoryPage = () => {
   }, [categoryName]);
 
   if (loading) return <p>Loading...</p>;
-  console.log(error);
 
   return (
     <div>
