@@ -61,6 +61,7 @@ const CategoryPage = () => {
   }, [categoryName]);
 
   if (loading) return <p>Loading...</p>;
+  console.log(error);
 
   return (
     <div>
