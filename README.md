@@ -27,7 +27,7 @@ https://nextjs-hobbyist.vercel.app/
 - [x] create new post
 - [ ] check new post format
 - [x] view new post on profile
-- [ ] check post under category
+- [x] check post under category
 - [ ] look into cloudinary and connect to db to save media (photos + videos
 - [ ] create new post with photo
 - [ ] create new post with video
