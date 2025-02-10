@@ -25,40 +25,40 @@ export async function GET() {
   }
 }
 
-export async function POST(req: NextRequest) {
-  if (req.method === "POST") {
-    try {
-      console.log("Creating a new post...");
-      const { title, categoryId, content } = await req.json();
-      const post = await prisma.post.create({
-        data: {
-          title,
-          categoryId,
-          content,
-        },
-      });
-      console.log("Post created:", post);
-      return NextResponse.json(post, { status: 201 });
-    } catch (error: unknown) {
-      let errorMessage = "Unknown error";
+// export async function POST(req: NextRequest) {
+//   if (req.method === "POST") {
+//     try {
+//       console.log("Creating a new post...");
+//       const { title, categoryId, content } = await req.json();
+//       const post = await prisma.post.create({
+//         data: {
+//           title,
+//           categoryId,
+//           content,
+//         },
+//       });
+//       console.log("Post created:", post);
+//       return NextResponse.json(post, { status: 201 });
+//     } catch (error: unknown) {
+//       let errorMessage = "Unknown error";
 
-      if (error instanceof Error) {
-        errorMessage = error.message;
-        console.error("Error details:", {
-          message: error.message,
-          stack: error.stack,
-          name: error.name,
-        });
-      } else {
-        console.error("Unexpected error:", error);
-      }
+//       if (error instanceof Error) {
+//         errorMessage = error.message;
+//         console.error("Error details:", {
+//           message: error.message,
+//           stack: error.stack,
+//           name: error.name,
+//         });
+//       } else {
+//         console.error("Unexpected error:", error);
+//       }
 
-      return NextResponse.json(
-        { error: "Error creating post", message: errorMessage },
-        { status: 500 }
-      );
-    }
-  } else {
-    return NextResponse.json({ error: "Method not allowed" }, { status: 405 });
-  }
-}
+//       return NextResponse.json(
+//         { error: "Error creating post", message: errorMessage },
+//         { status: 500 }
+//       );
+//     }
+//   } else {
+//     return NextResponse.json({ error: "Method not allowed" }, { status: 405 });
+//   }
+// }
