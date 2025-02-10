@@ -8,7 +8,7 @@ export async function GET() {
     // Move the client creation inside the GET function
     const supabase = await createClient();
 
-    let { data: categories, error } = await supabase
+    const { data: categories, error } = await supabase
       .from("Category")
       .select("*");
 
