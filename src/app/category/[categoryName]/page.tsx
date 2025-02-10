@@ -74,9 +74,9 @@ const CategoryPage = () => {
             {categories.map((category) => (
               <Link
                 key={category.name}
-                href={`/category/${encodeURIComponent(
-                  category.name.toLowerCase()
-                )}`}
+                href={`/category/${category.name
+                  .toLowerCase()
+                  .replace(/\s+/g, "-")}`}
                 className="bg-rose-500 hover:bg-rose-600 text-white font-semibold py-2 px-4 rounded-full shadow-md flex items-center gap-2 transition duration-300"
                 aria-label={`Explore ${category.name} category`}
               >

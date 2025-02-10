@@ -22,7 +22,15 @@ export async function GET(req: NextRequest) {
       return str ? str.charAt(0).toUpperCase() + str.slice(1) : "This category";
     };
 
-    const searchCategory = capitalizeFirstLetter(category);
+    const decodeAndFormatCategory = (category: string) => {
+      const decodedCategory = decodeURIComponent(category);
+      const formattedCategory = capitalizeFirstLetter(
+        decodedCategory.replace(/-/g, "+")
+      );
+      return formattedCategory;
+    };
+
+    const searchCategory = decodeAndFormatCategory(category);
 
     // Fetch category data
     const { data: categoryData, error: categoryError } = await supabase

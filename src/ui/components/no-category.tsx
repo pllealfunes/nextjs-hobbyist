@@ -26,7 +26,7 @@ export default function NoResults({
         {categories.map((cat) => (
           <Link
             key={cat.name}
-            href={`/category/${cat.name.toLowerCase()}`}
+            href={`/category/${cat.name.toLowerCase().replace(/\s+/g, "-")}`}
             className="bg-rose-500 hover:bg-rose-600 text-white font-semibold py-2 px-4 rounded-full shadow-md flex items-center gap-2 transition duration-300"
             aria-label={`Explore ${cat.name.toLowerCase()} category`}
           >
