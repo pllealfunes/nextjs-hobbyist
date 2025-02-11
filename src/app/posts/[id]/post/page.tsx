@@ -1,3 +1,8 @@
+"use client";
+import { useParams, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import Nav from "@/ui/components/nav";
+import Footer from "@/ui/components/footer";
 import { Button } from "@/ui/components/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/ui/components/avatar";
 import { Badge } from "@/ui/components/badge";
@@ -15,9 +20,45 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 
-export default function BlogPost() {
+interface Post {
+  id: string;
+  title: string;
+  content: string;
+  category_id: number;
+  published: boolean;
+  private: boolean;
+  author_id: string;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export default function PostPage() {
+  const { id } = useParams();
+  const searchParams = useSearchParams();
+  const category = searchParams.get("category") || "Unknown";
+  const [post, setPost] = useState<Post | null>(null);
+
+  const capitalizeFirstLetter = (str?: string) => {
+    return str ? str.charAt(0).toUpperCase() + str.slice(1) : "This category";
+  };
+
+  useEffect(() => {
+    if (id) {
+      // Fetch the post data by ID
+      fetch(`/api/posts/post?id=${id}`)
+        .then((response) => response.json())
+        .then((data) => setPost(data))
+        .catch((error) => console.error("Error fetching post:", error));
+    }
+  }, [id]);
+
+  if (!post) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="flex flex-col min-h-screen">
+      <Nav />
       <main className="flex-1 py-12 px-4 md:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
           <Link
@@ -29,7 +70,7 @@ export default function BlogPost() {
           </Link>
           <article>
             <Image
-              src="https://picsum.photos/200/200"
+              src="https://picsum.photos/800/400"
               alt="Blog post cover image"
               width={800}
               height={400}
@@ -54,7 +95,9 @@ export default function BlogPost() {
                     </Link>
                     <div className="flex items-center text-sm">
                       <Calendar className="h-4 w-4 mr-1" />
-                      <time dateTime="2023-05-15">May 15, 2023</time>
+                      <time dateTime="2023-05-15">
+                        {new Date(post.created_at).toLocaleDateString()}
+                      </time>
                       <span className="mx-2">•</span>
                       <Clock className="h-4 w-4 mr-1" />
                       <span>8 min read</span>
@@ -65,61 +108,11 @@ export default function BlogPost() {
                   variant="secondary"
                   className="bg-rose-100 text-rose-700 px-3 py-1 rounded-full text-xs"
                 >
-                  Gardening
+                  {capitalizeFirstLetter(category)}
                 </Badge>
               </div>
-              <h1 className="text-3xl font-bold mb-4">
-                The Art of Bonsai: A Beginner&apos;s Guide
-              </h1>
-              <div className="prose max-w-none">
-                <h2>Introduction to Bonsai</h2>
-                <p>
-                  Bonsai is the ancient Japanese art form of growing and
-                  training miniature trees in containers. This practice combines
-                  horticultural techniques and Asian aesthetics to create living
-                  works of art that can last for generations.
-                </p>
-                <h2>Choosing Your First Bonsai</h2>
-                <p>
-                  When starting your bonsai journey, it&apos;s important to
-                  choose a tree species that is suitable for beginners and your
-                  local climate. Some popular choices include:
-                </p>
-                <ul>
-                  <li>Japanese Maple (Acer palmatum)</li>
-                  <li>Chinese Elm (Ulmus parvifolia)</li>
-                  <li>Ficus species (such as Ficus retusa)</li>
-                  <li>Juniper (Juniperus procumbens &apos;Nana&apos;)</li>
-                </ul>
-                <h2>Basic Bonsai Care</h2>
-                <p>Caring for your bonsai involves several key aspects:</p>
-                <ol>
-                  <li>Watering: Keep the soil moist but not waterlogged</li>
-                  <li>
-                    Sunlight: Provide adequate light based on your tree&apos;s
-                    species
-                  </li>
-                  <li>
-                    Fertilizing: Feed your bonsai regularly during the growing
-                    season
-                  </li>
-                  <li>
-                    Pruning: Regularly trim branches and roots to maintain shape
-                    and size
-                  </li>
-                  <li>
-                    Repotting: Repot every 1-5 years, depending on the
-                    tree&apos;s growth rate
-                  </li>
-                </ol>
-                <h2>Conclusion</h2>
-                <p>
-                  Bonsai is a rewarding hobby that combines artistry with
-                  nature. With patience and dedication, you can create stunning
-                  miniature trees that will bring beauty and tranquility to your
-                  space for years to come.
-                </p>
-              </div>
+              <h1 className="text-3xl font-bold mb-4">{post.title}</h1>
+              <div className="prose max-w-none">{post.content}</div>
             </div>
           </article>
           <div className="mt-8 flex justify-end items-center">
@@ -135,6 +128,23 @@ export default function BlogPost() {
             </div>
           </div>
           <Separator className="my-8" />
+          <div className="mt-8">
+            <h3 className="text-xl font-semibold mb-4 text-rose-500">
+              Leave a Comment
+            </h3>
+            <div className="bg-white rounded-lg shadow p-4">
+              <Textarea
+                placeholder="Write your comment here..."
+                className="mb-4 border-blue-200 focus:border-blue-500 focus:ring-blue-500"
+              />
+              <div className="flex justify-end">
+                <Button className="bg-rose-500 hover:bg-rose-600 text-white">
+                  <Send className="h-4 w-4 mr-2" />
+                  Post Comment
+                </Button>
+              </div>
+            </div>
+          </div>
           <section className="mt-12">
             <h2 className="text-2xl font-bold mb-6 text-rose-500">Comments</h2>
             <div className="space-y-6">
@@ -144,14 +154,14 @@ export default function BlogPost() {
                   avatar: "/placeholder.svg?height=40&width=40",
                   date: "June 1, 2023",
                   content:
-                    "Great article! I&apos;ve been interested in starting bonsai as a hobby, and this guide is really helpful. Do you have any recommendations for good bonsai workshops or classes for beginners?",
+                    "Great article! I've been interested in starting bonsai as a hobby, and this guide is really helpful. Do you have any recommendations for good bonsai workshops or classes for beginners?",
                 },
                 {
                   author: "Bob Smith",
                   avatar: "/placeholder.svg?height=40&width=40",
                   date: "June 2, 2023",
                   content:
-                    "I&apos;ve been practicing bonsai for a few years now, and I can attest to how rewarding it is. One tip I&apos;d add is to join a local bonsai club if possible. It&apos;s a great way to learn from experienced practitioners and get hands-on guidance.",
+                    "I've been practicing bonsai for a few years now, and I can attest to how rewarding it is. One tip I'd add is to join a local bonsai club if possible. It's a great way to learn from experienced practitioners and get hands-on guidance.",
                 },
               ].map((comment, index) => (
                 <div key={index} className="bg-white rounded-lg shadow p-4">
@@ -178,23 +188,6 @@ export default function BlogPost() {
                   <p className="text-zinc-900">{comment.content}</p>
                 </div>
               ))}
-            </div>
-            <div className="mt-8">
-              <h3 className="text-xl font-semibold mb-4 text-rose-500">
-                Leave a Comment
-              </h3>
-              <div className="bg-white rounded-lg shadow p-4">
-                <Textarea
-                  placeholder="Write your comment here..."
-                  className="mb-4 border-blue-200 focus:border-blue-500 focus:ring-blue-500"
-                />
-                <div className="flex justify-end">
-                  <Button className="bg-rose-500 hover:bg-rose-600 text-white">
-                    <Send className="h-4 w-4 mr-2" />
-                    Post Comment
-                  </Button>
-                </div>
-              </div>
             </div>
           </section>
           <Separator className="my-8" />
@@ -249,6 +242,7 @@ export default function BlogPost() {
           </section>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

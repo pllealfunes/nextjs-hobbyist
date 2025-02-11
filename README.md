@@ -25,15 +25,17 @@ https://nextjs-hobbyist.vercel.app/
 ## Current Tasks:
 
 - [x] create new post
-- [ ] check new post format
 - [x] view new post on profile
 - [x] check post under category
+- [x] basic view individual post
 - [ ] look into cloudinary and connect to db to save media (photos + videos
 - [ ] create new post with photo
 - [ ] create new post with video
 - [ ] create new post with/out photo
 - [ ] create new post with/out video
 - [ ] check added media in database and cloudinary
+- [ ] check new post format
+- [ ] final view individual post
 
 ## Project Tasks:
 
