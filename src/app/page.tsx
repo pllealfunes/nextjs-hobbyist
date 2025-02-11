@@ -17,6 +17,9 @@ import {
   NotebookPen,
   Search,
   MessagesSquare,
+  GraduationCap,
+  Heart,
+  Leaf,
 } from "lucide-react";
 
 // Sample cards with data from JSONPlaceholder API
@@ -67,11 +70,14 @@ const cards = [
 const categories = [
   { name: "Physical", icon: <Dumbbell className="w-5 h-5" /> },
   { name: "Creative", icon: <Palette className="w-5 h-5" /> },
+  { name: "Nature", icon: <Leaf className="w-5 h-5" /> },
   { name: "Mental", icon: <Brain className="w-5 h-5" /> },
-  { name: "Food", icon: <Utensils className="w-5 h-5" /> },
   { name: "Musical", icon: <Music className="w-5 h-5" /> },
   { name: "Collecting", icon: <Box className="w-5 h-5" /> },
   { name: "Games + Puzzles", icon: <Puzzle className="w-5 h-5" /> },
+  { name: "Food", icon: <Utensils className="w-5 h-5" /> },
+  { name: "Lifestyle", icon: <Heart className="w-5 h-5" /> },
+  { name: "Education", icon: <GraduationCap className="w-5 h-5" /> },
 ];
 
 // Sample cards with data from JSONPlaceholder API
