@@ -28,35 +28,28 @@ https://nextjs-hobbyist.vercel.app/
 - [x] view new post on profile
 - [x] check post under category
 - [x] basic view individual post
-- [ ] look into cloudinary and connect to db to save media (photos + videos
-- [ ] create new post with photo
-- [ ] create new post with video
-- [ ] create new post with/out photo
-- [ ] create new post with/out video
+- [ ] look into cloudinary and connect to db to save media (photos + videos)
+- [ ] create new post with photo or video and w/out photo or video
 - [ ] check added media in database and cloudinary
 - [ ] check new post format
-- [ ] final view individual post
-
-## Project Tasks:
-
-- [ ] update database schemas
-- [ ] update post
-- [ ] update post with photo
-- [ ] update post with video
-- [ ] update post with/out photo
-- [ ] update post with/out video
-- [ ] view updated post on profile
-- [ ] check updated post format
-- [ ] check post under category
-- [ ] check updated media in database and cloudinary
 
 - [ ] mark posts as published and unpublished
 - [ ] display unpublished posts
 - [ ] display published and unpublished posts on calendar
 
-- [ ] check database for posts
-- [ ] check profile for posts
-- [ ] check category for posts
+- [ ] final view individual post
+- [ ] final check database for posts
+- [ ] final check profile for posts
+- [ ] final check category for posts
+
+## Project Tasks:
+
+- [ ] update post
+- [ ] update post with photo or video and w/out photo or video
+- [ ] view updated post on profile
+- [ ] check updated post format
+- [ ] check post under category
+- [ ] check updated media in database and cloudinary
 
 - [ ] create new comment
 - [ ] check new comment format
@@ -73,19 +66,21 @@ https://nextjs-hobbyist.vercel.app/
 - [ ] update user info
 
 - [ ] search posts
-- [ ] create user like functionality
-- [ ] display data in charts
+- [ ] create like functionality
 
 - [ ] follow and unfollow users
 - [ ] follow and unfollow categories
+
+- [ ] display data in charts
 
 - [ ] display real time updates/notifications
 
 - [ ] chat/dms between users
 
+- [ ] create seeds
+
 Leftovers
 
-- [ ] 500 after user sign up and logged in after first time - check again with new user
 - [ ] protected routes
 - [ ] fix layout of calendar and chart in pblished and drafts pages
 - [ ] fix how chart looks on md screens in dashboard
@@ -115,3 +110,8 @@ bun dev
 - ChatGPT
 - React Big Calendar Crash Course in 30 minutes [Usman Abdur Rehman](https://www.youtube.com/watch?v=ZFhDJAOd9Tg)
 - V0
+- Supabase Docs
+- ChatGPT + Microsoft Copilot
+- Youtube
+- Cloudinary Tutorials
+- Next.js Docs
