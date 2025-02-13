@@ -8,16 +8,19 @@ import Image from "@tiptap/extension-image";
 import DragHandle from "@tiptap-pro/extension-drag-handle-react";
 import CharacterCount from "@tiptap/extension-character-count";
 import FileHandler from "@tiptap-pro/extension-file-handler";
-import { useEffect } from "react";
+import ImageResize from "tiptap-extension-resize-image";
+import { useEffect, useState } from "react";
 
 interface TextEditorProps {
-  content: string;
-  onChange: (content: string) => void;
+  content: string | object;
+  onChange: (content: string | object) => void;
 }
 
 const limit = 12500;
 
 export default function TextEditor({ content, onChange }: TextEditorProps) {
+  const [isUploading, setIsUploading] = useState(false);
+
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -26,6 +29,7 @@ export default function TextEditor({ content, onChange }: TextEditorProps) {
       }),
       Highlight,
       Image,
+      ImageResize,
       FileHandler.configure({
         allowedMimeTypes: [
           "image/png",
@@ -36,54 +40,68 @@ export default function TextEditor({ content, onChange }: TextEditorProps) {
         onDrop: (currentEditor, files, pos) => {
           files.forEach((file) => {
             const fileReader = new FileReader();
-
             fileReader.readAsDataURL(file);
+
             fileReader.onload = () => {
+              // Insert image locally first
               currentEditor
                 .chain()
                 .insertContentAt(pos, {
                   type: "image",
-                  attrs: {
-                    src: fileReader.result,
-                  },
+                  attrs: { src: fileReader.result },
                 })
                 .focus()
                 .run();
+
+              // Upload to Cloudinary
+              setIsUploading(true);
+              const formData = new FormData();
+              formData.append("file", file);
+              formData.append("upload_preset", "tiptap_uploads"); // Replace with your preset
+
+              fetch(
+                "https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/image/upload",
+                {
+                  method: "POST",
+                  body: formData,
+                }
+              )
+                .then((res) => res.json())
+                .then((data) => {
+                  currentEditor.commands.setImage({ src: data.secure_url });
+                })
+                .finally(() => setIsUploading(false));
             };
           });
         },
         onPaste: (currentEditor, files, htmlContent) => {
           files.forEach((file) => {
             if (htmlContent) {
-              // if there is htmlContent, stop manual insertion & let other extensions handle insertion via inputRule
-              // you could extract the pasted file from this url string and upload it to a server for example
-              console.log(htmlContent); // eslint-disable-line no-console
-              return false;
+              console.log("Pasted HTML content:", htmlContent);
+              return false; // Prevent duplicate insertion
             }
 
             const fileReader = new FileReader();
-
             fileReader.readAsDataURL(file);
+
             fileReader.onload = () => {
               currentEditor
                 .chain()
                 .insertContentAt(currentEditor.state.selection.anchor, {
                   type: "image",
-                  attrs: {
-                    src: fileReader.result,
-                  },
+                  attrs: { src: fileReader.result },
                 })
                 .focus()
                 .run();
             };
           });
         },
-      }),
+      }), // Missing closing bracket and comma added here
       CharacterCount.configure({
         limit: 12500,
       }),
     ],
-    content: content, // Set initial content
+    content: content,
     editorProps: {
       attributes: {
         class: "min-h-[400px] border rounded-md py-4 px-4 text-lg",
@@ -131,7 +149,7 @@ export default function TextEditor({ content, onChange }: TextEditorProps) {
         </svg>
       </DragHandle>
 
-      {/* Make the editor bigger */}
+      {isUploading && <p>Uploading image...</p>}
       <EditorContent editor={editor} />
 
       {/* Character and Word Count */}

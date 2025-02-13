@@ -35,10 +35,39 @@ interface ToolBarProps {
 export default function ToolBar({ editor }: ToolBarProps) {
   if (!editor) return null;
 
-  const addImage = () => {
-    const url = window.prompt("URL");
-    if (url) {
-      editor.chain().focus().setImage({ src: url }).run();
+  const addImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.files || !event.target.files[0]) return;
+
+    const file = event.target.files[0];
+
+    // Ensure file is an image
+    if (
+      !["image/png", "image/jpeg", "image/gif", "image/webp"].includes(
+        file.type
+      )
+    ) {
+      alert("Only PNG, JPG, GIF, and WEBP images are allowed.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "tiptap_uploads"); // Replace with your Cloudinary preset
+
+    try {
+      const res = await fetch(
+        "https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/image/upload",
+        { method: "POST", body: formData }
+      );
+
+      const data = await res.json();
+
+      if (data.secure_url) {
+        editor?.chain().focus().setImage({ src: data.secure_url }).run();
+      }
+    } catch (error) {
+      console.error("Image upload failed", error);
+      alert("Image upload failed.");
     }
   };
 
@@ -139,9 +168,10 @@ export default function ToolBar({ editor }: ToolBarProps) {
     },
     {
       icon: <Upload className="size-4" />,
-      onClick: () => addImage(),
+      onClick: () => document.getElementById("imageUploadInput")?.click(),
       preesed: editor.isActive("image"),
     },
+
     {
       icon: <Undo className="size-4" />,
       onClick: () => editor.chain().focus().undo().run(),
@@ -166,6 +196,13 @@ export default function ToolBar({ editor }: ToolBarProps) {
           {option.icon}
         </Toggle>
       ))}
+      <input
+        type="file"
+        id="imageUploadInput"
+        accept="image/png, image/jpeg, image/gif, image/webp"
+        className="hidden"
+        onChange={addImage}
+      />
     </div>
   );
 }
