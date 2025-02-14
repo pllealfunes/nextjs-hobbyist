@@ -7,7 +7,6 @@ import Highlight from "@tiptap/extension-highlight";
 import Image from "@tiptap/extension-image";
 import DragHandle from "@tiptap-pro/extension-drag-handle-react";
 import CharacterCount from "@tiptap/extension-character-count";
-import FileHandler from "@tiptap-pro/extension-file-handler";
 import ImageResize from "tiptap-extension-resize-image";
 import { useEffect, useState } from "react";
 
@@ -30,73 +29,6 @@ export default function TextEditor({ content, onChange }: TextEditorProps) {
       Highlight,
       Image,
       ImageResize,
-      FileHandler.configure({
-        allowedMimeTypes: [
-          "image/png",
-          "image/jpeg",
-          "image/gif",
-          "image/webp",
-        ],
-        onDrop: (currentEditor, files, pos) => {
-          files.forEach((file) => {
-            const fileReader = new FileReader();
-            fileReader.readAsDataURL(file);
-
-            fileReader.onload = () => {
-              // Insert image locally first
-              currentEditor
-                .chain()
-                .insertContentAt(pos, {
-                  type: "image",
-                  attrs: { src: fileReader.result },
-                })
-                .focus()
-                .run();
-
-              // Upload to Cloudinary
-              setIsUploading(true);
-              const formData = new FormData();
-              formData.append("file", file);
-              formData.append("upload_preset", "tiptap_uploads"); // Replace with your preset
-
-              fetch(
-                "https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/image/upload",
-                {
-                  method: "POST",
-                  body: formData,
-                }
-              )
-                .then((res) => res.json())
-                .then((data) => {
-                  currentEditor.commands.setImage({ src: data.secure_url });
-                })
-                .finally(() => setIsUploading(false));
-            };
-          });
-        },
-        onPaste: (currentEditor, files, htmlContent) => {
-          files.forEach((file) => {
-            if (htmlContent) {
-              console.log("Pasted HTML content:", htmlContent);
-              return false; // Prevent duplicate insertion
-            }
-
-            const fileReader = new FileReader();
-            fileReader.readAsDataURL(file);
-
-            fileReader.onload = () => {
-              currentEditor
-                .chain()
-                .insertContentAt(currentEditor.state.selection.anchor, {
-                  type: "image",
-                  attrs: { src: fileReader.result },
-                })
-                .focus()
-                .run();
-            };
-          });
-        },
-      }), // Missing closing bracket and comma added here
       CharacterCount.configure({
         limit: 12500,
       }),
@@ -105,6 +37,36 @@ export default function TextEditor({ content, onChange }: TextEditorProps) {
     editorProps: {
       attributes: {
         class: "min-h-[400px] border rounded-md py-4 px-4 text-lg",
+      },
+      handleDrop: (view, event) => {
+        const hasFiles = event.dataTransfer?.files?.length;
+
+        if (!hasFiles) {
+          return false;
+        }
+
+        const files = Array.from(event.dataTransfer.files);
+        const images = files.filter((file) => /image/i.test(file.type));
+
+        if (images.length === 0) {
+          return false;
+        }
+
+        images.forEach((image) => {
+          const reader = new FileReader();
+
+          reader.onload = (readerEvent) => {
+            const node = view.state.schema.nodes.image.create({
+              src: readerEvent.target?.result,
+            });
+            const transaction = view.state.tr.replaceSelectionWith(node);
+            view.dispatch(transaction);
+          };
+
+          reader.readAsDataURL(image);
+        });
+
+        return true;
       },
     },
     onUpdate: ({ editor }) => {

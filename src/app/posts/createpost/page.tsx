@@ -141,7 +141,7 @@ export default function CreatePost() {
                 <FormControl>
                   <Select
                     value={field.value}
-                    onValueChange={field.onChange}
+                    onValueChange={(value) => field.onChange(value)}
                     required
                   >
                     <SelectTrigger id="category">

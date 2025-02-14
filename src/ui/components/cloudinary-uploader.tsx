@@ -1,19 +1,34 @@
 "use client";
 
-import { CldUploadButton } from "next-cloudinary";
+import { CldUploadWidget } from "next-cloudinary";
 import React from "react";
+import { Upload } from "lucide-react";
 
-const cloudPresetName = process.env.CLOUDINARY_PRESET_NAME;
+interface CloudinaryUploaderProps {
+  onUpload: (url: string) => void;
+}
 
-export default function CloudinaryUploader() {
+export default function CloudinaryUploader({
+  onUpload,
+}: CloudinaryUploaderProps) {
+  const handleSuccess = (result: any) => {
+    const { secure_url } = result.info;
+    onUpload(secure_url);
+  };
+
   return (
     <div>
-      <CldUploadButton
+      <CldUploadWidget
         options={{ multiple: true }}
-        uploadPreset={cloudPresetName}
+        signatureEndpoint="/api/sign-image"
+        onSuccess={handleSuccess}
       >
-        <span>Upload Image</span>
-      </CldUploadButton>
+        {({ open }) => (
+          <div onClick={() => open()}>
+            <Upload className="size-4" />
+          </div>
+        )}
+      </CldUploadWidget>
     </div>
   );
 }

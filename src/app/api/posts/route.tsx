@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 //import prisma from "@/lib/prisma";
 import { createClient } from "@/utils/supabase/server";
 
@@ -28,40 +28,46 @@ export async function GET() {
   }
 }
 
-// export async function POST(req: NextRequest) {
-//   if (req.method === "POST") {
-//     try {
-//       console.log("Creating a new post...");
-//       const { title, categoryId, content } = await req.json();
-//       const post = await prisma.post.create({
-//         data: {
-//           title,
-//           categoryId,
-//           content,
-//         },
-//       });
-//       console.log("Post created:", post);
-//       return NextResponse.json(post, { status: 201 });
-//     } catch (error: unknown) {
-//       let errorMessage = "Unknown error";
+export async function POST(req: NextRequest) {
+  if (req.method === "POST") {
+    try {
+      console.log("Creating a new post...");
+      const { title, category_id, content } = await req.json();
 
-//       if (error instanceof Error) {
-//         errorMessage = error.message;
-//         console.error("Error details:", {
-//           message: error.message,
-//           stack: error.stack,
-//           name: error.name,
-//         });
-//       } else {
-//         console.error("Unexpected error:", error);
-//       }
+      // Initialize the Supabase client
+      const supabase = await createClient();
 
-//       return NextResponse.json(
-//         { error: "Error creating post", message: errorMessage },
-//         { status: 500 }
-//       );
-//     }
-//   } else {
-//     return NextResponse.json({ error: "Method not allowed" }, { status: 405 });
-//   }
-// }
+      // Insert the new post into Supabase
+      const { data, error } = await supabase
+        .from("Post") // Replace with your table name
+        .insert([{ title, category_id, content }]);
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      console.log("Post created:", data);
+      return NextResponse.json(data, { status: 201 });
+    } catch (error: unknown) {
+      let errorMessage = "Unknown error";
+
+      if (error instanceof Error) {
+        errorMessage = error.message;
+        console.error("Error details:", {
+          message: error.message,
+          stack: error.stack,
+          name: error.name,
+        });
+      } else {
+        console.error("Unexpected error:", error);
+      }
+
+      return NextResponse.json(
+        { error: "Error creating post", message: errorMessage },
+        { status: 500 }
+      );
+    }
+  } else {
+    return NextResponse.json({ error: "Method not allowed" }, { status: 405 });
+  }
+}
