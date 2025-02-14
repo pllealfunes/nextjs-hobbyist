@@ -18,8 +18,6 @@ interface TextEditorProps {
 const limit = 12500;
 
 export default function TextEditor({ content, onChange }: TextEditorProps) {
-  const [isUploading, setIsUploading] = useState(false);
-
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -111,7 +109,6 @@ export default function TextEditor({ content, onChange }: TextEditorProps) {
         </svg>
       </DragHandle>
 
-      {isUploading && <p>Uploading image...</p>}
       <EditorContent editor={editor} />
 
       {/* Character and Word Count */}
