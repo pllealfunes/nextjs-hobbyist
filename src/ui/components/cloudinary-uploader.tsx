@@ -15,10 +15,6 @@ interface UploadResultInfo {
   secure_url: string;
 }
 
-type UploadResult = {
-  info: UploadResultInfo | string | undefined;
-};
-
 export default function CloudinaryUploader({
   onUpload,
 }: CloudinaryUploaderProps) {

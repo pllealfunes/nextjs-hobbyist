@@ -8,7 +8,7 @@ import Image from "@tiptap/extension-image";
 import DragHandle from "@tiptap-pro/extension-drag-handle-react";
 import CharacterCount from "@tiptap/extension-character-count";
 import ImageResize from "tiptap-extension-resize-image";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 interface TextEditorProps {
   content: string | object;
