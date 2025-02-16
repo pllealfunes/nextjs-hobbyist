@@ -30,3 +30,24 @@ export const SignUpSchema = z.object({
     .min(5, { message: "Please confirm the password by typing it again." })
     .max(15),
 });
+
+// Define the type for the 'html' parameter
+function extractTextFromHTML(html: string): string {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, "text/html");
+  return doc.body.textContent?.trim() || "";
+}
+
+export const CreatePostSchema = z.object({
+  title: z.string().min(10, "A Title of at least 10 characters is required"),
+  category: z.string().min(1, "Category is required"),
+  coverPhoto: z.string().url("Cover photo must be a valid URL").optional(),
+  content: z.string().refine(
+    (value) => {
+      return extractTextFromHTML(value).trim().length >= 200;
+    },
+    {
+      message: "A post must be 200 to 12500 characters long after trimming",
+    }
+  ),
+});

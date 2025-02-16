@@ -7,6 +7,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/ui/components/button";
 import { Input } from "@/ui/components/input";
 import { useRouter } from "next/navigation";
+import CoverPhotoUploader from "@/ui/components/coverphoto-uploader";
+import { CreatePostSchema } from "@/app/schemas";
 import {
   Select,
   SelectContent,
@@ -25,29 +27,8 @@ import {
   FormMessage,
 } from "@/ui/components/form";
 
-// Define the type for the 'html' parameter
-function extractTextFromHTML(html: string): string {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, "text/html");
-  return doc.body.textContent?.trim() || "";
-}
-
-// Validation schema
-const formSchema = z.object({
-  content: z.string().refine(
-    (value) => {
-      return extractTextFromHTML(value).trim().length >= 200;
-    },
-    {
-      message: "A post must be 200 to 12500 characters long after trimming",
-    }
-  ),
-  title: z.string().min(10, "A Title of at least 10 characters is required"),
-  category: z.string().min(1, "Category is required"),
-});
-
 // Define the type for form data
-type FormData = z.infer<typeof formSchema>;
+type FormData = z.infer<typeof CreatePostSchema>;
 
 type Category = {
   id: number;
@@ -59,11 +40,12 @@ export default function CreatePost() {
 
   const form = useForm<FormData>({
     mode: "onTouched",
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(CreatePostSchema),
     defaultValues: {
-      content: "",
-      category: "",
       title: "",
+      category: "",
+      coverPhoto: "",
+      content: "",
     },
   });
 
@@ -96,6 +78,7 @@ export default function CreatePost() {
         body: JSON.stringify({
           title: data.title,
           category_id: parseInt(data.category),
+          coverPhoto: data.coverPhoto,
           content: data.content,
         }),
       });
@@ -167,6 +150,20 @@ export default function CreatePost() {
               </FormItem>
             )}
           />
+          {/* Cover Photo Field */}
+          <FormField
+            control={form.control}
+            name="coverPhoto"
+            render={({ field }) => (
+              <FormItem className="my-2">
+                <FormLabel className="text-lg">Cover Photo</FormLabel>
+                <FormControl>
+                  <CoverPhotoUploader onUpload={(url) => field.onChange(url)} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           {/* Post Field */}
           <FormField
             control={form.control}
@@ -185,7 +182,7 @@ export default function CreatePost() {
             )}
           />
           <FormMessage />
-          <FormDescription>Use The Form to Freate a New Post</FormDescription>
+          <FormDescription>Use The Form to Create a New Post</FormDescription>
           {/* Container for Word Count and Submit Button */}
           <div className="flex justify-end items-end mt-4">
             <div className="mr-4">
