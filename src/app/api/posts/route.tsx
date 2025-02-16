@@ -37,10 +37,24 @@ export async function POST(req: NextRequest) {
       // Initialize the Supabase client
       const supabase = await createClient();
 
+      // Fetch the authenticated user directly from Supabase
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
+      if (userError) {
+        throw new Error(userError.message);
+      }
+
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+
       // Insert the new post into Supabase
       const { data, error } = await supabase
         .from("Post") // Replace with your table name
-        .insert([{ title, category_id, content }]);
+        .insert([{ title, category_id, author_id: user.id, content }]);
 
       if (error) {
         throw new Error(error.message);

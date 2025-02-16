@@ -92,7 +92,7 @@ export default function CreatePost() {
         },
         body: JSON.stringify({
           title: data.title,
-          categoryId: parseInt(data.category),
+          category_id: parseInt(data.category),
           content: data.content,
         }),
       });

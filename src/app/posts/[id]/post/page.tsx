@@ -112,7 +112,10 @@ export default function PostPage() {
                 </Badge>
               </div>
               <h1 className="text-3xl font-bold mb-4">{post.title}</h1>
-              <div className="prose max-w-none">{post.content}</div>
+              <div
+                className="prose max-w-none"
+                dangerouslySetInnerHTML={{ __html: post.content }}
+              />
             </div>
           </article>
           <div className="mt-8 flex justify-end items-center">
