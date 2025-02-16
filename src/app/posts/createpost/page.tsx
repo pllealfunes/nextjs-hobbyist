@@ -6,6 +6,7 @@ import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/ui/components/button";
 import { Input } from "@/ui/components/input";
+import { useRouter } from "next/navigation";
 import {
   Select,
   SelectContent,
@@ -54,6 +55,8 @@ type Category = {
 };
 
 export default function CreatePost() {
+  const router = useRouter();
+
   const form = useForm<FormData>({
     mode: "onTouched",
     resolver: zodResolver(formSchema),
@@ -100,6 +103,7 @@ export default function CreatePost() {
       if (response.ok) {
         const post = await response.json();
         console.log("Post created successfully", post);
+        router.push(`/posts/${post.id}`);
       } else {
         console.error("Error creating post");
       }
