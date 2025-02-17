@@ -41,7 +41,7 @@ function extractTextFromHTML(html: string): string {
 export const CreatePostSchema = z.object({
   title: z.string().min(10, "A Title of at least 10 characters is required"),
   category: z.string().min(1, "Category is required"),
-  coverPhoto: z.string().url("Cover photo must be a valid URL").optional(),
+  coverphoto: z.string().url("Cover photo must be a valid URL").optional(),
   content: z.string().refine(
     (value) => {
       return extractTextFromHTML(value).trim().length >= 200;

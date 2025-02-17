@@ -1,3 +1,4 @@
+import { useState } from "react";
 import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -37,16 +38,37 @@ const CreatePostForm: React.FC<{
   categories: Category[];
   onSubmit: SubmitHandler<FormData>;
 }> = ({ categories, onSubmit }) => {
+  const [localCoverPhoto, setLocalCoverPhoto] = useState<string | null>(null);
   const form = useForm<FormData>({
     mode: "onTouched",
     resolver: zodResolver(CreatePostSchema),
     defaultValues: {
       title: "",
       category: "",
-      coverPhoto: undefined,
+      coverphoto: "",
       content: "",
     },
   });
+
+  const handleFormSubmit = async (data: FormData) => {
+    // Upload cover photo to Cloudinary
+    let coverPhotoUrl = "";
+    if (localCoverPhoto) {
+      const formData = new FormData();
+      formData.append("file", localCoverPhoto);
+
+      const response = await fetch("/api/sign-image", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await response.json();
+      coverPhotoUrl = result.secure_url;
+    }
+
+    // Call the onSubmit handler with the uploaded photo URL
+    onSubmit({ ...data, coverphoto: coverPhotoUrl });
+  };
 
   return (
     <div className="max-w-3xl mx-auto py-5">
@@ -106,12 +128,18 @@ const CreatePostForm: React.FC<{
           {/* Cover Photo Field */}
           <FormField
             control={form.control}
-            name="coverPhoto"
+            name="coverphoto"
             render={({ field }) => (
               <FormItem className="my-2">
                 <FormLabel className="text-lg">Cover Photo</FormLabel>
                 <FormControl>
-                  <CoverPhotoUploader onUpload={(url) => field.onChange(url)} />
+                  <CoverPhotoUploader
+                    onImageSelect={(url) => {
+                      console.log("Cover photo selected", url);
+                      field.onChange(url);
+                      setLocalCoverPhoto(url);
+                    }}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

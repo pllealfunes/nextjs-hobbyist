@@ -42,7 +42,7 @@ export default function CreatePost() {
       title: string;
       category_id: number;
       content: string;
-      coverPhoto?: string; // Explicitly typed as optional
+      coverphoto?: string;
     } = {
       title: data.title,
       category_id: parseInt(data.category),
@@ -50,8 +50,8 @@ export default function CreatePost() {
     };
 
     // Only include coverPhoto if it's not empty or null
-    if (data.coverPhoto && data.coverPhoto.trim() !== "") {
-      payload.coverPhoto = data.coverPhoto;
+    if (data.coverphoto && data.coverphoto.trim() !== "") {
+      payload.coverphoto = data.coverphoto;
     }
 
     try {

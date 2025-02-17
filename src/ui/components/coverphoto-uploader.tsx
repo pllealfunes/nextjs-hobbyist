@@ -1,37 +1,51 @@
 "use client";
 
-import { CldUploadWidget } from "next-cloudinary";
+import { useState } from "react";
 import React from "react";
 import { Upload } from "lucide-react";
+import Image from "next/image";
 
 interface CoverPhotoUploaderProps {
-  onUpload: (url: string) => void;
+  onImageSelect: (url: string) => void;
 }
 
 export default function CoverPhotoUploader({
-  onUpload,
+  onImageSelect,
 }: CoverPhotoUploaderProps) {
-  const handleSuccess = (result: any) => {
-    const { secure_url } = result.info;
-    onUpload(secure_url);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const fileUrl = URL.createObjectURL(file);
+      setPreviewUrl(fileUrl);
+      onImageSelect(fileUrl); // Pass the local URL to the parent
+    }
   };
 
   return (
-    <CldUploadWidget
-      options={{ multiple: false }}
-      signatureEndpoint="/api/sign-image"
-      onSuccess={handleSuccess}
-    >
-      {({ open }) => (
-        <button
-          type="button"
-          onClick={() => open()}
-          className="flex items-center space-x-2"
-        >
-          <Upload className="size-4" />
-          <span>Upload Cover Photo</span>
-        </button>
+    <div>
+      <label className="flex items-center space-x-2 cursor-pointer">
+        <Upload className="size-4" />
+        <span>Upload Cover Photo</span>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
+          className="hidden"
+        />
+      </label>
+      {previewUrl && (
+        <div className="mt-4">
+          <Image
+            src={previewUrl}
+            alt="Cover Photo Preview"
+            width={200}
+            height={200}
+            className="rounded-lg"
+          />
+        </div>
       )}
-    </CldUploadWidget>
+    </div>
   );
 }

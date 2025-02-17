@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
   if (req.method === "POST") {
     try {
       console.log("Creating a new post...");
-      const { title, category_id, content } = await req.json();
+      const { title, category_id, coverphoto, content } = await req.json();
 
       // Initialize the Supabase client
       const supabase = await createClient();
@@ -54,7 +54,9 @@ export async function POST(req: NextRequest) {
       // Insert the new post into Supabase
       const { data, error } = await supabase
         .from("Post") // Replace with your table name
-        .insert([{ title, category_id, author_id: user.id, content }]);
+        .insert([
+          { title, category_id, author_id: user.id, coverphoto, content },
+        ]);
 
       if (error) {
         throw new Error(error.message);

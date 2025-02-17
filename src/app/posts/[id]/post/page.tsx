@@ -23,6 +23,7 @@ import Image from "next/image";
 interface Post {
   id: string;
   title: string;
+  coverphoto: string;
   content: string;
   category_id: number;
   published: boolean;
@@ -69,13 +70,16 @@ export default function PostPage() {
             Back to Home
           </Link>
           <article>
-            <Image
-              src="https://picsum.photos/800/400"
-              alt="Blog post cover image"
-              width={800}
-              height={400}
-              className="w-full object-cover rounded-lg"
-            />
+            {post.coverphoto && (
+              <Image
+                src={post.coverphoto}
+                alt="Blog post cover image"
+                width={800}
+                height={400}
+                className="w-full object-cover rounded-lg"
+              />
+            )}
+
             <div className="p-6 md:p-8">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center space-x-4">
