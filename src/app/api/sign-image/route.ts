@@ -1,5 +1,5 @@
 import { v2 as cloudinary } from "cloudinary";
-const crypto = require("crypto");
+import crypto from "crypto";
 
 export async function POST(request: Request) {
   try {

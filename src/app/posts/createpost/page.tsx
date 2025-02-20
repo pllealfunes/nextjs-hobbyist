@@ -5,7 +5,7 @@ import CreatePostForm from "@/ui/forms/createpost-form";
 import { SubmitHandler } from "react-hook-form";
 import { CreatePostSchema } from "@/app/schemas";
 import { z } from "zod";
-const crypto = require("crypto");
+import crypto from "crypto";
 
 // Define the type for form data
 type FormData = z.infer<typeof CreatePostSchema>;

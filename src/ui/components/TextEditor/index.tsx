@@ -19,7 +19,7 @@ interface TextEditorProps {
 const limit = 12500;
 
 export default function TextEditor({ content, onChange }: TextEditorProps) {
-  const [isUploading, setIsUploading] = useState(false);
+  //const [isUploading, setIsUploading] = useState(false);
 
   const editor = useEditor({
     extensions: [

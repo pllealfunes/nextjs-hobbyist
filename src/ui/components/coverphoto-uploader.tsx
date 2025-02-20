@@ -14,13 +14,13 @@ export default function CoverPhotoUploader({
   onImageSelect,
 }: CoverPhotoUploaderProps) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  // const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       setPreviewUrl(URL.createObjectURL(file)); // Create a temporary URL for preview
-      setSelectedFile(file);
+      // setSelectedFile(file);
       onImageSelect(file); // Pass the File object to the parent
     }
     console.log(file);
@@ -28,7 +28,7 @@ export default function CoverPhotoUploader({
 
   const removeCoverPhoto = () => {
     setPreviewUrl(null);
-    setSelectedFile(null);
+    // setSelectedFile(null);
     onImageSelect(null);
   };
 

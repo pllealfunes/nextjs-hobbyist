@@ -35,9 +35,9 @@ interface ToolBarProps {
 export default function ToolBar({ editor }: ToolBarProps) {
   if (!editor) return null;
 
-  const handleUpload = (url: string) => {
-    editor.chain().focus().setImage({ src: url }).run();
-  };
+  // const handleUpload = (url: string) => {
+  //   editor.chain().focus().setImage({ src: url }).run();
+  // };
 
   const Options = [
     {
