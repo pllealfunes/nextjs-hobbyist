@@ -32,7 +32,8 @@ export async function POST(req: NextRequest) {
   if (req.method === "POST") {
     try {
       console.log("Creating a new post...");
-      const { title, category_id, coverphoto, content } = await req.json();
+      const { title, category_id, coverphoto, content, published } =
+        await req.json();
 
       // Initialize the Supabase client
       const supabase = await createClient();
@@ -55,15 +56,23 @@ export async function POST(req: NextRequest) {
       const { data, error } = await supabase
         .from("Post") // Replace with your table name
         .insert([
-          { title, category_id, author_id: user.id, coverphoto, content },
-        ]);
+          {
+            title,
+            category_id,
+            author_id: user.id,
+            coverphoto,
+            content,
+            published,
+          },
+        ])
+        .select();
 
       if (error) {
         throw new Error(error.message);
       }
 
       console.log("Post created:", data);
-      return NextResponse.json(data, { status: 201 });
+      return NextResponse.json(data[0], { status: 201 });
     } catch (error: unknown) {
       let errorMessage = "Unknown error";
 
@@ -85,5 +94,50 @@ export async function POST(req: NextRequest) {
     }
   } else {
     return NextResponse.json({ error: "Method not allowed" }, { status: 405 });
+  }
+}
+
+export async function PUT(req: NextRequest) {
+  try {
+    const { postId, ...updatedFields } = await req.json();
+
+    // Initialize the Supabase client
+    const supabase = await createClient();
+
+    // Update the post with the provided fields
+    const { data, error } = await supabase
+      .from("Post") // Replace with your table name
+      .update(updatedFields)
+      .eq("id", postId)
+      .select("*"); // Ensure it returns all fields
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    if (!data || data.length === 0) {
+      throw new Error("No post found to update");
+    }
+
+    console.log("Post updated:", data[0]);
+    return NextResponse.json(data[0], { status: 200 });
+  } catch (error: unknown) {
+    let errorMessage = "Unknown error";
+
+    if (error instanceof Error) {
+      errorMessage = error.message;
+      console.error("Error details:", {
+        message: error.message,
+        stack: error.stack,
+        name: error.name,
+      });
+    } else {
+      console.error("Unexpected error:", error);
+    }
+
+    return NextResponse.json(
+      { error: "Error updating post", message: errorMessage },
+      { status: 500 }
+    );
   }
 }

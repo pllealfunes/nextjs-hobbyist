@@ -4,38 +4,37 @@ import { useState } from "react";
 import React from "react";
 import { Upload } from "lucide-react";
 import Image from "next/image";
+import { Button } from "@/ui/components/button";
 
 interface CoverPhotoUploaderProps {
-  onImageSelect: (url: string) => void;
+  onImageSelect: (file: File | null) => void; // Pass a File object instead of a string
 }
 
 export default function CoverPhotoUploader({
   onImageSelect,
 }: CoverPhotoUploaderProps) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      const fileUrl = URL.createObjectURL(file);
-      setPreviewUrl(fileUrl);
-      onImageSelect(fileUrl); // Pass the local URL to the parent
+      setPreviewUrl(URL.createObjectURL(file)); // Create a temporary URL for preview
+      setSelectedFile(file);
+      onImageSelect(file); // Pass the File object to the parent
     }
+    console.log(file);
+  };
+
+  const removeCoverPhoto = () => {
+    setPreviewUrl(null);
+    setSelectedFile(null);
+    onImageSelect(null);
   };
 
   return (
     <div>
-      <label className="flex items-center space-x-2 cursor-pointer">
-        <Upload className="size-4" />
-        <span>Upload Cover Photo</span>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleImageChange}
-          className="hidden"
-        />
-      </label>
-      {previewUrl && (
+      {previewUrl ? (
         <div className="mt-4">
           <Image
             src={previewUrl}
@@ -44,7 +43,21 @@ export default function CoverPhotoUploader({
             height={200}
             className="rounded-lg"
           />
+          <Button className="mt-4" onClick={removeCoverPhoto}>
+            Remove Cover Photo
+          </Button>
         </div>
+      ) : (
+        <label className="flex items-center space-x-2 cursor-pointer">
+          <Upload className="size-4" />
+          <span>Upload Cover Photo</span>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            className="hidden"
+          />
+        </label>
       )}
     </div>
   );

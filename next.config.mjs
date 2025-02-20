@@ -22,6 +22,10 @@ const nextConfig = {
         hostname: "tailwindui.com",
         port: "", // optional, use if needed
       },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+      },
     ],
   },
   serverExternalPackages: ["yjs"],

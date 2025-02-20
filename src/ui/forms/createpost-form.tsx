@@ -38,37 +38,17 @@ const CreatePostForm: React.FC<{
   categories: Category[];
   onSubmit: SubmitHandler<FormData>;
 }> = ({ categories, onSubmit }) => {
-  const [localCoverPhoto, setLocalCoverPhoto] = useState<string | null>(null);
   const form = useForm<FormData>({
     mode: "onTouched",
     resolver: zodResolver(CreatePostSchema),
     defaultValues: {
       title: "",
       category: "",
-      coverphoto: "",
+      coverphoto: undefined,
       content: "",
+      published: false,
     },
   });
-
-  const handleFormSubmit = async (data: FormData) => {
-    // Upload cover photo to Cloudinary
-    let coverPhotoUrl = "";
-    if (localCoverPhoto) {
-      const formData = new FormData();
-      formData.append("file", localCoverPhoto);
-
-      const response = await fetch("/api/sign-image", {
-        method: "POST",
-        body: formData,
-      });
-
-      const result = await response.json();
-      coverPhotoUrl = result.secure_url;
-    }
-
-    // Call the onSubmit handler with the uploaded photo URL
-    onSubmit({ ...data, coverphoto: coverPhotoUrl });
-  };
 
   return (
     <div className="max-w-3xl mx-auto py-5">
@@ -129,15 +109,14 @@ const CreatePostForm: React.FC<{
           <FormField
             control={form.control}
             name="coverphoto"
-            render={({ field }) => (
+            render={() => (
               <FormItem className="my-2">
                 <FormLabel className="text-lg">Cover Photo</FormLabel>
                 <FormControl>
                   <CoverPhotoUploader
-                    onImageSelect={(url) => {
-                      console.log("Cover photo selected", url);
-                      field.onChange(url);
-                      setLocalCoverPhoto(url);
+                    onImageSelect={(image) => {
+                      console.log("Selected Image Base64:", image); // Debugging log
+                      form.setValue("coverphoto", image ?? undefined);
                     }}
                   />
                 </FormControl>
@@ -169,8 +148,22 @@ const CreatePostForm: React.FC<{
               {/* Word Count component */}
               {/* Assuming your word count is displayed inside the TextEditor */}
             </div>
-            <Button type="submit" className="ml-2">
-              Submit
+            <Button
+              type="submit"
+              className="ml-2"
+              onClick={() => form.setValue("published", true)}
+            >
+              Publish
+            </Button>
+            <Button
+              type="button"
+              className="ml-2"
+              onClick={() => {
+                form.setValue("published", false);
+                //form.handleSubmit(draftSubmit)();
+              }}
+            >
+              Save as Draft
             </Button>
           </div>
         </form>

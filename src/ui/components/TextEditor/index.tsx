@@ -8,7 +8,8 @@ import Image from "@tiptap/extension-image";
 import DragHandle from "@tiptap-pro/extension-drag-handle-react";
 import CharacterCount from "@tiptap/extension-character-count";
 import ImageResize from "tiptap-extension-resize-image";
-import { useEffect } from "react";
+import FileHandler from "@tiptap-pro/extension-file-handler";
+import { useEffect, useState } from "react";
 
 interface TextEditorProps {
   content: string | object;
@@ -18,6 +19,8 @@ interface TextEditorProps {
 const limit = 12500;
 
 export default function TextEditor({ content, onChange }: TextEditorProps) {
+  const [isUploading, setIsUploading] = useState(false);
+
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -27,6 +30,68 @@ export default function TextEditor({ content, onChange }: TextEditorProps) {
       Highlight,
       Image,
       ImageResize,
+      FileHandler.configure({
+        allowedMimeTypes: [
+          "image/png",
+          "image/jpeg",
+          "image/gif",
+          "image/webp",
+        ],
+        onDrop: (currentEditor, files, pos) => {
+          files.forEach((file) => {
+            const fileReader = new FileReader();
+            fileReader.readAsDataURL(file);
+            fileReader.onload = () => {
+              currentEditor
+                .chain()
+                .insertContentAt(pos, {
+                  type: "image",
+                  attrs: { src: fileReader.result },
+                })
+                .focus()
+                .run();
+
+              // Upload to Cloudinary
+              // setIsUploading(true);
+              // const formData = new FormData();
+              // formData.append("file", file);
+              // formData.append("upload_preset", "tiptap_uploads"); // Replace with your preset
+              // fetch(
+              //   "https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/image/upload",
+              //   {
+              //     method: "POST",
+              //     body: formData,
+              //   }
+              // )
+              //   .then((res) => res.json())
+              //   .then((data) => {
+              //     currentEditor.commands.setImage({ src: data.secure_url });
+              //   })
+              //   .finally(() => setIsUploading(false));
+            };
+          });
+        },
+        onPaste: (currentEditor, files, htmlContent) => {
+          files.forEach((file) => {
+            if (htmlContent) {
+              console.log("Pasted HTML content:", htmlContent);
+              return false; // Prevent duplicate insertion
+            }
+            const fileReader = new FileReader();
+            fileReader.readAsDataURL(file);
+            fileReader.onload = () => {
+              currentEditor
+                .chain()
+                .insertContentAt(currentEditor.state.selection.anchor, {
+                  type: "image",
+                  attrs: { src: fileReader.result },
+                })
+                .focus()
+                .run();
+            };
+          });
+        },
+      }),
       CharacterCount.configure({
         limit: 12500,
       }),
@@ -36,36 +101,6 @@ export default function TextEditor({ content, onChange }: TextEditorProps) {
       attributes: {
         class: "min-h-[400px] border rounded-md py-4 px-4 text-lg",
       },
-      handleDrop: (view, event) => {
-        const hasFiles = event.dataTransfer?.files?.length;
-
-        if (!hasFiles) {
-          return false;
-        }
-
-        const files = Array.from(event.dataTransfer.files);
-        const images = files.filter((file) => /image/i.test(file.type));
-
-        if (images.length === 0) {
-          return false;
-        }
-
-        images.forEach((image) => {
-          const reader = new FileReader();
-
-          reader.onload = (readerEvent) => {
-            const node = view.state.schema.nodes.image.create({
-              src: readerEvent.target?.result,
-            });
-            const transaction = view.state.tr.replaceSelectionWith(node);
-            view.dispatch(transaction);
-          };
-
-          reader.readAsDataURL(image);
-        });
-
-        return true;
-      },
     },
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
@@ -73,7 +108,6 @@ export default function TextEditor({ content, onChange }: TextEditorProps) {
     immediatelyRender: false,
   });
 
-  // Only update the content if the prop changes from outside (e.g., loading content)
   useEffect(() => {
     if (editor && editor.getHTML() !== content) {
       editor.commands.setContent(content);
@@ -124,7 +158,7 @@ export default function TextEditor({ content, onChange }: TextEditorProps) {
               fill="green"
               stroke="currentColor"
               strokeWidth="10"
-              strokeDasharray={`calc(${percentage} * 31.4 / 100) 31.4`}
+              strokeDasharray={`${(percentage * 31.4) / 100} 31.4`}
               transform="rotate(-90) translate(-20)"
             />
             <circle r="6" cx="10" cy="10" fill="white" />

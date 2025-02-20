@@ -1,16 +1,47 @@
 import { v2 as cloudinary } from "cloudinary";
+const crypto = require("crypto");
 
 export async function POST(request: Request) {
-  const body = (await request.json()) as {
-    paramsToSign: Record<string, string>;
-  };
+  try {
+    const { userId, postId } = await request.json();
 
-  const { paramsToSign } = body;
+    // Cloudinary Signature
+    const timestamp = Math.round(new Date().getTime() / 1000);
 
-  const signature = cloudinary.utils.api_sign_request(
-    paramsToSign,
-    process.env.NEXT_PUBLIC_CLOUDINARY_API_SECRET as string
-  );
+    // Create a hashed user ID
+    const hashedUserId = crypto
+      .createHash("sha256")
+      .update(userId)
+      .digest("hex");
 
-  return Response.json({ signature });
+    // Use the hashed ID in your public_id
+    const public_id = `cover_photos/${hashedUserId}_${postId}`;
+
+    const paramsToSign = {
+      timestamp,
+      eager: "w_400,h_300,c_pad|w_260,h_200,c_crop",
+      public_id,
+    };
+
+    const signature = cloudinary.utils.api_sign_request(
+      paramsToSign,
+      process.env.CLOUDINARY_API_SECRET as string
+    );
+
+    return new Response(
+      JSON.stringify({
+        timestamp,
+        signature,
+        api_key: process.env.CLOUDINARY_API_KEY,
+      }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  } catch (error) {
+    return new Response(JSON.stringify({ error }), {
+      status: 500,
+    });
+  }
 }
