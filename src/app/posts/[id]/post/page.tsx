@@ -59,7 +59,6 @@ export default function PostPage() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Nav />
       <main className="flex-1 py-12 px-4 md:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
           <Link
@@ -185,7 +184,7 @@ export default function PostPage() {
                     <div>
                       <Link
                         href="#"
-                        className="font-semibold hover:text-rose-600"
+                        className="font-semibold text-zinc-900 hover:text-rose-600"
                       >
                         {comment.author}
                       </Link>
