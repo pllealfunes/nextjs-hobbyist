@@ -1,7 +1,6 @@
 "use client";
 import { useParams, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import Nav from "@/ui/components/nav";
 import Footer from "@/ui/components/footer";
 import { Button } from "@/ui/components/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/ui/components/avatar";
