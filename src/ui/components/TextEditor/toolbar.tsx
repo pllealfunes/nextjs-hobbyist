@@ -22,10 +22,10 @@ import {
   Space,
   List,
   SeparatorHorizontal,
+  Upload,
 } from "lucide-react";
 import { ListOrdered } from "lucide-react";
 import { Editor } from "@tiptap/react";
-//import CloudinaryUploader from "@/ui/components/cloudinary-uploader";
 
 // Define the prop types
 interface ToolBarProps {
@@ -35,9 +35,34 @@ interface ToolBarProps {
 export default function ToolBar({ editor }: ToolBarProps) {
   if (!editor) return null;
 
-  // const handleUpload = (url: string) => {
-  //   editor.chain().focus().setImage({ src: url }).run();
-  // };
+  const addImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.files) return;
+
+    const files = Array.from(event.target.files); // Handle multiple files
+
+    for (const file of files) {
+      await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+
+        reader.onloadend = () => {
+          const base64data = reader.result?.toString() || "";
+
+          // Ensure each image is inserted at a unique position
+          editor
+            .chain()
+            .insertContentAt(editor.state.doc.content.size, {
+              type: "image",
+              attrs: { src: base64data },
+            })
+            .focus()
+            .run();
+
+          resolve(null);
+        };
+      });
+    }
+  };
 
   const Options = [
     {
@@ -135,6 +160,11 @@ export default function ToolBar({ editor }: ToolBarProps) {
       pressed: editor.isActive("highlight"),
     },
     {
+      icon: <Upload className="size-4" />,
+      onClick: () => document.getElementById("imageUploadInput")?.click(),
+      pressed: editor.isActive("image"),
+    },
+    {
       icon: <Undo className="size-4" />,
       onClick: () => editor.chain().focus().undo().run(),
       pressed: editor.isActive("undo"),
@@ -158,7 +188,13 @@ export default function ToolBar({ editor }: ToolBarProps) {
           {option.icon}
         </Toggle>
       ))}
-      {/* <CloudinaryUploader onUpload={handleUpload} /> */}
+      <input
+        type="file"
+        id="imageUploadInput"
+        accept="image/png, image/jpeg, image/gif, image/webp"
+        className="hidden"
+        onChange={addImage}
+      />
     </div>
   );
 }

@@ -39,52 +39,53 @@ export default function TextEditor({ content, onChange }: TextEditorProps) {
         ],
         onDrop: (currentEditor, files, pos) => {
           files.forEach((file) => {
-            const fileReader = new FileReader();
-            fileReader.readAsDataURL(file);
-            fileReader.onload = () => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+
+            reader.onload = () => {
+              const base64data = reader.result?.toString() || "";
+
+              // Insert without overwriting existing images
               currentEditor
                 .chain()
                 .insertContentAt(pos, {
                   type: "image",
-                  attrs: { src: fileReader.result },
+                  attrs: { src: base64data },
                 })
                 .focus()
                 .run();
-
-              // Upload to Cloudinary
-              // setIsUploading(true);
-              // const formData = new FormData();
-              // formData.append("file", file);
-              // formData.append("upload_preset", "tiptap_uploads"); // Replace with your preset
-              // fetch(
-              //   "https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/image/upload",
-              //   {
-              //     method: "POST",
-              //     body: formData,
-              //   }
-              // )
-              //   .then((res) => res.json())
-              //   .then((data) => {
-              //     currentEditor.commands.setImage({ src: data.secure_url });
-              //   })
-              //   .finally(() => setIsUploading(false));
             };
           });
         },
+
         onPaste: (currentEditor, files, htmlContent) => {
+          if (htmlContent) {
+            console.log("Pasted HTML content:", htmlContent);
+            return false; // Prevent duplicate pasting
+          }
+
           files.forEach((file) => {
-            if (htmlContent) {
-              console.log("Pasted HTML content:", htmlContent);
-              return false; // Prevent duplicate insertion
-            }
-            const fileReader = new FileReader();
-            fileReader.readAsDataURL(file);
-            fileReader.onload = () => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+
+            reader.onload = () => {
+              const base64data = reader.result?.toString() || "";
+
+              // Prevent duplicates by checking if the image already exists
+              const existingImages = currentEditor
+                .getJSON()
+                .content?.some(
+                  (node) =>
+                    node.type === "image" && node.attrs?.src === base64data
+                );
+
+              if (existingImages) return;
+
               currentEditor
                 .chain()
                 .insertContentAt(currentEditor.state.selection.anchor, {
                   type: "image",
-                  attrs: { src: fileReader.result },
+                  attrs: { src: base64data },
                 })
                 .focus()
                 .run();
@@ -103,7 +104,12 @@ export default function TextEditor({ content, onChange }: TextEditorProps) {
       },
     },
     onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
+      const newContent = editor.getHTML();
+
+      // Prevent unnecessary re-renders when images are added
+      if (newContent !== content) {
+        onChange(newContent);
+      }
     },
     immediatelyRender: false,
   });

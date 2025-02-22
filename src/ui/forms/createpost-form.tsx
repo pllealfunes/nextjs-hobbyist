@@ -6,7 +6,7 @@ import { Button } from "@/ui/components/button";
 import { Input } from "@/ui/components/input";
 import { CreatePostSchema } from "@/app/schemas";
 import CoverPhotoUploader from "@/ui/components/coverphoto-uploader";
-import TextEditor from "@/ui/components/TextEditor"; // Assuming you have a TextEditor component
+import TextEditor from "@/ui/components/TextEditor";
 import {
   Select,
   SelectContent,

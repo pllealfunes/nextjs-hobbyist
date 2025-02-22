@@ -15,6 +15,91 @@ type Category = {
   name: string;
 };
 
+const extractImages = (content: string): string[] => {
+  const imgTags = content.match(/<img [^>]*src="[^"]*"[^>]*>/gm) || [];
+  return imgTags
+    .map((tag) => {
+      const srcMatch = tag.match(/src="([^"]*)"/);
+      return srcMatch ? srcMatch[1] : null;
+    })
+    .filter((src) => src !== null);
+};
+
+interface Post {
+  author_id: number;
+  id: number;
+}
+
+const base64ToBlob = (base64: string): Blob => {
+  const byteString = atob(base64.split(",")[1]);
+  const mimeString = base64.split(",")[0].split(":")[1].split(";")[0];
+
+  const ab = new ArrayBuffer(byteString.length);
+  const ia = new Uint8Array(ab);
+  for (let i = 0; i < byteString.length; i++) {
+    ia[i] = byteString.charCodeAt(i);
+  }
+  return new Blob([ab], { type: mimeString });
+};
+
+const uploadImageToCloudinary = async (
+  image: string,
+  post: Post
+): Promise<string> => {
+  const blob = base64ToBlob(image);
+  const res = await fetch("/api/sign-image", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userId: post.author_id, postId: post.id }),
+  });
+  const { signature, timestamp, public_id, api_key } = await res.json();
+
+  if (!signature || !timestamp) throw new Error("Signature missing");
+
+  const formData = new FormData();
+  formData.append("file", blob);
+  formData.append("signature", signature);
+  formData.append("timestamp", timestamp);
+  formData.append("public_id", public_id);
+  formData.append("api_key", api_key);
+  formData.append("eager", "w_400,h_300,c_pad|w_260,h_200,c_crop");
+
+  const uploadResponse = await fetch(
+    `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+    {
+      method: "POST",
+      body: formData,
+    }
+  );
+
+  if (!uploadResponse.ok) throw new Error("Failed to upload image");
+
+  const uploadResult = await uploadResponse.json();
+
+  return uploadResult.secure_url;
+};
+
+interface ImageMap {
+  original: string;
+  cloudinaryUrl: string;
+}
+
+const replaceImageUrlsInContent = (
+  content: string,
+  imageMap: ImageMap[]
+): string => {
+  let updatedContent = content;
+  imageMap.forEach(({ original, cloudinaryUrl }) => {
+    // Escape special characters in the original URL
+    const safeOriginal = original.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+    updatedContent = updatedContent.replace(
+      new RegExp(safeOriginal, "g"),
+      cloudinaryUrl
+    );
+  });
+  return updatedContent;
+};
+
 export default function CreatePost() {
   const router = useRouter();
 
@@ -65,36 +150,48 @@ export default function CreatePost() {
       if (!response.ok) throw new Error("Failed to create post");
 
       const post = await response.json();
-      console.log("Post created:", post);
+
+      // Step 1: Extract and upload images from the content
+      const images = extractImages(data.content);
+      const imageMap: ImageMap[] = [];
+
+      for (const image of images) {
+        const cloudinaryUrl = await uploadImageToCloudinary(image, post);
+        imageMap.push({ original: image, cloudinaryUrl });
+      }
+
+      const updatedContent = replaceImageUrlsInContent(data.content, imageMap);
+
+      // Update the post with the new content containing Cloudinary URLs
+      await fetch(`/api/posts`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          postId: post.id,
+          content: updatedContent,
+        }),
+      });
+
+      console.log("Post updated with images");
 
       // Step 2: If a cover photo file exists, upload it
       if (data.coverphoto) {
-        const res = await fetch("/api/sign-image", {
+        const res = await fetch("/api/sign-coverphoto", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ userId: post.author_id, postId: post.id }),
         });
-        const { signature, timestamp, api_key } = await res.json();
+        const { signature, timestamp, public_id, api_key } = await res.json();
 
         if (!signature || !timestamp) throw new Error("Signature missing");
-
-        // Create a hashed user ID
-        const userId = post.author_id;
-        const hashedUserId = crypto
-          .createHash("sha256")
-          .update(userId)
-          .digest("hex");
-
-        // Use the hashed ID in your public_id
-        const public_id = `cover_photos/${hashedUserId}_${post.id}`;
 
         // Prepare FormData
         const formData = new FormData();
         formData.append("file", data.coverphoto);
-        formData.append("api_key", api_key);
-        formData.append("timestamp", timestamp);
         formData.append("signature", signature);
+        formData.append("timestamp", timestamp);
         formData.append("public_id", public_id);
+        formData.append("api_key", api_key);
         formData.append("eager", "w_400,h_300,c_pad|w_260,h_200,c_crop");
         // Upload to Cloudinary
         const uploadResponse = await fetch(

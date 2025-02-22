@@ -15,7 +15,7 @@ export async function POST(request: Request) {
       .digest("hex");
 
     // Use the hashed ID in your public_id
-    const public_id = `post_photos/${hashedUserId}_${postId}`;
+    const public_id = `cover_photos/${hashedUserId}_${postId}`;
 
     const paramsToSign = {
       timestamp,
@@ -30,8 +30,8 @@ export async function POST(request: Request) {
 
     return new Response(
       JSON.stringify({
-        signature,
         timestamp,
+        signature,
         public_id,
         api_key: process.env.CLOUDINARY_API_KEY,
       }),
