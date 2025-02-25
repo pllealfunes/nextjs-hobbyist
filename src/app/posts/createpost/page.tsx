@@ -230,7 +230,7 @@ export default function CreatePost() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto py-5">
+    <div>
       <CreatePostForm categories={categories} onSubmit={onSubmit} />
     </div>
   );

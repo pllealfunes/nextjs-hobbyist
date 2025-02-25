@@ -9,6 +9,7 @@ import DragHandle from "@tiptap-pro/extension-drag-handle-react";
 import CharacterCount from "@tiptap/extension-character-count";
 import ImageResize from "tiptap-extension-resize-image";
 import FileHandler from "@tiptap-pro/extension-file-handler";
+import Youtube from "@tiptap/extension-youtube";
 import { useEffect } from "react";
 
 interface TextEditorProps {
@@ -30,6 +31,11 @@ export default function TextEditor({ content, onChange }: TextEditorProps) {
       Highlight,
       Image,
       ImageResize,
+      Youtube.configure({
+        width: 320,
+        height: 320,
+        nocookie: true,
+      }),
       FileHandler.configure({
         allowedMimeTypes: [
           "image/png",
@@ -100,7 +106,8 @@ export default function TextEditor({ content, onChange }: TextEditorProps) {
     content: content,
     editorProps: {
       attributes: {
-        class: "min-h-[400px] border rounded-md py-4 px-4 text-lg",
+        spellcheck: "true",
+        class: "min-h-[500px] border rounded-md py-4 px-4 text-lg",
       },
     },
     onUpdate: ({ editor }) => {
@@ -139,7 +146,7 @@ export default function TextEditor({ content, onChange }: TextEditorProps) {
           fill="none"
           viewBox="0 0 24 24"
           strokeWidth="1.5"
-          stroke="currentColor"
+          stroke="black"
         >
           <path
             strokeLinecap="round"
@@ -153,21 +160,27 @@ export default function TextEditor({ content, onChange }: TextEditorProps) {
 
       {/* Character and Word Count */}
       <div className="flex justify-end items-center mt-4">
-        <div className="character-count flex items-center space-x-2">
+        <div
+          className={`character-count ${
+            editor.storage.characterCount.characters() === limit
+              ? "character-count--warning"
+              : ""
+          }`}
+        >
           {/* Character count as circle gauge */}
           <svg height="40" width="40" viewBox="0 0 20 20">
-            <circle r="10" cx="10" fill="#e9ecef" />
+            <circle r="10" cx="10" fill="transparent" />
             <circle
               r="5"
               cx="10"
               cy="10"
-              fill="green"
+              fill="transparent"
               stroke="currentColor"
               strokeWidth="10"
               strokeDasharray={`${(percentage * 31.4) / 100} 31.4`}
               transform="rotate(-90) translate(-20)"
             />
-            <circle r="6" cx="10" cy="10" fill="white" />
+            <circle r="6" cx="10" cy="10" fill="grey" />
           </svg>
           {editor.storage.characterCount.characters()} / {limit} characters
           <br />

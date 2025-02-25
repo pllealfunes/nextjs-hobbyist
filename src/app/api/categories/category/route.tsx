@@ -19,7 +19,13 @@ export async function GET(req: NextRequest) {
     }
 
     const capitalizeFirstLetter = (str?: string) => {
-      return str ? str.charAt(0).toUpperCase() + str.slice(1) : "This category";
+      if (!str) return "This category";
+
+      if (str.toLowerCase() === "games+puzzles") {
+        return "Games+Puzzles";
+      }
+
+      return str.charAt(0).toUpperCase() + str.slice(1);
     };
 
     const decodeAndFormatCategory = (category: string) => {

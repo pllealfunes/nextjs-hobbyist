@@ -59,7 +59,9 @@ const CreatePostForm: React.FC<{
             name="title"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-lg">Title</FormLabel>
+                <FormLabel htmlFor="title" className="text-lg">
+                  Title
+                </FormLabel>
                 <FormControl>
                   <Input
                     className="mb-2 w-full border rounded-md p-2 text-lg"
@@ -75,7 +77,7 @@ const CreatePostForm: React.FC<{
             control={form.control}
             name="category"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="my-2">
                 <FormLabel htmlFor="category" className="text-lg">
                   Category
                 </FormLabel>
@@ -110,7 +112,9 @@ const CreatePostForm: React.FC<{
             name="coverphoto"
             render={() => (
               <FormItem className="my-2">
-                <FormLabel className="text-lg">Cover Photo</FormLabel>
+                <FormLabel htmlFor="coverphoto" className="text-lg">
+                  Cover Photo
+                </FormLabel>
                 <FormControl>
                   <CoverPhotoUploader
                     onImageSelect={(image) => {
@@ -129,7 +133,9 @@ const CreatePostForm: React.FC<{
             name="content"
             render={({ field }) => (
               <FormItem className="my-2">
-                <FormLabel className="text-lg">Post</FormLabel>
+                <FormLabel htmlFor="content" className="text-lg">
+                  Post
+                </FormLabel>
                 <FormControl>
                   <TextEditor
                     content={field.value}

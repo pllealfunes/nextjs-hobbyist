@@ -3,6 +3,8 @@ import { useParams, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Footer from "@/ui/components/footer";
 import { Button } from "@/ui/components/button";
+import Link from "next/link";
+import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/ui/components/avatar";
 import { Badge } from "@/ui/components/badge";
 import { Card, CardContent } from "@/ui/components/card";
@@ -16,8 +18,6 @@ import {
   ChevronLeft,
   Send,
 } from "lucide-react";
-import Link from "next/link";
-import Image from "next/image";
 
 interface Post {
   id: string;
@@ -39,8 +39,18 @@ export default function PostPage() {
   const [post, setPost] = useState<Post | null>(null);
 
   const capitalizeFirstLetter = (str?: string) => {
-    return str ? str.charAt(0).toUpperCase() + str.slice(1) : "This category";
+    if (!str) return "This category";
+
+    if (str.toLowerCase() === "games+puzzles") {
+      return "Games+Puzzles";
+    }
+
+    return str.charAt(0).toUpperCase() + str.slice(1);
   };
+
+  <Link href={`/category/${category}`} passHref>
+    {capitalizeFirstLetter(category)}
+  </Link>;
 
   useEffect(() => {
     if (id) {
@@ -110,7 +120,10 @@ export default function PostPage() {
                   variant="secondary"
                   className="bg-rose-100 text-rose-700 px-3 py-1 rounded-full text-xs"
                 >
-                  {capitalizeFirstLetter(category)}
+                  <Link href={`/category/${category}`} passHref>
+                    {" "}
+                    {capitalizeFirstLetter(category)}
+                  </Link>
                 </Badge>
               </div>
               <h1 className="text-3xl font-bold mb-4">{post.title}</h1>

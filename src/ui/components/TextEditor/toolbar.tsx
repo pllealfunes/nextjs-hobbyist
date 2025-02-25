@@ -22,7 +22,8 @@ import {
   Space,
   List,
   SeparatorHorizontal,
-  Upload,
+  Camera,
+  Video,
 } from "lucide-react";
 import { ListOrdered } from "lucide-react";
 import { Editor } from "@tiptap/react";
@@ -61,6 +62,24 @@ export default function ToolBar({ editor }: ToolBarProps) {
           resolve(null);
         };
       });
+    }
+  };
+
+  const addYoutubeVideo = () => {
+    const url = prompt("Enter YouTube URL");
+
+    if (url) {
+      // Validate if it's a YouTube URL (basic check)
+      const youtubeRegex =
+        /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/(watch\?v=)?([a-zA-Z0-9_-]+)$/;
+
+      if (!youtubeRegex.test(url)) {
+        alert("Please enter a valid YouTube URL.");
+        return;
+      }
+
+      // Add video to the editor
+      editor.chain().focus().setYoutubeVideo({ src: url }).run();
     }
   };
 
@@ -152,7 +171,7 @@ export default function ToolBar({ editor }: ToolBarProps) {
     },
     {
       icon: <Space className="size-4" />,
-      onClick: () => editor.chain().focus().toggleHighlight().run(),
+      onClick: () => editor.chain().focus().setHardBreak().run(),
     },
     {
       icon: <Highlighter className="size-4" />,
@@ -160,9 +179,14 @@ export default function ToolBar({ editor }: ToolBarProps) {
       pressed: editor.isActive("highlight"),
     },
     {
-      icon: <Upload className="size-4" />,
+      icon: <Camera className="size-4" />,
       onClick: () => document.getElementById("imageUploadInput")?.click(),
       pressed: editor.isActive("image"),
+    },
+    {
+      icon: <Video className="size-4" />,
+      onClick: addYoutubeVideo,
+      pressed: editor.isActive("video"),
     },
     {
       icon: <Undo className="size-4" />,
@@ -177,7 +201,7 @@ export default function ToolBar({ editor }: ToolBarProps) {
   ];
 
   return (
-    <div className="border rounded-md p-1.5 mb-1 space-x-1 sticky top-10 z-50">
+    <div className="border rounded-md p-1.5 mb-1 sticky top-10 z-50 flex flex-wrap items-center gap-1 overflow-hidden">
       {Options.map((option, i) => (
         <Toggle
           key={i}

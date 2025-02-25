@@ -4,7 +4,7 @@ A blogging platform where users can blog about their hobbies, explore new ideas,
 
 While the previous version was built using the MERN stack this version uses modern technologies and includes more fetaures for users to enjoy.
 
-This project is being built with Next.js, TypeScript, Tailwind, Zod, Shadcn, Prisma, Postgres, and Vercel.
+This project is being built with Next.js, TypeScript, Tailwind, Zod, Shadcn, Postgres, and Vercel.
 
 ## Deployed Project
 

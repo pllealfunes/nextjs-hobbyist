@@ -58,9 +58,9 @@ export default function DashboardPosts({ post, categories }: PostCardProps) {
         <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
           <span>{new Date(post.created_at).toLocaleDateString()}</span>
           <Link
-            href={`/category/${encodeURIComponent(
-              getCategoryName(post.category_id).toLowerCase()
-            )}`}
+            href={`/category/${getCategoryName(
+              post.category_id
+            ).toLowerCase()}`}
             passHref
           >
             <div
