@@ -50,7 +50,7 @@ interface ToolBarProps {
 export default function ToolBar({ editor }: ToolBarProps) {
   if (!editor) return null;
 
-  let [videoUrl, setVideoUrl] = useState("");
+  const [videoUrl, setVideoUrl] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const addImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
