@@ -9,7 +9,7 @@ import DragHandle from "@tiptap-pro/extension-drag-handle-react";
 import CharacterCount from "@tiptap/extension-character-count";
 import ImageResize from "tiptap-extension-resize-image";
 import FileHandler from "@tiptap-pro/extension-file-handler";
-import Youtube from "@tiptap/extension-youtube";
+import Video from "@/ui/components/video-uploader";
 import { useEffect } from "react";
 
 interface TextEditorProps {
@@ -31,11 +31,7 @@ export default function TextEditor({ content, onChange }: TextEditorProps) {
       Highlight,
       Image,
       ImageResize,
-      Youtube.configure({
-        width: 320,
-        height: 320,
-        nocookie: true,
-      }),
+      Video,
       FileHandler.configure({
         allowedMimeTypes: [
           "image/png",

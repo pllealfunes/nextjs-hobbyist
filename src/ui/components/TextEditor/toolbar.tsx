@@ -24,9 +24,23 @@ import {
   SeparatorHorizontal,
   Camera,
   Video,
+  ListOrdered,
 } from "lucide-react";
-import { ListOrdered } from "lucide-react";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/ui/components/dialog";
+import { Input } from "@/ui/components/input";
+import { Label } from "@/ui/components/label";
+import { Button } from "@/ui/components/button";
 import { Editor } from "@tiptap/react";
+import { useState } from "react";
 
 // Define the prop types
 interface ToolBarProps {
@@ -35,6 +49,9 @@ interface ToolBarProps {
 
 export default function ToolBar({ editor }: ToolBarProps) {
   if (!editor) return null;
+
+  let [videoUrl, setVideoUrl] = useState("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const addImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files) return;
@@ -65,22 +82,49 @@ export default function ToolBar({ editor }: ToolBarProps) {
     }
   };
 
-  const addYoutubeVideo = () => {
-    const url = prompt("Enter YouTube URL");
+  const youtubeRegex =
+    /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/|v\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+  const vimeoRegex =
+    /^(?:https?:\/\/)?(?:www\.)?vimeo\.com\/(?:groups\/\d+\/videos\/|video\/|)(\d+)/;
 
-    if (url) {
-      // Validate if it's a YouTube URL (basic check)
-      const youtubeRegex =
-        /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/(watch\?v=)?([a-zA-Z0-9_-]+)$/;
+  const addVideo = () => {
+    const matchYouTube = videoUrl.match(youtubeRegex);
+    const matchVimeo = videoUrl.match(vimeoRegex);
 
-      if (!youtubeRegex.test(url)) {
-        alert("Please enter a valid YouTube URL.");
-        return;
-      }
-
-      // Add video to the editor
-      editor.chain().focus().setYoutubeVideo({ src: url }).run();
+    if (!matchYouTube && !matchVimeo) {
+      alert("Please enter a valid YouTube or Vimeo link.");
+      return;
     }
+
+    let formattedUrl = videoUrl;
+
+    // Convert YouTube link to embed format
+    if (matchYouTube) {
+      const videoId = matchYouTube[1];
+      formattedUrl = `https://www.youtube.com/embed/${videoId}`;
+    }
+
+    // Convert Vimeo link to embed format
+    if (matchVimeo) {
+      const videoId = matchVimeo[1];
+      formattedUrl = `https://player.vimeo.com/video/${videoId}`;
+    }
+
+    console.log("Submitting:", formattedUrl);
+
+    // ✅ Insert a new video node at the current selection without replacing anything
+    editor
+      ?.chain()
+      .focus()
+      .insertContentAt(editor.state.selection.anchor, {
+        type: "video",
+        attrs: { src: formattedUrl },
+      })
+      .run();
+
+    // Reset input and close dialog
+    setVideoUrl("");
+    setIsDialogOpen(false);
   };
 
   const Options = [
@@ -185,7 +229,7 @@ export default function ToolBar({ editor }: ToolBarProps) {
     },
     {
       icon: <Video className="size-4" />,
-      onClick: addYoutubeVideo,
+      onClick: () => setIsDialogOpen(true),
       pressed: editor.isActive("video"),
     },
     {
@@ -219,6 +263,49 @@ export default function ToolBar({ editor }: ToolBarProps) {
         className="hidden"
         onChange={addImage}
       />
+      <Dialog
+        open={isDialogOpen}
+        onOpenChange={(open) => {
+          setIsDialogOpen(open);
+          if (!open) {
+            setVideoUrl(""); // Clear videoUrl when closing the dialog
+          }
+        }}
+      >
+        <DialogTrigger asChild>
+          <button style={{ display: "none" }}></button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add Video</DialogTitle>
+            <DialogDescription>
+              Paste a link from YouTube or Vimeo.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex items-center space-x-2">
+            <div className="grid flex-1 gap-2">
+              <Label htmlFor="link" className="sr-only">
+                Link
+              </Label>
+              <Input
+                value={videoUrl}
+                onChange={(e) => setVideoUrl(e.target.value)}
+                placeholder="https://www.youtube.com/embed/..."
+              />
+            </div>
+          </div>
+          <DialogFooter className="flex justify-between">
+            <DialogClose asChild>
+              <Button type="button" variant="secondary">
+                Close
+              </Button>
+            </DialogClose>
+            <Button type="submit" onClick={addVideo}>
+              Add
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

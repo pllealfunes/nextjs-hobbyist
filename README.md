@@ -115,3 +115,4 @@ bun dev
 - Youtube
 - Cloudinary Tutorials
 - Next.js Docs
+- TipTap Video Embed Extension by Codemzy [TipTap Video Embed Extension](https://www.codemzy.com/blog/tiptap-video-embed-extension)
