@@ -150,6 +150,12 @@ export default function CreatePost() {
 
       const post = await response.json();
 
+      // If the post is a draft, stop here
+      if (!data.published) {
+        console.log("Post saved as draft:", post);
+        return;
+      }
+
       // Step 1: Extract and upload images from the content
       const images = extractImages(data.content);
       const imageMap: ImageMap[] = [];

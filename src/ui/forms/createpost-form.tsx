@@ -2,6 +2,7 @@ import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useRouter } from "next/navigation";
 import { Button } from "@/ui/components/button";
 import { Input } from "@/ui/components/input";
 import { CreatePostSchema } from "@/app/schemas";
@@ -14,7 +15,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/ui/components/select";
-
 import {
   Form,
   FormControl,
@@ -24,6 +24,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/ui/components/form";
+import Published from "@/app/posts/published/page";
 
 // Define the type for form data
 type FormData = z.infer<typeof CreatePostSchema>;
@@ -48,6 +49,34 @@ const CreatePostForm: React.FC<{
       published: false,
     },
   });
+
+  const router = useRouter();
+
+  const saveAsDraft = async (data: FormData) => {
+    console.log(data);
+
+    try {
+      const response = await fetch("/api/posts/drafts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: data.title,
+          category_id: parseInt(data.category, 10),
+          content: data.content,
+          coverphoto: data.coverphoto,
+          published: false,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to save draft");
+
+      const draft = await response.json();
+      console.log("Draft saved:", draft);
+      router.push("/posts/drafts");
+    } catch (error) {
+      console.error("Error saving draft:", error);
+    }
+  };
 
   return (
     <div className="max-w-3xl mx-auto py-5">
@@ -163,10 +192,7 @@ const CreatePostForm: React.FC<{
             <Button
               type="button"
               className="ml-2"
-              onClick={() => {
-                form.setValue("published", false);
-                //form.handleSubmit(draftSubmit)();
-              }}
+              onClick={() => saveAsDraft(form.getValues())}
             >
               Save as Draft
             </Button>

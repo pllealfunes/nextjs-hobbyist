@@ -91,8 +91,6 @@ export async function POST(req: NextRequest) {
         { status: 500 }
       );
     }
-  } else {
-    return NextResponse.json({ error: "Method not allowed" }, { status: 405 });
   }
 }
 
