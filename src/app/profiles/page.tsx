@@ -30,7 +30,7 @@ export default function Profile() {
   useEffect(() => {
     async function getPosts() {
       try {
-        const response = await fetch("/api/posts");
+        const response = await fetch("/api/posts/published");
         const data = await response.json();
 
         const categoriesResponse = await fetch("/api/categories");

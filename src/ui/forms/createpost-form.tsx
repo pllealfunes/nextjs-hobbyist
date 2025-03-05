@@ -175,26 +175,27 @@ const CreatePostForm: React.FC<{
               </FormItem>
             )}
           />
-          <FormDescription>Use The Form to Create a New Post</FormDescription>
           {/* Container for Word Count and Submit Button */}
           <div className="flex justify-end items-end mt-4">
             <div className="mr-4">
               {/* Word Count component */}
               {/* Assuming your word count is displayed inside the TextEditor */}
             </div>
+          </div>
+          <div className="flex justify-between gap-2 items-center">
+            <Button
+              type="submit"
+              className="ml-2"
+              onClick={() => form.setValue("published", false)}
+            >
+              Save as Draft
+            </Button>
             <Button
               type="submit"
               className="ml-2"
               onClick={() => form.setValue("published", true)}
             >
               Publish
-            </Button>
-            <Button
-              type="button"
-              className="ml-2"
-              onClick={() => saveAsDraft(form.getValues())}
-            >
-              Save as Draft
             </Button>
           </div>
         </form>

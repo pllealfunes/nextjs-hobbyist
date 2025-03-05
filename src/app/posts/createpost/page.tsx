@@ -15,13 +15,10 @@ type Category = {
 };
 
 const extractImages = (content: string): string[] => {
-  const imgTags = content.match(/<img [^>]*src="[^"]*"[^>]*>/gm) || [];
-  return imgTags
-    .map((tag) => {
-      const srcMatch = tag.match(/src="([^"]*)"/);
-      return srcMatch ? srcMatch[1] : null;
-    })
-    .filter((src) => src !== null);
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(content, "text/html");
+  const imgTags = Array.from(doc.querySelectorAll("img"));
+  return imgTags.map((img) => img.src).filter((src) => src);
 };
 
 interface Post {
@@ -150,20 +147,18 @@ export default function CreatePost() {
 
       const post = await response.json();
 
-      // If the post is a draft, stop here
-      if (!data.published) {
-        console.log("Post saved as draft:", post);
-        return;
-      }
-
       // Step 1: Extract and upload images from the content
       const images = extractImages(data.content);
-      const imageMap: ImageMap[] = [];
+      let imageMap: ImageMap[] = [];
 
-      for (const image of images) {
-        const cloudinaryUrl = await uploadImageToCloudinary(image, post);
-        imageMap.push({ original: image, cloudinaryUrl });
-      }
+      const uploadPromises = images.map((image) =>
+        uploadImageToCloudinary(image, post)
+      );
+      const cloudinaryUrls = await Promise.all(uploadPromises);
+      imageMap = images.map((original, index) => ({
+        original,
+        cloudinaryUrl: cloudinaryUrls[index],
+      }));
 
       const updatedContent = replaceImageUrlsInContent(data.content, imageMap);
 
@@ -225,10 +220,13 @@ export default function CreatePost() {
       }
 
       // Step 4: Redirect the user
+      if (!data.published) {
+        return router.push("/posts/drafts");
+      }
       const category = getCategoryName(
         parseInt(data.category, 10)
       ).toLowerCase();
-      router.push(`/posts/${post.id}/post?category=${category}`);
+      return router.push(`/posts/${post.id}/post?category=${category}`);
     } catch (error) {
       console.error("Error handling post submission:", error);
     }
