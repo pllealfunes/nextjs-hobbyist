@@ -2,7 +2,6 @@ import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useRouter } from "next/navigation";
 import { Button } from "@/ui/components/button";
 import { Input } from "@/ui/components/input";
 import { CreatePostSchema } from "@/app/schemas";
@@ -47,8 +46,6 @@ const CreatePostForm: React.FC<{
       published: false,
     },
   });
-
-  const router = useRouter();
 
   return (
     <div className="max-w-3xl mx-auto py-5">
