@@ -1,19 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Post, columns } from "@/ui/components/table-columns";
+import { Post, Category, columns } from "@/ui/components/table-columns";
 import { DataTable } from "@/ui/components/data-table";
 import PostCalendar from "@/ui/components/calendar";
 import { LikesCommentsChart } from "@/ui/components/likescomments-chart";
 
 export default function Drafts() {
   const [posts, setPosts] = useState<Post[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch("/api/posts/drafts");
-        const data = await response.json(); // Ensure you await this
+        const data = await response.json();
 
         if (Array.isArray(data)) {
           setPosts(data);
@@ -25,8 +26,24 @@ export default function Drafts() {
       }
     };
 
+    async function loadCategories() {
+      try {
+        const response = await fetch("/api/categories");
+        const data = await response.json();
+        setCategories(data);
+      } catch (error) {
+        console.error("Error fetching categories", error);
+      }
+    }
+
     fetchData();
+    loadCategories();
   }, []);
+
+  const getCategoryName = (categoryId: number): string => {
+    const category = categories.find((cat) => cat.id === categoryId);
+    return category ? category.name : "Unknown";
+  };
 
   return (
     <div className="container mx-auto py-10">
@@ -36,7 +53,7 @@ export default function Drafts() {
         </div>
         <PostCalendar />
       </div>
-      <DataTable columns={columns} data={posts} />
+      <DataTable columns={columns(getCategoryName)} data={posts} />
     </div>
   );
 }

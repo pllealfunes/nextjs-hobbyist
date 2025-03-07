@@ -18,13 +18,11 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/ui/components/form";
-import Published from "@/app/posts/published/page";
 
 // Define the type for form data
 type FormData = z.infer<typeof CreatePostSchema>;
@@ -51,32 +49,6 @@ const CreatePostForm: React.FC<{
   });
 
   const router = useRouter();
-
-  const saveAsDraft = async (data: FormData) => {
-    console.log(data);
-
-    try {
-      const response = await fetch("/api/posts/drafts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: data.title,
-          category_id: parseInt(data.category, 10),
-          content: data.content,
-          coverphoto: data.coverphoto,
-          published: false,
-        }),
-      });
-
-      if (!response.ok) throw new Error("Failed to save draft");
-
-      const draft = await response.json();
-      console.log("Draft saved:", draft);
-      router.push("/posts/drafts");
-    } catch (error) {
-      console.error("Error saving draft:", error);
-    }
-  };
 
   return (
     <div className="max-w-3xl mx-auto py-5">
