@@ -6,7 +6,7 @@ import { DataTable } from "@/ui/components/data-table";
 import PostCalendar from "@/ui/components/calendar";
 import { LikesCommentsChart } from "@/ui/components/likescomments-chart";
 
-export default function Drafts() {
+export default function Published() {
   const [posts, setPosts] = useState<Post[]>([]);
 
   useEffect(() => {
@@ -25,7 +25,7 @@ export default function Drafts() {
       }
     };
 
-    fetchData(); // Call the async function
+    fetchData();
   }, []);
 
   return (

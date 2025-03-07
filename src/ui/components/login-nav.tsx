@@ -79,9 +79,9 @@ export default function LoginNav() {
                         href="/posts/drafts"
                         aria-label="Go to drafts page"
                         className={clsx(
-                          "flex justify-center items-center px-3 py-2 text-sm font-medium",
+                          "flex justify-center items-center px-3 py-2 text-sm font-medium rounded-md",
                           {
-                            "bg-gray-700": pathname === "/posts/drafts",
+                            "bg-gray-100": pathname === "/posts/drafts",
                           }
                         )}
                       >
@@ -93,9 +93,9 @@ export default function LoginNav() {
                         href="/posts/published"
                         aria-label="Go to published page"
                         className={clsx(
-                          "flex justify-center items-center px-3 py-2 text-sm font-medium",
+                          "flex justify-center items-center px-3 py-2 text-sm font-medium rounded-md",
                           {
-                            "bg-gray-700": pathname === "/posts/published",
+                            "bg-gray-100": pathname === "/posts/published",
                           }
                         )}
                       >

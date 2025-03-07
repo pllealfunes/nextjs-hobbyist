@@ -16,6 +16,7 @@ import {
 interface Post {
   id: string;
   title: string;
+  coverphoto: string | null;
   content: string | null;
   category_id: number;
   published: boolean;

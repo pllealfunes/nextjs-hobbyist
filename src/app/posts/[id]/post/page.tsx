@@ -81,7 +81,7 @@ export default function PostPage() {
             {post.coverphoto && (
               <Image
                 src={post.coverphoto}
-                alt="Blog post cover image"
+                alt={post.title}
                 width={800}
                 height={400}
                 className="w-full object-cover rounded-lg"

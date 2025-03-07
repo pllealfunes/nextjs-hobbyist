@@ -25,7 +25,7 @@ export default function Drafts() {
       }
     };
 
-    fetchData(); // Call the async function
+    fetchData();
   }, []);
 
   return (
