@@ -81,7 +81,8 @@ export default function LoginNav() {
                         className={clsx(
                           "flex justify-center items-center px-3 py-2 text-sm font-medium rounded-md",
                           {
-                            "bg-gray-100": pathname === "/posts/drafts",
+                            "bg-gray-100 dark:bg-gray-700":
+                              pathname === "/posts/drafts",
                           }
                         )}
                       >
@@ -95,7 +96,8 @@ export default function LoginNav() {
                         className={clsx(
                           "flex justify-center items-center px-3 py-2 text-sm font-medium rounded-md",
                           {
-                            "bg-gray-100": pathname === "/posts/published",
+                            "bg-gray-100 dark:bg-gray-700":
+                              pathname === "/posts/published",
                           }
                         )}
                       >
