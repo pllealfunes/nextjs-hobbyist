@@ -37,7 +37,7 @@ const formSchema = z.object({
 // Define the type for form data
 type FormData = z.infer<typeof formSchema>;
 
-export default function CreatePost() {
+export default function EditPost() {
   const form = useForm<FormData>({
     mode: "onTouched",
     resolver: zodResolver(formSchema),

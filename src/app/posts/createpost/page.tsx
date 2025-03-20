@@ -14,28 +14,31 @@ type Category = {
   name: string;
 };
 
-const extractImages = (content: string): string[] => {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(content, "text/html");
-  const imgTags = Array.from(doc.querySelectorAll("img"));
-  return imgTags.map((img) => img.src).filter((src) => src);
-};
-
 interface Post {
   author_id: number;
   id: number;
 }
 
-const base64ToBlob = (base64: string): Blob => {
-  const byteString = atob(base64.split(",")[1]);
-  const mimeString = base64.split(",")[0].split(":")[1].split(";")[0];
+interface ImageMap {
+  original: string;
+  cloudinaryUrl: string;
+}
 
-  const ab = new ArrayBuffer(byteString.length);
-  const ia = new Uint8Array(ab);
-  for (let i = 0; i < byteString.length; i++) {
-    ia[i] = byteString.charCodeAt(i);
-  }
-  return new Blob([ab], { type: mimeString });
+const extractImages = (content: string): string[] => {
+  const doc = new DOMParser().parseFromString(content, "text/html");
+  return Array.from(doc.querySelectorAll("img"), (img) => img.src).filter(
+    Boolean
+  );
+};
+
+const base64ToBlob = (base64: string): Blob => {
+  const [meta, data] = base64.split(",");
+  const mimeType = meta.match(/:(.*?);/)?.[1] || "";
+  const byteString = atob(data);
+  const arrayBuffer = new Uint8Array(byteString.length).map((_, i) =>
+    byteString.charCodeAt(i)
+  );
+  return new Blob([arrayBuffer], { type: mimeType });
 };
 
 const uploadImageToCloudinary = async (
@@ -49,8 +52,7 @@ const uploadImageToCloudinary = async (
     body: JSON.stringify({ userId: post.author_id, postId: post.id }),
   });
   const { signature, timestamp, public_id, api_key } = await res.json();
-
-  if (!signature || !timestamp) throw new Error("Signature missing");
+  if (!signature) throw new Error("Signature missing");
 
   const formData = new FormData();
   formData.append("file", blob);
@@ -60,40 +62,38 @@ const uploadImageToCloudinary = async (
   formData.append("api_key", api_key);
   formData.append("eager", "w_400,h_300,c_pad|w_260,h_200,c_crop");
 
-  const uploadResponse = await fetch(
+  const uploadRes = await fetch(
     `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
     {
       method: "POST",
       body: formData,
     }
   );
+  if (!uploadRes.ok) throw new Error("Image upload failed");
 
-  if (!uploadResponse.ok) throw new Error("Failed to upload image");
-
-  const uploadResult = await uploadResponse.json();
-
-  return uploadResult.secure_url;
+  return (await uploadRes.json()).secure_url;
 };
-
-interface ImageMap {
-  original: string;
-  cloudinaryUrl: string;
-}
 
 const replaceImageUrlsInContent = (
   content: string,
   imageMap: ImageMap[]
 ): string => {
-  let updatedContent = content;
-  imageMap.forEach(({ original, cloudinaryUrl }) => {
-    // Escape special characters in the original URL
-    const safeOriginal = original.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
-    updatedContent = updatedContent.replace(
-      new RegExp(safeOriginal, "g"),
-      cloudinaryUrl
-    );
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(content, "text/html");
+
+  doc.querySelectorAll("img").forEach((img) => {
+    const originalSrc = img.getAttribute("src"); // Ensure correct original src
+    const replacement = imageMap.find(
+      ({ original }) => original === originalSrc
+    )?.cloudinaryUrl;
+
+    if (replacement) {
+      console.log(`Replacing: ${replacement}`);
+      img.setAttribute("src", replacement);
+    }
   });
-  return updatedContent;
+
+  return doc.body.innerHTML; // Ensure correct content return
 };
 
 export default function CreatePost() {
@@ -123,20 +123,21 @@ export default function CreatePost() {
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     console.log("Form Data:", data);
 
-    // Step 1: Create the post without the cover photo
-    const payload: {
-      title: string;
-      category_id: number;
-      content: string;
-      published: boolean;
-    } = {
-      title: data.title,
-      category_id: parseInt(data.category, 10),
-      content: data.content,
-      published: data.published,
-    };
-
     try {
+      // Step 1: Create the post without the cover photo
+
+      const payload: {
+        title: string;
+        category_id: number;
+        content: string;
+        published: boolean;
+      } = {
+        title: data.title,
+        category_id: parseInt(data.category, 10),
+        content: data.content,
+        published: data.published,
+      };
+
       const response = await fetch("/api/posts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -149,18 +150,14 @@ export default function CreatePost() {
 
       // Step 1: Extract and upload images from the content
       const images = extractImages(data.content);
-      let imageMap: ImageMap[] = [];
+      console.log(images);
 
-      const uploadPromises = images.map((image) =>
-        uploadImageToCloudinary(image, post)
-      );
-      const cloudinaryUrls = await Promise.all(uploadPromises);
-      imageMap = images.map((original, index) => ({
-        original,
-        cloudinaryUrl: cloudinaryUrls[index],
-      }));
-
-      const updatedContent = replaceImageUrlsInContent(data.content, imageMap);
+      let updatedContent = data.content;
+      for (const image of images) {
+        const cloudinaryUrl = await uploadImageToCloudinary(image, post);
+        updatedContent = updatedContent.replace(image, cloudinaryUrl);
+      }
+      console.log("Final", updatedContent);
 
       // Update the post with the new content containing Cloudinary URLs
       await fetch(`/api/posts`, {
@@ -220,13 +217,13 @@ export default function CreatePost() {
       }
 
       // Step 4: Redirect the user
-      if (!data.published) {
-        return router.push("/posts/drafts");
-      }
-      const category = getCategoryName(
-        parseInt(data.category, 10)
-      ).toLowerCase();
-      return router.push(`/posts/${post.id}/post?category=${category}`);
+      router.push(
+        data.published
+          ? `/posts/${post.id}/post?category=${getCategoryName(
+              Number(data.category)
+            ).toLowerCase()}`
+          : "/posts/drafts"
+      );
     } catch (error) {
       console.error("Error handling post submission:", error);
     }

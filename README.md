@@ -24,23 +24,9 @@ https://nextjs-hobbyist.vercel.app/
 
 ## Current Tasks:
 
-- [x] create new post
-- [x] view new post on profile
-- [x] check post under category
-- [x] basic view individual post
-- [ ] look into cloudinary and connect to db to save media (photos + videos)
-- [ ] create new post with photo or video and w/out photo or video
-- [ ] check added media in database and cloudinary
-- [ ] check new post format
-
-- [ ] mark posts as published and unpublished
-- [ ] display unpublished posts
-- [ ] display published and unpublished posts on calendar
-
-- [ ] final view individual post
-- [ ] final check database for posts
-- [ ] final check profile for posts
-- [ ] final check category for posts
+- [ ] photos dupliacte on create post
+- [ ] no spacing around media in create post
+- [ ] create post error handling
 
 ## Project Tasks:
 
@@ -85,6 +71,10 @@ Leftovers
 - [ ] fix layout of calendar and chart in pblished and drafts pages
 - [ ] fix how chart looks on md screens in dashboard
 - [ ] fix charts display - does not show bars
+
+- [ ] photos dupliacte on create post
+- [ ] no spacing around media in create post
+- [ ] create post error handling
 
 ## Getting Started
 

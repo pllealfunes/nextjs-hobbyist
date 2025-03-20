@@ -4,7 +4,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/ui/components/button";
 import { Checkbox } from "@/ui/components/checkbox";
 import { ArrowUpDown, Trash2, Pencil } from "lucide-react";
-
+import Link from "next/link";
 export type Post = {
   id: string;
   title: string;
@@ -82,9 +82,12 @@ export const columns = (
   {
     id: "actions",
     header: "Actions",
-    cell: () => (
+    cell: ({ row }) => (
       <div className="flex justify-evenly items-center gap-3 lg:gap-1">
-        <Pencil className="text-rose-400 cursor-pointer" />
+        {/* Correctly pass the post ID to the Link */}
+        <Link href={`/posts/editpost/${row.original.id}`} passHref>
+          <Pencil className="text-rose-400 cursor-pointer" />
+        </Link>
         <Trash2 className="text-red-500 cursor-pointer" />
       </div>
     ),
