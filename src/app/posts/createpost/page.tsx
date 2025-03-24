@@ -74,27 +74,27 @@ const uploadImageToCloudinary = async (
   return (await uploadRes.json()).secure_url;
 };
 
-const replaceImageUrlsInContent = (
-  content: string,
-  imageMap: ImageMap[]
-): string => {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(content, "text/html");
+// const replaceImageUrlsInContent = (
+//   content: string,
+//   imageMap: ImageMap[]
+// ): string => {
+//   const parser = new DOMParser();
+//   const doc = parser.parseFromString(content, "text/html");
 
-  doc.querySelectorAll("img").forEach((img) => {
-    const originalSrc = img.getAttribute("src"); // Ensure correct original src
-    const replacement = imageMap.find(
-      ({ original }) => original === originalSrc
-    )?.cloudinaryUrl;
+//   doc.querySelectorAll("img").forEach((img) => {
+//     const originalSrc = img.getAttribute("src"); // Ensure correct original src
+//     const replacement = imageMap.find(
+//       ({ original }) => original === originalSrc
+//     )?.cloudinaryUrl;
 
-    if (replacement) {
-      console.log(`Replacing: ${replacement}`);
-      img.setAttribute("src", replacement);
-    }
-  });
+//     if (replacement) {
+//       console.log(`Replacing: ${replacement}`);
+//       img.setAttribute("src", replacement);
+//     }
+//   });
 
-  return doc.body.innerHTML; // Ensure correct content return
-};
+//   return doc.body.innerHTML; // Ensure correct content return
+// };
 
 export default function CreatePost() {
   const router = useRouter();

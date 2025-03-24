@@ -1,18 +1,25 @@
 "use client";
-import TextEditor from "@/ui/components/TextEditor";
-import { useForm, SubmitHandler } from "react-hook-form";
+
+import EditPostForm from "@/ui/forms/editpost-form";
 import * as z from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@/ui/components/button";
-import { Input } from "@/ui/components/input";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/ui/components/form";
+import { useEffect, useState } from "react";
+import { useParams, useSearchParams, useRouter } from "next/navigation";
+import { SubmitHandler } from "react-hook-form";
+import { CreatePostSchema } from "@/app/schemas";
+import { Skeleton } from "@/ui/components/skeleton";
+
+interface Post {
+  id: string;
+  title: string;
+  coverphoto: string;
+  content: string;
+  category_id: number;
+  published: boolean;
+  private: boolean;
+  author_id: string;
+  created_at: Date;
+  updated_at: Date;
+}
 
 // Define the type for the 'html' parameter
 function extractTextFromHTML(html: string): string {
@@ -21,31 +28,44 @@ function extractTextFromHTML(html: string): string {
   return doc.body.textContent?.trim() || "";
 }
 
-// Validation schema
-const formSchema = z.object({
-  post: z.string().refine(
-    (value) => {
-      return extractTextFromHTML(value).trim().length >= 200;
-    },
-    {
-      message: "The text must be 200 to 12500 characters long after trimming",
-    }
-  ),
-  title: z.string().min(10, "Title is required"), // Title validation
-});
-
 // Define the type for form data
-type FormData = z.infer<typeof formSchema>;
+type FormData = z.infer<typeof CreatePostSchema>;
+
+type Category = {
+  id: number;
+  name: string;
+};
 
 export default function EditPost() {
-  const form = useForm<FormData>({
-    mode: "onTouched",
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      post: "",
-      title: "",
-    },
-  });
+  const { postid } = useParams();
+  const searchParams = useSearchParams();
+  const [post, setPost] = useState<Post | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
+  //const router = useRouter();
+
+  useEffect(() => {
+    async function loadCategories() {
+      try {
+        const resCategories = await fetch("/api/categories");
+        const categoriesFecthed = await resCategories.json();
+
+        const resPost = await fetch(`/api/posts/post?id=${postid}`);
+        const postFetched = await resPost.json();
+
+        setCategories(categoriesFecthed);
+        setPost(postFetched);
+      } catch (error) {
+        console.error("Error fetching categories", error);
+      }
+    }
+
+    loadCategories();
+  }, [postid]);
+
+  const getCategoryName = (categoryId: number): string => {
+    const category = categories.find((cat) => cat.id === categoryId);
+    return category ? category.name : "Unknown";
+  };
 
   // Define the type for 'data'
   const onSubmit: SubmitHandler<FormData> = (data) => {
@@ -53,55 +73,27 @@ export default function EditPost() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto py-5">
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
-          {/* Title Field */}
-          <FormField
-            control={form.control}
-            name="title"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-lg">Edit Title</FormLabel>
-                <FormControl>
-                  <Input
-                    className="mb-2 w-full border rounded-md p-2 text-lg"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+    <div>
+      {post ? (
+        <EditPostForm categories={categories} post={post} onSubmit={onSubmit} />
+      ) : (
+        <div className="max-w-3xl mx-auto py-5 space-y-4">
+          {/* Skeleton for title input */}
+          <Skeleton className="h-12 w-full rounded-md" />
 
-          {/* Post Field */}
-          <FormField
-            control={form.control}
-            name="post"
-            render={({ field }) => (
-              <FormItem className="my-2">
-                <FormLabel className="text-lg">Edit Post</FormLabel>
-                <FormControl>
-                  <TextEditor
-                    content={field.value}
-                    onChange={(value) => field.onChange(value)}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {/* Skeleton for category input */}
+          <Skeleton className="h-12 w-full rounded-md" />
 
-          {/* Container for Word Count and Submit Button */}
-          <div className="flex justify-end items-end mt-4">
-            <div className="mr-4">
-              {/* Word Count component */}
-              {/* Assuming your word count is displayed inside the TextEditor */}
-            </div>
-            <Button className="ml-2">Submit</Button>
-          </div>
-        </form>
-      </Form>
+          {/* Skeleton for coverphoto input */}
+          <Skeleton className="h-12 w-32 rounded-md" />
+
+          {/* Skeleton for content input */}
+          <Skeleton className="h-64 w-full rounded-md" />
+
+          {/* Skeleton for submit button */}
+          <Skeleton className="h-12 w-32 rounded-md" />
+        </div>
+      )}
     </div>
   );
 }

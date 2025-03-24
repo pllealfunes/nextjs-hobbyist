@@ -255,7 +255,7 @@ export default function LoginNav() {
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem>
-                    <Link href="/drafts" aria-label="Go to drafts page">
+                    <Link href="/posts/drafts" aria-label="Go to drafts page">
                       Drafts
                     </Link>
                   </DropdownMenuItem>
@@ -278,7 +278,7 @@ export default function LoginNav() {
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem>
-                    <Link href="/posts/drafts" aria-label="Go to drafts page">
+                    <Link href="/explore" aria-label="Go to drafts page">
                       Explore
                     </Link>
                   </DropdownMenuItem>
