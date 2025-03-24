@@ -40,10 +40,10 @@ interface Post {
 // Define the type for form data
 type FormData = z.infer<typeof CreatePostSchema>;
 
-type Category = {
-  id: number;
-  name: string;
-};
+// type Category = {
+//   id: number;
+//   name: string;
+// };
 
 interface EditPostFormProps {
   categories: { id: number; name: string }[];

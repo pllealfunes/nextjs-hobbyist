@@ -19,10 +19,10 @@ interface Post {
   id: number;
 }
 
-interface ImageMap {
-  original: string;
-  cloudinaryUrl: string;
-}
+// interface ImageMap {
+//   original: string;
+//   cloudinaryUrl: string;
+// }
 
 const extractImages = (content: string): string[] => {
   const doc = new DOMParser().parseFromString(content, "text/html");

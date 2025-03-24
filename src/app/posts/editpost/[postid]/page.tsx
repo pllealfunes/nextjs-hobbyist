@@ -3,7 +3,7 @@
 import EditPostForm from "@/ui/forms/editpost-form";
 import * as z from "zod";
 import { useEffect, useState } from "react";
-import { useParams, useSearchParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { SubmitHandler } from "react-hook-form";
 import { CreatePostSchema } from "@/app/schemas";
 import { Skeleton } from "@/ui/components/skeleton";
@@ -22,11 +22,11 @@ interface Post {
 }
 
 // Define the type for the 'html' parameter
-function extractTextFromHTML(html: string): string {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, "text/html");
-  return doc.body.textContent?.trim() || "";
-}
+// function extractTextFromHTML(html: string): string {
+//   const parser = new DOMParser();
+//   const doc = parser.parseFromString(html, "text/html");
+//   return doc.body.textContent?.trim() || "";
+// }
 
 // Define the type for form data
 type FormData = z.infer<typeof CreatePostSchema>;
@@ -38,7 +38,7 @@ type Category = {
 
 export default function EditPost() {
   const { postid } = useParams();
-  const searchParams = useSearchParams();
+  //const searchParams = useSearchParams();
   const [post, setPost] = useState<Post | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   //const router = useRouter();
@@ -62,10 +62,10 @@ export default function EditPost() {
     loadCategories();
   }, [postid]);
 
-  const getCategoryName = (categoryId: number): string => {
-    const category = categories.find((cat) => cat.id === categoryId);
-    return category ? category.name : "Unknown";
-  };
+  // const getCategoryName = (categoryId: number): string => {
+  //   const category = categories.find((cat) => cat.id === categoryId);
+  //   return category ? category.name : "Unknown";
+  // };
 
   // Define the type for 'data'
   const onSubmit: SubmitHandler<FormData> = (data) => {
