@@ -157,7 +157,7 @@ const CreatePostForm: React.FC<{
               className="ml-2"
               onClick={() => form.setValue("published", false)}
             >
-              Save as Draft
+              Save Draft
             </Button>
             <Button
               type="submit"

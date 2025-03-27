@@ -187,7 +187,7 @@ const EditPostForm = ({ categories, post, onSubmit }: EditPostFormProps) => {
               className="ml-2"
               onClick={() => form.setValue("published", false)}
             >
-              Save as Draft
+              Save Draft
             </Button>
             <Button
               type="submit"
