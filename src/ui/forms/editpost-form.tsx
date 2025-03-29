@@ -1,5 +1,5 @@
 import React from "react";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -8,6 +8,7 @@ import { Input } from "@/ui/components/input";
 import { CreatePostSchema } from "@/app/schemas";
 import CoverPhotoUploader from "@/ui/components/coverphoto-uploader";
 import TextEditor from "@/ui/components/TextEditor";
+
 import {
   Select,
   SelectContent,
@@ -23,6 +24,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/ui/components/form";
+import Image from "next/image";
 
 interface Post {
   id: string;
@@ -52,13 +54,16 @@ interface EditPostFormProps {
 }
 
 const EditPostForm = ({ categories, post, onSubmit }: EditPostFormProps) => {
+  const [coverPhoto, setCoverPhoto] = useState(post.coverphoto); // Track current cover photo
+  const [isDeleted, setIsDeleted] = useState(false); // Track if the cover photo is deleted
+
   const form = useForm<FormData>({
     mode: "onTouched",
     resolver: zodResolver(CreatePostSchema),
     defaultValues: {
       title: post?.title ?? "",
       category: post?.category_id.toString() ?? "",
-      //coverphoto: post?.coverphoto ?? "",
+      coverphoto: undefined,
       content: post?.content ?? "",
       published: post?.published ?? "",
     },
@@ -69,12 +74,32 @@ const EditPostForm = ({ categories, post, onSubmit }: EditPostFormProps) => {
       form.reset({
         title: post.title,
         category: post.category_id?.toString() ?? "",
-        // coverphoto: post.coverphoto ?? "",
         content: post.content ?? "",
         published: post.published ?? false,
       });
     }
   }, [post, form]);
+
+  const handleDeleteCoverPhoto = async () => {
+    try {
+      const response = await fetch("/api/delete-coverphoto", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ public_id: coverPhoto }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete cover photo");
+      }
+
+      // On success, clear the coverPhoto state
+      setCoverPhoto("");
+      setIsDeleted(true); // Mark as deleted
+      form.setValue("coverphoto", undefined);
+    } catch (error) {
+      console.error("Error deleting cover photo:", error);
+    }
+  };
 
   return (
     <div className="max-w-3xl mx-auto py-5">
@@ -143,18 +168,32 @@ const EditPostForm = ({ categories, post, onSubmit }: EditPostFormProps) => {
                   Cover Photo
                 </FormLabel>
                 <FormControl>
-                  <CoverPhotoUploader
-                    onImageSelect={(image) => {
-                      console.log("Selected Image Base64:", image);
-                      form.setValue("coverphoto", image ?? undefined);
-                    }}
-                  />
+                  {coverPhoto && !isDeleted ? (
+                    <div>
+                      <Image
+                        src={coverPhoto}
+                        alt="Cover Photo Preview"
+                        width={200}
+                        height={200}
+                        className="rounded-lg"
+                      />
+                      <Button className="mt-4" onClick={handleDeleteCoverPhoto}>
+                        Remove Cover Photo
+                      </Button>
+                    </div>
+                  ) : (
+                    <CoverPhotoUploader
+                      onImageSelect={(image) => {
+                        console.log("Selected Image Base64:", image);
+                        form.setValue("coverphoto", image ?? undefined);
+                      }}
+                    />
+                  )}
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          {post?.coverphoto}
           {/* Post Field */}
           <FormField
             control={form.control}
