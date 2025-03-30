@@ -26,6 +26,11 @@ interface Post {
   updated_at: Date;
 }
 
+interface FinalPayload {
+  content: string; // The updated content of the post
+  coverphoto?: string; // Optional Cloudinary URL for the cover photo
+}
+
 // Define the type for the 'html' parameter
 // function extractTextFromHTML(html: string): string {
 //   const parser = new DOMParser();
@@ -123,7 +128,7 @@ export default function EditPost() {
       }
 
       // Step 4: Update the post with Cloudinary URLs
-      const finalPayload: Record<string, any> = { content: updatedContent };
+      const finalPayload: FinalPayload = { content: updatedContent };
       if (coverPhotoUrl) finalPayload.coverphoto = coverPhotoUrl; // Include cover photo if it exists
 
       const finalResponse = await fetch(`/api/posts/${post?.id}`, {
