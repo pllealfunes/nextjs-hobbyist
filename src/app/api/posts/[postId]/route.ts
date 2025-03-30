@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 
 export async function PUT(
-  req: NextRequest,
+  req: Request,
   { params }: { params: { postId: string } }
 ) {
   try {
