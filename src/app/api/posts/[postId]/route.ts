@@ -1,17 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 
-type Params = {
-  id: string;
-};
-
-type Props = {
-  params: Params;
-};
-
-export async function PUT(req: NextRequest, { params }: Props) {
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: Promise<{ postId: string }> }
+) {
   try {
-    const postId = params.id; // Get the post ID from the URL
+    const { postId } = await params; // Get the post ID from the URL
     const updatedFields = await req.json(); // Parse the request body (JSON payload)
 
     console.log("Post ID:", postId);
