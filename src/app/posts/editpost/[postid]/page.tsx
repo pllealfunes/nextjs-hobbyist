@@ -8,7 +8,6 @@ import { SubmitHandler } from "react-hook-form";
 import { CreatePostSchema } from "@/app/schemas";
 import { Skeleton } from "@/ui/components/skeleton";
 import {
-  handlePost,
   extractImages,
   fileToBase64,
   uploadImageToCloudinary,

@@ -59,42 +59,42 @@ export const uploadImageToCloudinary = async (
   return (await uploadRes.json()).secure_url;
 };
 
-export const handlePost = async (
-  formData: FormData, // FormData to handle both text and files
-  post: Post | null, // Pass null for creating a post, or an existing post for editing
-  isEdit: boolean,
-  router: any,
-  getCategoryName: (id: number) => string
-) => {
-  try {
-    const url = isEdit ? `/api/posts/${post?.id}` : "/api/posts";
-    console.log("API URL:", url);
+// export const handlePost = async (
+//   formData: FormData, // FormData to handle both text and files
+//   post: Post | null, // Pass null for creating a post, or an existing post for editing
+//   isEdit: boolean,
+//   router: any,
+//   getCategoryName: (id: number) => string
+// ) => {
+//   try {
+//     const url = isEdit ? `/api/posts/${post?.id}` : "/api/posts";
+//     console.log("API URL:", url);
 
-    const method = isEdit ? "PUT" : "POST";
+//     const method = isEdit ? "PUT" : "POST";
 
-    // Send request with FormData
-    const response = await fetch(url, {
-      method,
-      body: formData,
-    });
+//     // Send request with FormData
+//     const response = await fetch(url, {
+//       method,
+//       body: formData,
+//     });
 
-    if (!response.ok) {
-      throw new Error(
-        isEdit ? "Failed to update post" : "Failed to create post"
-      );
-    }
+//     if (!response.ok) {
+//       throw new Error(
+//         isEdit ? "Failed to update post" : "Failed to create post"
+//       );
+//     }
 
-    const currentPost = isEdit ? post : await response.json();
+//     const currentPost = isEdit ? post : await response.json();
 
-    // Redirect the user
-    router.push(
-      formData.get("published") === "true"
-        ? `/posts/${currentPost.id}/post?category=${getCategoryName(
-            Number(formData.get("category"))
-          ).toLowerCase()}`
-        : "/posts/drafts"
-    );
-  } catch (error) {
-    console.error("Error handling post:", error);
-  }
-};
+//     // Redirect the user
+//     router.push(
+//       formData.get("published") === "true"
+//         ? `/posts/${currentPost.id}/post?category=${getCategoryName(
+//             Number(formData.get("category"))
+//           ).toLowerCase()}`
+//         : "/posts/drafts"
+//     );
+//   } catch (error) {
+//     console.error("Error handling post:", error);
+//   }
+// };
