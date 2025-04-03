@@ -49,7 +49,7 @@ export const base64ToBlob = (base64: string): Blob => {
   try {
     byteString = atob(data);
   } catch (error) {
-    throw new Error("Invalid base64 data. Could not decode.");
+    throw new Error(`Invalid base64 data. Could not decode.${error}`);
   }
 
   const arrayBuffer = new Uint8Array(byteString.length).map((_, i) =>
