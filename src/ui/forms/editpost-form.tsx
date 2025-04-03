@@ -51,11 +51,18 @@ interface EditPostFormProps {
   categories: { id: number; name: string }[];
   post: Post;
   onSubmit: SubmitHandler<FormData>;
+  isDeleted: boolean;
+  setIsDeleted: (value: boolean) => void;
 }
 
-const EditPostForm = ({ categories, post, onSubmit }: EditPostFormProps) => {
-  const [coverPhoto, setCoverPhoto] = useState(post.coverphoto); // Track current cover photo
-  const [isDeleted, setIsDeleted] = useState(false); // Track if the cover photo is deleted
+const EditPostForm = ({
+  categories,
+  post,
+  onSubmit,
+  isDeleted,
+  setIsDeleted,
+}: EditPostFormProps) => {
+  const [coverPhoto, setCoverPhoto] = useState(post.coverphoto);
 
   const form = useForm<FormData>({
     mode: "onTouched",
@@ -82,19 +89,8 @@ const EditPostForm = ({ categories, post, onSubmit }: EditPostFormProps) => {
 
   const handleDeleteCoverPhoto = async () => {
     try {
-      const response = await fetch("/api/delete-coverphoto", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ public_id: coverPhoto }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to delete cover photo");
-      }
-
-      // On success, clear the coverPhoto state
       setCoverPhoto("");
-      setIsDeleted(true); // Mark as deleted
+      setIsDeleted(true);
       form.setValue("coverphoto", undefined);
     } catch (error) {
       console.error("Error deleting cover photo:", error);

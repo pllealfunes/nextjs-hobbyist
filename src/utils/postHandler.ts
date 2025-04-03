@@ -1,19 +1,61 @@
 import { Post } from "@/lib/types";
 
-export const extractImages = (content: string): string[] => {
-  const doc = new DOMParser().parseFromString(content, "text/html");
-  return Array.from(doc.querySelectorAll("img"), (img) => img.src).filter(
-    Boolean
-  );
+type ExtractedImages = {
+  newImages: string[]; // Base64 or temporary URLs
+  existingImages: string[]; // Cloudinary URLs
+};
+
+export const extractImages = (content: string): ExtractedImages => {
+  const imageRegex = /<img[^>]*src="([^"]+)"[^>]*>/g; // Regex to extract image `src`
+  const cloudinaryUrlPrefix = "https://res.cloudinary.com"; // Cloudinary URL prefix
+
+  const newImages: string[] = [];
+  const existingImages: string[] = [];
+
+  let match;
+  while ((match = imageRegex.exec(content)) !== null) {
+    const imageUrl = match[1]; // Extract the `src` attribute value
+
+    if (imageUrl.startsWith(cloudinaryUrlPrefix)) {
+      existingImages.push(imageUrl); // Categorize as existing Cloudinary image
+    } else {
+      newImages.push(imageUrl); // Categorize as a new image (base64 or temporary URL)
+    }
+  }
+
+  return { newImages, existingImages };
 };
 
 export const base64ToBlob = (base64: string): Blob => {
+  if (!base64 || !base64.includes(",")) {
+    throw new Error(
+      "Invalid base64 string. Ensure it contains metadata and data."
+    );
+  }
+
   const [meta, data] = base64.split(",");
+  if (!meta || !data) {
+    throw new Error(
+      "Malformed base64 string. Missing metadata or encoded content."
+    );
+  }
+
   const mimeType = meta.match(/:(.*?);/)?.[1] || "";
-  const byteString = atob(data);
+  if (!mimeType) {
+    throw new Error("Unable to determine MIME type from metadata.");
+  }
+
+  let byteString;
+  try {
+    byteString = atob(data);
+  } catch (error) {
+    throw new Error("Invalid base64 data. Could not decode.");
+  }
+
   const arrayBuffer = new Uint8Array(byteString.length).map((_, i) =>
     byteString.charCodeAt(i)
   );
+
   return new Blob([arrayBuffer], { type: mimeType });
 };
 
@@ -26,10 +68,16 @@ export const fileToBase64 = (file: File): Promise<string> => {
   });
 };
 
+const uploadedImageCache = new Set<string>();
 export const uploadImageToCloudinary = async (
   image: string,
   post: Post
 ): Promise<string> => {
+  if (uploadedImageCache.has(image)) {
+    console.log("Image already uploaded, skipping:", image);
+    return image; // Return the previously uploaded image URL
+  }
+
   const blob = base64ToBlob(image);
   const res = await fetch("/api/sign-image", {
     method: "POST",

@@ -52,6 +52,7 @@ export default function EditPost() {
   const [post, setPost] = useState<Post | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const router = useRouter();
+  const [isDeleted, setIsDeleted] = useState(false);
 
   useEffect(() => {
     async function loadCategories() {
@@ -105,13 +106,25 @@ export default function EditPost() {
       console.log("Post details updated successfully");
 
       // Step 2: Extract and upload images in content
-      const images = extractImages(data.content); // Extract base64 or temporary URLs
+      // Step 2: Extract and upload images in content
+      const { newImages, existingImages } = extractImages(data.content);
       let updatedContent = data.content;
 
+      // Handle existing images
+      existingImages.forEach((image) => {
+        console.log("Using existing image:", image);
+      });
+
+      // Upload new images
       const uploadedImageUrls = await Promise.all(
-        images.map(async (image) => {
-          const cloudinaryUrl = await uploadImageToCloudinary(image, post);
-          return { original: image, cloudinaryUrl };
+        newImages.map(async (image) => {
+          try {
+            const cloudinaryUrl = await uploadImageToCloudinary(image, post);
+            return { original: image, cloudinaryUrl };
+          } catch (error) {
+            console.error("Error uploading new image:", error);
+            return { original: image, cloudinaryUrl: image }; // Fallback to original image
+          }
         })
       );
 
@@ -120,11 +133,48 @@ export default function EditPost() {
         updatedContent = updatedContent.replace(original, cloudinaryUrl);
       });
 
+      // Handle cover photo deletion
+      if (isDeleted && post.coverphoto && data.coverphoto === undefined) {
+        const public_id = post.coverphoto
+          .split("/")
+          .slice(-2) // Get the last two parts, folder and image name
+          .join("/") // Join them to form the public ID
+          .split(".")[0];
+        try {
+          const response = await fetch("/api/delete-coverphoto", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ public_id }),
+          });
+
+          const data = await response.json();
+          console.log("Delete coverphoto Message", data.message);
+        } catch (error) {
+          console.error("Error deleting image:", error);
+        }
+      }
+
       // Step 3: Upload cover photo (if provided)
       let coverPhotoUrl = null;
-      if (data.coverphoto) {
-        const base64CoverPhoto = await fileToBase64(data.coverphoto);
-        coverPhotoUrl = await uploadImageToCloudinary(base64CoverPhoto, post);
+
+      if (data.coverphoto instanceof File && data.coverphoto != undefined) {
+        // A new file has been uploaded via the file finder
+        try {
+          console.log("New cover photo detected:", data.coverphoto);
+          const base64CoverPhoto = await fileToBase64(data.coverphoto);
+          coverPhotoUrl = await uploadImageToCloudinary(base64CoverPhoto, post);
+        } catch (error) {
+          console.error("Error uploading new cover photo:", error);
+        }
+      } else if (
+        typeof data.coverphoto === "string" &&
+        data.coverphoto === post.coverphoto
+      ) {
+        // The existing cover photo URL is being used
+        console.log("Using existing cover photo, no upload necessary.");
+        coverPhotoUrl = post.coverphoto; // Retain the existing Cloudinary URL
+      } else {
+        console.log("No cover photo provided for upload.");
       }
 
       // Step 4: Update the post with Cloudinary URLs
@@ -158,7 +208,13 @@ export default function EditPost() {
   return (
     <div>
       {post ? (
-        <EditPostForm categories={categories} post={post} onSubmit={onSubmit} />
+        <EditPostForm
+          categories={categories}
+          post={post}
+          onSubmit={onSubmit}
+          isDeleted={isDeleted}
+          setIsDeleted={setIsDeleted}
+        />
       ) : (
         <div className="max-w-3xl mx-auto py-5 space-y-4">
           {/* Skeleton for title input */}
