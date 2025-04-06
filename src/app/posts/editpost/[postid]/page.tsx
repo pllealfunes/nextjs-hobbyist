@@ -16,7 +16,7 @@ import {
 interface Post {
   id: string;
   title: string;
-  coverphoto: string;
+  coverphoto: string | null | undefined;
   content: string;
   category_id: number;
   published: boolean;
@@ -28,7 +28,7 @@ interface Post {
 
 interface FinalPayload {
   content: string; // The updated content of the post
-  coverphoto?: string; // Optional Cloudinary URL for the cover photo
+  coverphoto?: string | null | undefined; // Optional Cloudinary URL for the cover photo
 }
 
 // Define the type for the 'html' parameter
@@ -106,7 +106,6 @@ export default function EditPost() {
       console.log("Post details updated successfully");
 
       // Step 2: Extract and upload images in content
-      // Step 2: Extract and upload images in content
       const { newImages, existingImages } = extractImages(data.content);
       let updatedContent = data.content;
 
@@ -179,7 +178,13 @@ export default function EditPost() {
 
       // Step 4: Update the post with Cloudinary URLs
       const finalPayload: FinalPayload = { content: updatedContent };
-      if (coverPhotoUrl) finalPayload.coverphoto = coverPhotoUrl; // Include cover photo if it exists
+
+      // If the cover photo is deleted, remove it from the payload
+      if (isDeleted || !data.coverphoto || data.coverphoto === undefined) {
+        finalPayload.coverphoto = null; // Ensure coverphoto is set to null or undefined
+      } else if (coverPhotoUrl) {
+        finalPayload.coverphoto = coverPhotoUrl; // Include the new cover photo if it's uploaded
+      }
 
       const finalResponse = await fetch(`/api/posts/${post?.id}`, {
         method: "PUT",
@@ -207,6 +212,7 @@ export default function EditPost() {
 
   return (
     <div>
+      {post?.coverphoto}
       {post ? (
         <EditPostForm
           categories={categories}

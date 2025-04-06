@@ -29,7 +29,7 @@ import Image from "next/image";
 interface Post {
   id: string;
   title: string;
-  coverphoto: string;
+  coverphoto: string | null | undefined;
   content: string;
   category_id: number;
   published: boolean;
