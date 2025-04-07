@@ -11,6 +11,8 @@ import {
   extractImages,
   fileToBase64,
   uploadImageToCloudinary,
+  deleteImageFromCloudinary,
+  removeCloudinaryUrls,
 } from "@/utils/postHandler";
 
 interface Post {
@@ -87,6 +89,27 @@ export default function EditPost() {
     try {
       console.log("Editing Post ID:", post?.id);
 
+      // Step 1: Extract existing images (Cloudinary URLs)
+      const { existingImages: oldImages } = extractImages(post.content); // Old images in content
+      const { newImages, existingImages: newExistingImages } = extractImages(
+        data.content
+      ); // New images in content
+
+      // Step 2: Delete images from Cloudinary that were removed from content
+      // Find images that are in existingImages but no longer in the new content
+      const imagesToDelete = oldImages.filter(
+        (img) => !newExistingImages.includes(img)
+      );
+
+      // Delete images from Cloudinary
+      for (const imageUrl of imagesToDelete) {
+        console.log("Deleting image from Cloudinary:", imageUrl);
+        await deleteImageFromCloudinary(imageUrl); // Delete image from Cloudinary
+      }
+
+      // Step 3: Clean content by removing Cloudinary image URLs
+      let cleanedContent = removeCloudinaryUrls(data.content); // Remove Cloudinary URLs from content
+
       // Step 1: Update basic post details without images
       const payload = {
         title: data.title,
@@ -105,14 +128,14 @@ export default function EditPost() {
 
       console.log("Post details updated successfully");
 
-      // Step 2: Extract and upload images in content
-      const { newImages, existingImages } = extractImages(data.content);
-      let updatedContent = data.content;
+      // // Step 2: Extract and upload images in content
+      // const { newImages, existingImages } = extractImages(data.content);
+      // let updatedContent = data.content;
 
-      // Handle existing images
-      existingImages.forEach((image) => {
-        console.log("Using existing image:", image);
-      });
+      // // Handle existing images
+      // existingImages.forEach((image) => {
+      //   console.log("Using existing image:", image);
+      // });
 
       // Upload new images
       const uploadedImageUrls = await Promise.all(
@@ -127,9 +150,14 @@ export default function EditPost() {
         })
       );
 
+      // // Replace image URLs in the content
+      // uploadedImageUrls.forEach(({ original, cloudinaryUrl }) => {
+      //   updatedContent = updatedContent.replace(original, cloudinaryUrl);
+      // });
+
       // Replace image URLs in the content
       uploadedImageUrls.forEach(({ original, cloudinaryUrl }) => {
-        updatedContent = updatedContent.replace(original, cloudinaryUrl);
+        cleanedContent = cleanedContent.replace(original, cloudinaryUrl);
       });
 
       // Handle cover photo deletion
@@ -177,7 +205,7 @@ export default function EditPost() {
       }
 
       // Step 4: Update the post with Cloudinary URLs
-      const finalPayload: FinalPayload = { content: updatedContent };
+      const finalPayload: FinalPayload = { content: cleanedContent };
 
       // If the cover photo is deleted, remove it from the payload
       if (isDeleted || !data.coverphoto || data.coverphoto === undefined) {

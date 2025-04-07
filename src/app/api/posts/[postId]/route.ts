@@ -18,6 +18,11 @@ export async function PUT(
       throw new Error("Invalid or missing postId");
     }
 
+    // Ensure coverphoto is null if it's undefined or explicitly deleted
+    if (updatedFields.coverphoto === undefined) {
+      updatedFields.coverphoto = null; // Set coverphoto to null if undefined
+    }
+
     // Initialize Supabase client
     const supabase = await createClient();
 
@@ -36,6 +41,16 @@ export async function PUT(
     return NextResponse.json(data[0], { status: 200 });
   } catch (error) {
     console.error("Error updating post:", error);
-    return NextResponse.json({ error: error }, { status: 500 });
+
+    // Type guard to check if error is an instance of Error
+    if (error instanceof Error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    // Fallback if error is not an instance of Error
+    return NextResponse.json(
+      { error: "An unknown error occurred" },
+      { status: 500 }
+    );
   }
 }

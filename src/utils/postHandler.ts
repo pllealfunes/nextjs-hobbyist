@@ -107,6 +107,45 @@ export const uploadImageToCloudinary = async (
   return (await uploadRes.json()).secure_url;
 };
 
+export const deleteImageFromCloudinary = async (imageUrl: string) => {
+  // Extract the public_id from the Cloudinary URL
+  const public_id = imageUrl
+    .split("/")
+    .slice(-2) // Get the last two parts, folder and image name
+    .join("/") // Join them to form the public ID
+    .split(".")[0]; // Remove file extension
+
+  try {
+    const response = await fetch(`/api/delete-coverphoto`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ public_id }),
+    });
+
+    const data = await response.json();
+    if (data.error) {
+      console.error("Error deleting image from Cloudinary:", data.error);
+    } else {
+      console.log("Image deleted from Cloudinary:", data);
+    }
+  } catch (error) {
+    console.error("Error calling delete image API:", error);
+  }
+};
+
+export const removeCloudinaryUrls = (content: string): string => {
+  const cloudinaryUrlPrefix = "https://res.cloudinary.com"; // Cloudinary URL prefix
+  const imageRegex = /<img[^>]*src="([^"]+)"[^>]*>/g;
+
+  // Replace the image URLs that start with the Cloudinary prefix with an empty string
+  return content.replace(imageRegex, (match, imageUrl) => {
+    if (imageUrl.startsWith(cloudinaryUrlPrefix)) {
+      return ""; // Remove Cloudinary image
+    }
+    return match; // Keep non-Cloudinary images
+  });
+};
+
 // export const handlePost = async (
 //   formData: FormData, // FormData to handle both text and files
 //   post: Post | null, // Pass null for creating a post, or an existing post for editing
