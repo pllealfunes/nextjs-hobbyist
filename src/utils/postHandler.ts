@@ -96,6 +96,42 @@ export const uploadImageToCloudinary = async (
   formData.append("eager", "w_400,h_300,c_pad|w_260,h_200,c_crop");
 
   const uploadRes = await fetch(
+    `
+https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload
+`,
+
+    {
+      method: "POST",
+      body: formData,
+    }
+  );
+  if (!uploadRes.ok) throw new Error("Image upload failed");
+
+  return (await uploadRes.json()).secure_url;
+};
+
+export const coverphotoImageToCloudinary = async (
+  image: string,
+  post: Post
+): Promise<string> => {
+  const blob = base64ToBlob(image);
+  const res = await fetch("/api/sign-coverphoto", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userId: post.author_id, postId: post.id }),
+  });
+  const { signature, timestamp, public_id, api_key } = await res.json();
+  if (!signature) throw new Error("Signature missing");
+
+  const formData = new FormData();
+  formData.append("file", image);
+  formData.append("signature", signature);
+  formData.append("timestamp", timestamp);
+  formData.append("public_id", public_id);
+  formData.append("api_key", api_key);
+  formData.append("eager", "w_400,h_300,c_pad|w_260,h_200,c_crop");
+
+  const uploadRes = await fetch(
     `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
     {
       method: "POST",
@@ -116,7 +152,7 @@ export const deleteImageFromCloudinary = async (imageUrl: string) => {
     .split(".")[0]; // Remove file extension
 
   try {
-    const response = await fetch(`/api/delete-coverphoto`, {
+    const response = await fetch(`/api/delete-image`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ public_id }),
@@ -133,55 +169,33 @@ export const deleteImageFromCloudinary = async (imageUrl: string) => {
   }
 };
 
-export const removeCloudinaryUrls = (content: string): string => {
-  const cloudinaryUrlPrefix = "https://res.cloudinary.com"; // Cloudinary URL prefix
-  const imageRegex = /<img[^>]*src="([^"]+)"[^>]*>/g;
+export const removeDeletedCloudinaryImages = (
+  content: string,
+  imagesToDelete: string[]
+): string => {
+  let cleanedContent = content;
 
-  // Replace the image URLs that start with the Cloudinary prefix with an empty string
-  return content.replace(imageRegex, (match, imageUrl) => {
-    if (imageUrl.startsWith(cloudinaryUrlPrefix)) {
-      return ""; // Remove Cloudinary image
-    }
-    return match; // Keep non-Cloudinary images
-  });
+  for (const imageUrl of imagesToDelete) {
+    const escapedUrl = imageUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const regex = new RegExp(`<img[^>]*src="${escapedUrl}"[^>]*>`, "g");
+    cleanedContent = cleanedContent.replace(regex, "");
+  }
+
+  return cleanedContent;
 };
 
-// export const handlePost = async (
-//   formData: FormData, // FormData to handle both text and files
-//   post: Post | null, // Pass null for creating a post, or an existing post for editing
-//   isEdit: boolean,
-//   router: any,
-//   getCategoryName: (id: number) => string
-// ) => {
-//   try {
-//     const url = isEdit ? `/api/posts/${post?.id}` : "/api/posts";
-//     console.log("API URL:", url);
+export const replaceBase64WithCloudinaryUrls = (
+  html: string,
+  uploadedImageUrls: { original: string; cloudinaryUrl: string }[]
+) => {
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  const imgs = doc.querySelectorAll("img");
 
-//     const method = isEdit ? "PUT" : "POST";
+  imgs.forEach((img) => {
+    const src = img.getAttribute("src");
+    const match = uploadedImageUrls.find((u) => u.original === src);
+    if (match) img.setAttribute("src", match.cloudinaryUrl);
+  });
 
-//     // Send request with FormData
-//     const response = await fetch(url, {
-//       method,
-//       body: formData,
-//     });
-
-//     if (!response.ok) {
-//       throw new Error(
-//         isEdit ? "Failed to update post" : "Failed to create post"
-//       );
-//     }
-
-//     const currentPost = isEdit ? post : await response.json();
-
-//     // Redirect the user
-//     router.push(
-//       formData.get("published") === "true"
-//         ? `/posts/${currentPost.id}/post?category=${getCategoryName(
-//             Number(formData.get("category"))
-//           ).toLowerCase()}`
-//         : "/posts/drafts"
-//     );
-//   } catch (error) {
-//     console.error("Error handling post:", error);
-//   }
-// };
+  return doc.body.innerHTML;
+};

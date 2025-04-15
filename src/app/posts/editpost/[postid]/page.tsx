@@ -11,8 +11,9 @@ import {
   extractImages,
   fileToBase64,
   uploadImageToCloudinary,
+  coverphotoImageToCloudinary,
   deleteImageFromCloudinary,
-  removeCloudinaryUrls,
+  removeDeletedCloudinaryImages,
 } from "@/utils/postHandler";
 
 interface Post {
@@ -89,32 +90,32 @@ export default function EditPost() {
     try {
       console.log("Editing Post ID:", post?.id);
 
-      // Step 1: Extract existing images (Cloudinary URLs)
-      const { existingImages: oldImages } = extractImages(post.content); // Old images in content
+      // Step 1: Extract existing images (Cloudinary URLs) from the content
+      const { existingImages: oldImages } = extractImages(post.content);
       const { newImages, existingImages: newExistingImages } = extractImages(
         data.content
-      ); // New images in content
+      );
 
-      // Step 2: Delete images from Cloudinary that were removed from content
-      // Find images that are in existingImages but no longer in the new content
+      // Step 2: Delete images from Cloudinary that are removed from the content
       const imagesToDelete = oldImages.filter(
         (img) => !newExistingImages.includes(img)
       );
 
-      // Delete images from Cloudinary
       for (const imageUrl of imagesToDelete) {
-        console.log("Deleting image from Cloudinary:", imageUrl);
-        await deleteImageFromCloudinary(imageUrl); // Delete image from Cloudinary
+        console.log("Deleting content image from Cloudinary:", imageUrl);
+        await deleteImageFromCloudinary(imageUrl);
       }
 
-      // Step 3: Clean content by removing Cloudinary image URLs
-      let cleanedContent = removeCloudinaryUrls(data.content); // Remove Cloudinary URLs from content
+      let cleanedContent = removeDeletedCloudinaryImages(
+        data.content,
+        imagesToDelete
+      );
 
-      // Step 1: Update basic post details without images
+      // Prepare basic post update payload (without images)
       const payload = {
         title: data.title,
         category_id: parseInt(data.category, 10),
-        content: data.content, // Temporary content without Cloudinary URLs
+        content: data.content, // Content before replacing image URLs
         published: data.published,
       };
 
@@ -128,16 +129,7 @@ export default function EditPost() {
 
       console.log("Post details updated successfully");
 
-      // // Step 2: Extract and upload images in content
-      // const { newImages, existingImages } = extractImages(data.content);
-      // let updatedContent = data.content;
-
-      // // Handle existing images
-      // existingImages.forEach((image) => {
-      //   console.log("Using existing image:", image);
-      // });
-
-      // Upload new images
+      // Step 3: Upload new images
       const uploadedImageUrls = await Promise.all(
         newImages.map(async (image) => {
           try {
@@ -150,46 +142,29 @@ export default function EditPost() {
         })
       );
 
-      // // Replace image URLs in the content
-      // uploadedImageUrls.forEach(({ original, cloudinaryUrl }) => {
-      //   updatedContent = updatedContent.replace(original, cloudinaryUrl);
-      // });
-
-      // Replace image URLs in the content
       uploadedImageUrls.forEach(({ original, cloudinaryUrl }) => {
         cleanedContent = cleanedContent.replace(original, cloudinaryUrl);
       });
 
-      // Handle cover photo deletion
-      if (isDeleted && post.coverphoto && data.coverphoto === undefined) {
-        const public_id = post.coverphoto
-          .split("/")
-          .slice(-2) // Get the last two parts, folder and image name
-          .join("/") // Join them to form the public ID
-          .split(".")[0];
+      // Step 4: Handle cover photo deletion (if flagged)
+      if (isDeleted && post.coverphoto && !data.coverphoto) {
         try {
-          const response = await fetch("/api/delete-coverphoto", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ public_id }),
-          });
-
-          const data = await response.json();
-          console.log("Delete coverphoto Message", data.message);
+          await deleteImageFromCloudinary(post.coverphoto);
         } catch (error) {
-          console.error("Error deleting image:", error);
+          console.error("Error deleting cover photo from Cloudinary:", error);
         }
       }
 
-      // Step 3: Upload cover photo (if provided)
       let coverPhotoUrl = null;
 
-      if (data.coverphoto instanceof File && data.coverphoto != undefined) {
-        // A new file has been uploaded via the file finder
+      if (data.coverphoto instanceof File) {
+        // Upload new cover photo file
         try {
-          console.log("New cover photo detected:", data.coverphoto);
           const base64CoverPhoto = await fileToBase64(data.coverphoto);
-          coverPhotoUrl = await uploadImageToCloudinary(base64CoverPhoto, post);
+          coverPhotoUrl = await coverphotoImageToCloudinary(
+            base64CoverPhoto,
+            post
+          );
         } catch (error) {
           console.error("Error uploading new cover photo:", error);
         }
@@ -197,37 +172,35 @@ export default function EditPost() {
         typeof data.coverphoto === "string" &&
         data.coverphoto === post.coverphoto
       ) {
-        // The existing cover photo URL is being used
-        console.log("Using existing cover photo, no upload necessary.");
-        coverPhotoUrl = post.coverphoto; // Retain the existing Cloudinary URL
-      } else {
-        console.log("No cover photo provided for upload.");
+        // Use existing cover photo URL
+        coverPhotoUrl = post.coverphoto;
       }
 
-      // Step 4: Update the post with Cloudinary URLs
+      // Prepare final payload
       const finalPayload: FinalPayload = { content: cleanedContent };
 
-      // If the cover photo is deleted, remove it from the payload
-      if (isDeleted || !data.coverphoto || data.coverphoto === undefined) {
-        finalPayload.coverphoto = null; // Ensure coverphoto is set to null or undefined
+      if (isDeleted && !data.coverphoto && post.coverphoto) {
+        finalPayload.coverphoto = null; // Clear cover photo only if deleted
       } else if (coverPhotoUrl) {
-        finalPayload.coverphoto = coverPhotoUrl; // Include the new cover photo if it's uploaded
+        finalPayload.coverphoto = coverPhotoUrl; // Set new or existing cover photo URL
       }
 
+      // Step 5: Update the post with images and cover photo
       const finalResponse = await fetch(`/api/posts/${post?.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(finalPayload),
       });
 
-      if (!finalResponse.ok)
+      if (!finalResponse.ok) {
         throw new Error("Failed to update post with Cloudinary URLs");
+      }
 
       console.log("Post updated with images and cover photo");
 
+      // Step 6: Redirect the user
       const getCategory = getCategoryName(Number(data.category));
 
-      // Step 5: Redirect the user
       router.push(
         data.published
           ? `/posts/${post?.id}/post?category=${getCategory.toLowerCase()}`
@@ -240,7 +213,6 @@ export default function EditPost() {
 
   return (
     <div>
-      {post?.coverphoto}
       {post ? (
         <EditPostForm
           categories={categories}
