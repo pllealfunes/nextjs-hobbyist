@@ -55,7 +55,7 @@ export default function ToolBar({ editor }: ToolBarProps) {
   if (!editor) return null;
 
   const addImage = (() => {
-    let queue: string[] = [];
+    const queue: string[] = [];
     let isProcessing = false;
 
     return async (event: React.ChangeEvent<HTMLInputElement>) => {
