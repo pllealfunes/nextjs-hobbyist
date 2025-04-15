@@ -24,32 +24,19 @@ https://nextjs-hobbyist.vercel.app/
 
 ## Current Tasks:
 
-- [ ] photos dupliacte on create post
-- [ ] no spacing around media in create post
-- [ ] create post error handling
-
-## Project Tasks:
-
-- [ ] update post
-- [ ] update post with photo or video and w/out photo or video
-- [ ] view updated post on profile
-- [ ] check updated post format
-- [ ] check post under category
-- [ ] check updated media in database and cloudinary
-
-- [ ] create new comment
-- [ ] check new comment format
-- [ ] view new comment
-
-- [ ] update new comment
-- [ ] update check new comment format
-- [ ] view updated comment
-
+- [ ] skeleton when editing post
+- [ ] skeleton when creating post
 - [ ] upload user photo
 - [ ] check media in database and cloudinary
 - [ ] update user photo
 - [ ] check updated media in database and cloudinary
 - [ ] update user info
+
+## Project Tasks:
+
+- [ ] update new comment
+- [ ] update check new comment format
+- [ ] view updated comment
 
 - [ ] search posts
 - [ ] create like functionality
@@ -72,8 +59,8 @@ Leftovers
 - [ ] fix how chart looks on md screens in dashboard
 - [ ] fix charts display - does not show bars
 
-- [ ] photos dupliacte on create post
-- [ ] no spacing around media in create post
+- [ ] photos dupliacte on create and edit post
+- [ ] no spacing around media in create and edit post
 - [ ] create post error handling
 
 ## Getting Started

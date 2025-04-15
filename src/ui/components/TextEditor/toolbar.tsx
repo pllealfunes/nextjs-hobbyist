@@ -41,6 +41,7 @@ import { Label } from "@/ui/components/label";
 import { Button } from "@/ui/components/button";
 import { Editor } from "@tiptap/react";
 import { useState } from "react";
+import { fileToBase64 } from "@/utils/postHandler";
 
 // Define the prop types
 interface ToolBarProps {
@@ -53,34 +54,51 @@ export default function ToolBar({ editor }: ToolBarProps) {
 
   if (!editor) return null;
 
-  const addImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (!event.target.files) return;
+  const addImage = (() => {
+    let queue: string[] = [];
+    let isProcessing = false;
 
-    const files = Array.from(event.target.files); // Handle multiple files
+    return async (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (!event.target.files || !editor) return;
 
-    for (const file of files) {
-      await new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
+      const files = Array.from(event.target.files);
+      const base64Images = await Promise.all(files.map(fileToBase64));
 
-        reader.onloadend = () => {
-          const base64data = reader.result?.toString() || "";
+      queue.push(...base64Images);
 
-          // Ensure each image is inserted at a unique position
-          editor
-            .chain()
-            .insertContentAt(editor.state.doc.content.size, {
-              type: "image",
-              attrs: { src: base64data },
-            })
-            .focus()
-            .run();
+      if (isProcessing) return;
+      isProcessing = true;
 
-          resolve(null);
-        };
-      });
-    }
-  };
+      while (queue.length > 0) {
+        const image = queue.shift();
+        if (!image) continue;
+
+        const { doc } = editor.state;
+
+        // Insert at the very end of the document (after the last node)
+        let insertPos = doc.content.size;
+        doc.descendants((node, pos) => {
+          if (node.type.name === "image") {
+            insertPos = pos + node.nodeSize;
+          }
+        });
+
+        editor
+          .chain()
+          .focus()
+          .insertContentAt(insertPos, {
+            type: "image",
+            attrs: { src: image },
+          })
+          .run();
+
+        // Wait for TipTap to flush its updates before moving to the next image
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
+
+      isProcessing = false;
+    };
+  })();
 
   const youtubeRegex =
     /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/|v\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;

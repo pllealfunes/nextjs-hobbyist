@@ -10,7 +10,7 @@ import CharacterCount from "@tiptap/extension-character-count";
 import ImageResize from "tiptap-extension-resize-image";
 import FileHandler from "@tiptap-pro/extension-file-handler";
 import Video from "@/ui/components/video-uploader";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface TextEditorProps {
   content: string | object;
@@ -20,7 +20,9 @@ interface TextEditorProps {
 const limit = 12500;
 
 export default function TextEditor({ content, onChange }: TextEditorProps) {
-  //const [isUploading, setIsUploading] = useState(false);
+  const [debounceTimer, setDebounceTimer] = useState<NodeJS.Timeout | null>(
+    null
+  );
 
   const editor = useEditor({
     extensions: [
@@ -109,9 +111,14 @@ export default function TextEditor({ content, onChange }: TextEditorProps) {
     onUpdate: ({ editor }) => {
       const newContent = editor.getHTML();
 
-      // Prevent unnecessary re-renders when images are added
       if (newContent !== content) {
-        onChange(newContent);
+        if (debounceTimer) clearTimeout(debounceTimer);
+
+        const timer = setTimeout(() => {
+          onChange(newContent);
+        }, 300); // 300ms debounce
+
+        setDebounceTimer(timer);
       }
     },
     immediatelyRender: false,

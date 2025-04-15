@@ -68,16 +68,10 @@ export const fileToBase64 = (file: File): Promise<string> => {
   });
 };
 
-const uploadedImageCache = new Set<string>();
 export const uploadImageToCloudinary = async (
   image: string,
   post: Post
 ): Promise<string> => {
-  if (uploadedImageCache.has(image)) {
-    console.log("Image already uploaded, skipping:", image);
-    return image; // Return the previously uploaded image URL
-  }
-
   const blob = base64ToBlob(image);
   const res = await fetch("/api/sign-image", {
     method: "POST",
