@@ -114,7 +114,6 @@ export const coverphotoImageToCloudinary = async (
   image: string,
   post: Post
 ): Promise<string> => {
-  const blob = base64ToBlob(image);
   const res = await fetch("/api/sign-coverphoto", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
