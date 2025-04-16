@@ -24,9 +24,8 @@ https://nextjs-hobbyist.vercel.app/
 
 ## Current Tasks:
 
-- [ ] skeleton when editing post
 - [ ] skeleton when creating post
-- [ ] toast notifications
+- [ ] create toast notifications
 - [ ] delete post
 - [ ] upload user photo
 - [ ] check media in database and cloudinary
