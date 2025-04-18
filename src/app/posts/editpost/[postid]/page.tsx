@@ -188,7 +188,9 @@ export default function EditPost() {
       })(),
       {
         loading: "Saving changes...",
-        success: "Post updated successfully!",
+        success: data.published
+          ? "Post created successfully!"
+          : "Draft saved successfully!",
         error: (err) => `Something went wrong while saving: ${err.toString()}`,
       }
     );

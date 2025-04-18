@@ -10,3 +10,8 @@ export interface Post {
   created_at: Date;
   updated_at: Date;
 }
+
+export type Category = {
+  id: number;
+  name: string;
+};
