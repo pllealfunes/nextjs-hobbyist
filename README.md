@@ -4,7 +4,7 @@ A blogging platform where users can blog about their hobbies, explore new ideas,
 
 While the previous version was built using the MERN stack this version uses modern technologies and includes more fetaures for users to enjoy.
 
-This project is being built with Next.js, TypeScript, Tailwind, Zod, Shadcn, Postgres, and Vercel.
+This project is being built with Next.js, TypeScript, Tailwind, Zod, Shadcn, Supabase, Cloudinary, and Vercel.
 
 ## Deployed Project
 
@@ -24,20 +24,19 @@ https://nextjs-hobbyist.vercel.app/
 
 ## Current Tasks:
 
-- [ ] skeleton when creating post
-- [ ] create toast notifications
 - [ ] delete post
+- [ ] update user info
 - [ ] upload user photo
 - [ ] check media in database and cloudinary
 - [ ] update user photo
 - [ ] check updated media in database and cloudinary
-- [ ] update user info
 
 ## Project Tasks:
 
-- [ ] update new comment
-- [ ] update check new comment format
+- [ ] create new comment
 - [ ] view updated comment
+- [ ] update new comment
+- [ ] delete comment
 
 - [ ] search posts
 - [ ] create like functionality
@@ -62,7 +61,6 @@ Leftovers
 
 - [ ] photos dupliacte on create and edit post
 - [ ] no spacing around media in create and edit post
-- [ ] create post error handling
 
 ## Getting Started
 
