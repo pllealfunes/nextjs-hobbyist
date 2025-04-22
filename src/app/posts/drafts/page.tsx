@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Post, Category, columns } from "@/ui/components/table-columns";
+import { columns } from "@/ui/components/table-columns";
 import { DataTable } from "@/ui/components/data-table";
 import PostCalendar from "@/ui/components/calendar";
 import { LikesCommentsChart } from "@/ui/components/likescomments-chart";
+import { Post, Category } from "@/lib/types";
 
 export default function Drafts() {
   const [posts, setPosts] = useState<Post[]>([]);

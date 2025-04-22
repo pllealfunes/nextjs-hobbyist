@@ -7,6 +7,7 @@ import { useParams, useRouter } from "next/navigation";
 import { SubmitHandler } from "react-hook-form";
 import { CreatePostSchema } from "@/app/schemas";
 import { Skeleton } from "@/ui/components/skeleton";
+import { Trash2 } from "lucide-react";
 import {
   extractImages,
   fileToBase64,
@@ -16,39 +17,15 @@ import {
   removeDeletedCloudinaryImages,
 } from "@/utils/postHandler";
 import { toast } from "react-hot-toast";
-
-interface Post {
-  id: string;
-  title: string;
-  coverphoto: string | null | undefined;
-  content: string;
-  category_id: number;
-  published: boolean;
-  private: boolean;
-  author_id: string;
-  created_at: Date;
-  updated_at: Date;
-}
+import { Post, Category } from "@/lib/types";
 
 interface FinalPayload {
   content: string; // The updated content of the post
   coverphoto?: string | null | undefined; // Optional Cloudinary URL for the cover photo
 }
 
-// Define the type for the 'html' parameter
-// function extractTextFromHTML(html: string): string {
-//   const parser = new DOMParser();
-//   const doc = parser.parseFromString(html, "text/html");
-//   return doc.body.textContent?.trim() || "";
-// }
-
 // Define the type for form data
 type FormData = z.infer<typeof CreatePostSchema>;
-
-type Category = {
-  id: number;
-  name: string;
-};
 
 export default function EditPost() {
   const { postid } = useParams();
@@ -90,8 +67,6 @@ export default function EditPost() {
 
     await toast.promise(
       (async () => {
-        console.log("Editing Post ID:", post?.id);
-
         const { existingImages: oldImages } = extractImages(post.content);
         const { newImages, existingImages: newExistingImages } = extractImages(
           data.content
@@ -199,13 +174,23 @@ export default function EditPost() {
   return (
     <div>
       {post ? (
-        <EditPostForm
-          categories={categories}
-          post={post}
-          onSubmit={onSubmit}
-          isDeleted={isDeleted}
-          setIsDeleted={setIsDeleted}
-        />
+        <div className="flex flex-col items-center w-full">
+          {/* Trash icon aligned to the right */}
+          <div className="mx-auto w-full  md:w-4/5 lg:w-2/3 xl:w-3/5 2xl:w-1/2 flex justify-end mb-4">
+            <Trash2 className="text-red-500 cursor-pointer w-9 h-9" />
+          </div>
+
+          {/* Centered form underneath */}
+          <div className="w-full max-w-2xl">
+            <EditPostForm
+              categories={categories}
+              post={post}
+              onSubmit={onSubmit}
+              isDeleted={isDeleted}
+              setIsDeleted={setIsDeleted}
+            />
+          </div>
+        </div>
       ) : (
         <div className="max-w-3xl mx-auto py-5 space-y-4">
           {/* Skeleton for title input */}

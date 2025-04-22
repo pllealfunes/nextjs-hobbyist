@@ -5,16 +5,30 @@ import { Button } from "@/ui/components/button";
 import { Checkbox } from "@/ui/components/checkbox";
 import { ArrowUpDown, Trash2, Pencil } from "lucide-react";
 import Link from "next/link";
-export type Post = {
-  id: string;
-  title: string;
-  category: number;
-  created_at: string;
-};
+import { Post } from "@/lib/types";
+import { toast } from "react-hot-toast";
 
-export type Category = {
-  id: number;
-  name: string;
+const deletePost = async (postId: string, onSuccess?: () => void) => {
+  await toast.promise(
+    async () => {
+      const res = await fetch(`/api/posts/${postId}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) {
+        const { error } = await res.json();
+        throw new Error(error || "Failed to delete post");
+      }
+
+      if (onSuccess) onSuccess(); // Optional callback for UI refresh etc.
+    },
+    {
+      loading: "Deleting post...",
+      success: "Post deleted successfully!",
+      error: (err) =>
+        `Something went wrong while deleting the post: ${err.toString()}`,
+    }
+  );
 };
 
 export const columns = (
@@ -88,7 +102,10 @@ export const columns = (
         <Link href={`/posts/editpost/${row.original.id}`} passHref>
           <Pencil className="text-rose-400 cursor-pointer" />
         </Link>
-        <Trash2 className="text-red-500 cursor-pointer" />
+        <Trash2
+          className="text-red-500 cursor-pointer"
+          onClick={() => deletePost(row.original.id)}
+        />
       </div>
     ),
   },

@@ -17,20 +17,9 @@ import {
   MessageCircle,
   ChevronLeft,
   Send,
+  Trash2,
 } from "lucide-react";
-
-interface Post {
-  id: string;
-  title: string;
-  coverphoto: string;
-  content: string;
-  category_id: number;
-  published: boolean;
-  private: boolean;
-  author_id: string;
-  created_at: Date;
-  updated_at: Date;
-}
+import { Post } from "@/lib/types";
 
 export default function PostPage() {
   const { id } = useParams();
@@ -77,6 +66,9 @@ export default function PostPage() {
             <ChevronLeft className="h-4 w-4 mr-2" />
             Back to Home
           </Link>
+          <div className="mx-auto w-full flex justify-end mb-4">
+            <Trash2 className="text-red-500 cursor-pointer w-9 h-9" />
+          </div>
           <article>
             {post.coverphoto && (
               <Image

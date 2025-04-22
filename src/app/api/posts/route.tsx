@@ -11,12 +11,13 @@ export async function GET() {
     const { data: posts, error } = await supabase
       .from("Post")
       .select("*")
+      .eq("published", true)
       .order("created_at", { ascending: false });
-    console.log(posts);
 
-    if (error) throw error;
+    if (error) throw new Error(error.message);
+    if (!posts || posts.length === 0)
+      throw new Error("No posts published found");
 
-    console.log("Posts fetched:", posts);
     return NextResponse.json(posts, { status: 200 });
   } catch (error) {
     console.error("Error fetching posts:", error);
@@ -40,20 +41,16 @@ export async function POST(req: NextRequest) {
       // Fetch the authenticated user directly from Supabase
       const {
         data: { user },
-        error: userError,
+        error: authError,
       } = await supabase.auth.getUser();
 
-      if (userError) {
-        throw new Error(userError.message);
-      }
-
-      if (!user) {
-        throw new Error("User not authenticated");
+      if (authError || !user) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
       }
 
       // Insert the new post into Supabase
       const { data, error } = await supabase
-        .from("Post") // Replace with your table name
+        .from("Post")
         .insert([
           {
             title,

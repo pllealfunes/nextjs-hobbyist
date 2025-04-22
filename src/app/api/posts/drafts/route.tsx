@@ -3,26 +3,35 @@ import { createClient } from "@/utils/supabase/server";
 
 export async function GET() {
   try {
-    console.log("Fetching posts...");
-
-    // Initialize the Supabase client
     const supabase = await createClient();
 
+    // Get the authenticated user
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Fetch only the user's draft posts
     const { data: posts, error } = await supabase
       .from("Post")
       .select("*")
-      .is("published", false)
+      .eq("author_id", user.id)
+      .eq("published", false)
       .order("created_at", { ascending: false });
-    console.log(posts);
 
-    if (error) throw error;
+    if (error) throw new Error(error.message);
+    if (!posts || posts.length === 0)
+      throw new Error("No post found to update");
 
-    console.log("Posts fetched:", posts);
     return NextResponse.json(posts, { status: 200 });
   } catch (error) {
-    console.error("Error fetching posts:", error);
+    console.error("Error fetching draft posts:", error);
     return NextResponse.json(
-      { error: "Error fetching posts" },
+      { error: "Error fetching draft posts" },
       { status: 500 }
     );
   }
