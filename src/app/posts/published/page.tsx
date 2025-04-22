@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Post, Category, columns } from "@/ui/components/table-columns";
+import { Post, Category } from "@/lib/types";
+import { columns } from "@/ui/components/table-columns";
 import { DataTable } from "@/ui/components/data-table";
 import PostCalendar from "@/ui/components/calendar";
 import { LikesCommentsChart } from "@/ui/components/likescomments-chart";
