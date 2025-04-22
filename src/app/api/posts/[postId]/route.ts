@@ -3,7 +3,7 @@ import { createClient } from "@/utils/supabase/server";
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { postId: string } }
+  { params }: { params: Promise<{ postId: string }> }
 ) {
   try {
     const { postId } = await params; // Get the post ID from the URL
@@ -61,10 +61,10 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { postId: string } }
+  { params }: { params: Promise<{ postId: string }> }
 ) {
   try {
-    const { postId } = params;
+    const { postId } = await params;
 
     if (!postId || typeof postId !== "string" || postId.trim() === "") {
       return NextResponse.json(
