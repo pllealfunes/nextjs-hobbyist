@@ -3,7 +3,7 @@ import { createClient } from "@/utils/supabase/server";
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: Promise<{ postId: string }> }
+  { params }: { params: { postId: string } }
 ) {
   try {
     const { postId } = await params; // Get the post ID from the URL
@@ -75,7 +75,6 @@ export async function DELETE(
 
     const supabase = await createClient();
 
-    // 🔐 Authenticate the user
     const {
       data: { user },
       error: authError,
@@ -85,12 +84,11 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // 🗑️ Attempt to delete the post
     const { data, error } = await supabase
       .from("Post")
       .delete()
       .eq("id", postId)
-      .eq("author_id", user.id) // extra safe – only delete if the post belongs to the user
+      .eq("author_id", user.id)
       .select("*");
 
     if (error) throw new Error(error.message);
@@ -107,7 +105,6 @@ export async function DELETE(
     );
   } catch (error) {
     console.error("Error deleting post:", error);
-
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Unknown error" },
       { status: 500 }
