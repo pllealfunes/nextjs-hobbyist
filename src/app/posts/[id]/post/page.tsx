@@ -60,11 +60,11 @@ export default function PostPage() {
       <main className="flex-1 py-12 px-4 md:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
           <Link
-            href="/"
+            href="/profiles"
             className="inline-flex items-center hover:text-rose-500 mb-6"
           >
             <ChevronLeft className="h-4 w-4 mr-2" />
-            Back to Home
+            Back to Profile
           </Link>
           <div className="mx-auto w-full flex justify-end mb-4">
             <Trash2 className="text-red-500 cursor-pointer w-9 h-9" />
@@ -98,13 +98,42 @@ export default function PostPage() {
                       John Doe
                     </Link>
                     <div className="flex items-center text-sm">
-                      <Calendar className="h-4 w-4 mr-1" />
-                      <time dateTime="2023-05-15">
-                        {new Date(post.created_at).toLocaleDateString()}
-                      </time>
-                      <span className="mx-2">•</span>
-                      <Clock className="h-4 w-4 mr-1" />
-                      <span>8 min read</span>
+                      {post.updated_at && post.updated_at != post.created_at ? (
+                        <>
+                          <div className="flex items-center">
+                            <Calendar className="h-4 w-4 mr-1" />
+                            <time
+                              dateTime={new Date(
+                                post.updated_at
+                              ).toLocaleDateString()}
+                            >
+                              {new Date(post.created_at).toLocaleDateString()}
+                            </time>
+                          </div>
+                          <span className="mx-2">•</span>
+                          <div>
+                            Updated:&nbsp;
+                            <time
+                              dateTime={new Date(
+                                post.updated_at
+                              ).toLocaleDateString()}
+                            >
+                              {new Date(post.updated_at).toLocaleDateString()}
+                            </time>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="flex items-center">
+                          <Calendar className="h-4 w-4 mr-1" />
+                          <time
+                            dateTime={new Date(
+                              post.updated_at
+                            ).toLocaleDateString()}
+                          >
+                            {new Date(post.created_at).toLocaleDateString()}
+                          </time>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

@@ -23,15 +23,19 @@ export async function GET() {
       .eq("published", true)
       .order("created_at", { ascending: false });
 
-    if (error) throw new Error(error.message);
-    if (!posts || posts.length === 0)
-      throw new Error("No published posts for the user");
+    if (error) {
+      console.error("Error fetching published posts from Supabase:", error);
+      return NextResponse.json(
+        { error: "Error fetching published posts" },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json(posts, { status: 200 });
   } catch (error) {
-    console.error("Error fetching published posts:", error);
+    console.error("Error in API route /api/posts/published:", error);
     return NextResponse.json(
-      { error: "Error fetching published posts" },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }

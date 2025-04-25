@@ -20,7 +20,7 @@ const deletePost = async (postId: string, onSuccess?: () => void) => {
         throw new Error(error || "Failed to delete post");
       }
 
-      if (onSuccess) onSuccess(); // Optional callback for UI refresh etc.
+      if (onSuccess) onSuccess();
     },
     {
       loading: "Deleting post...",
@@ -32,7 +32,8 @@ const deletePost = async (postId: string, onSuccess?: () => void) => {
 };
 
 export const columns = (
-  getCategoryName: (categoryId: number) => string
+  getCategoryName: (categoryId: number) => string,
+  onDeleteSuccess: () => void
 ): ColumnDef<Post>[] => [
   {
     id: "select",
@@ -60,7 +61,12 @@ export const columns = (
     accessorKey: "title",
     header: "Title",
     cell: ({ row }) => (
-      <div className="capitalize cursor-pointer">{row.getValue("title")}</div>
+      <Link href={`/posts/editpost/${row.original.id}`} passHref>
+        {" "}
+        <div className="capitalize cursor-pointer">
+          {row.getValue("title")}
+        </div>{" "}
+      </Link>
     ),
   },
   {
@@ -104,7 +110,7 @@ export const columns = (
         </Link>
         <Trash2
           className="text-red-500 cursor-pointer"
-          onClick={() => deletePost(row.original.id)}
+          onClick={() => deletePost(row.original.id, onDeleteSuccess)}
         />
       </div>
     ),

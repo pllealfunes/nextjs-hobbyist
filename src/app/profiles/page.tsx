@@ -3,25 +3,8 @@
 import { useEffect, useState } from "react";
 import DashboardPosts from "@/ui/components/dashboard-posts";
 import UserProfile from "@/ui/components/userprofile";
+import { Post, Category } from "@/lib/types";
 import { useAuth } from "@/contexts/authContext";
-
-interface Post {
-  id: string;
-  title: string;
-  coverphoto: string | null;
-  content: string | null;
-  category_id: number;
-  published: boolean;
-  private: boolean;
-  author_id: string | null;
-  created_at: Date;
-  updated_at: Date;
-}
-
-interface Category {
-  id: number;
-  name: string;
-}
 
 export default function Profile() {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -39,14 +22,10 @@ export default function Profile() {
 
         if (Array.isArray(data)) {
           setPosts(data);
-        } else {
-          console.error("Data is not an array:", data);
         }
 
         if (Array.isArray(categoriesData)) {
           setCategories(categoriesData);
-        } else {
-          console.error("Data is not an array:", categoriesData);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -58,7 +37,7 @@ export default function Profile() {
 
   return (
     <div>
-      <UserProfile />
+      <UserProfile post={posts.length} />
       {/* Posts Section */}
       {user &&
       Array.isArray(posts) &&
@@ -74,7 +53,11 @@ export default function Profile() {
             ))}
           </div>
         </section>
-      ) : null}
+      ) : (
+        <section className="m-32 text-center">
+          <h2 className="text-3xl">Create A Post To See It Here!</h2>
+        </section>
+      )}
     </div>
   );
 }

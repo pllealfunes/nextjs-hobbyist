@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
+import { extractImages, deleteImageFromCloudinary } from "@/utils/postHandler";
+import { v2 as cloudinary } from "cloudinary";
+import { extractPublicIdFromUrl } from "@/utils/postHandler";
 
 export async function PUT(
   req: NextRequest,
@@ -59,6 +62,12 @@ export async function PUT(
   }
 }
 
+cloudinary.config({
+  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
 export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ postId: string }> }
@@ -82,6 +91,41 @@ export async function DELETE(
 
     if (authError || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Fetch the post to get the cover photo public_id
+    const { data: postData, error: fetchError } = await supabase
+      .from("Post")
+      .select("id, content, coverphoto")
+      .eq("id", postId)
+      .eq("author_id", user.id)
+      .single();
+
+    if (fetchError) throw new Error(fetchError.message);
+    if (!postData) {
+      return NextResponse.json(
+        { error: "Post not found or not authorized" },
+        { status: 403 }
+      );
+    }
+
+    // Extract images from content
+    const { existingImages: contentImages } = extractImages(postData.content);
+
+    // 🧹 Delete content images from Cloudinary
+    for (const imageUrl of contentImages) {
+      const publicId = extractPublicIdFromUrl(imageUrl);
+      if (publicId) {
+        await cloudinary.uploader.destroy(publicId);
+      }
+    }
+
+    // 🧹 Delete cover photo if exists
+    if (postData.coverphoto) {
+      const coverPublicId = extractPublicIdFromUrl(postData.coverphoto);
+      if (coverPublicId) {
+        await cloudinary.uploader.destroy(coverPublicId);
+      }
     }
 
     const { data, error } = await supabase

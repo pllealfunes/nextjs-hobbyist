@@ -1,24 +1,7 @@
 import Image from "next/image";
 //import { Button } from "./button";
 import Link from "next/link";
-
-interface Post {
-  id: string;
-  title: string;
-  coverphoto: string | null;
-  content: string | null;
-  category_id: number;
-  published: boolean;
-  private: boolean;
-  author_id: string | null;
-  created_at: Date;
-  updated_at: Date;
-}
-
-interface Category {
-  id: number;
-  name: string;
-}
+import { Post, Category } from "@/lib/types";
 
 interface PostCardProps {
   post: Post;

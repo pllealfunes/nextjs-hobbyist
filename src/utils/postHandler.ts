@@ -136,32 +136,6 @@ export const coverphotoImageToCloudinary = async (
   return (await uploadRes.json()).secure_url;
 };
 
-export const deleteImageFromCloudinary = async (imageUrl: string) => {
-  // Extract the public_id from the Cloudinary URL
-  const public_id = imageUrl
-    .split("/")
-    .slice(-2) // Get the last two parts, folder and image name
-    .join("/") // Join them to form the public ID
-    .split(".")[0]; // Remove file extension
-
-  try {
-    const response = await fetch(`/api/delete-image`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ public_id }),
-    });
-
-    const data = await response.json();
-    if (data.error) {
-      console.error("Error deleting image from Cloudinary:", data.error);
-    } else {
-      console.log("Image deleted from Cloudinary:", data);
-    }
-  } catch (error) {
-    console.error("Error calling delete image API:", error);
-  }
-};
-
 export const removeDeletedCloudinaryImages = (
   content: string,
   imagesToDelete: string[]
@@ -191,4 +165,44 @@ export const replaceBase64WithCloudinaryUrls = (
   });
 
   return doc.body.innerHTML;
+};
+
+export const extractPublicIdFromUrl = (url: string): string | null => {
+  try {
+    const parts = new URL(url).pathname.split("/");
+    const versionIndex = parts.findIndex((part) => part.startsWith("v"));
+    const publicIdParts = parts.slice(versionIndex + 1); // after version
+    const filename = publicIdParts.pop()!;
+    const publicId = [...publicIdParts, filename.split(".")[0]].join("/");
+    return publicId;
+  } catch {
+    return null;
+  }
+};
+
+// Deletes image from Cloudinary via your API route
+export const deleteImageFromCloudinary = async (imageUrl: string) => {
+  const public_id = extractPublicIdFromUrl(imageUrl);
+
+  if (!public_id) {
+    console.warn("Could not extract public_id from image URL:", imageUrl);
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/delete-image", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ public_id }),
+    });
+
+    const data = await response.json();
+    if (data.error) {
+      console.error("Error deleting image from Cloudinary:", data.error);
+    } else {
+      console.log("Image deleted from Cloudinary:", data);
+    }
+  } catch (error) {
+    console.error("Error calling delete image API:", error);
+  }
 };

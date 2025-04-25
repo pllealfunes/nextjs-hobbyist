@@ -10,7 +10,11 @@ import {
 } from "@radix-ui/react-icons";
 import { useAuth } from "@/contexts/authContext";
 
-const UserProfile = () => {
+interface UserProfileProps {
+  post: number;
+}
+
+const UserProfile = ({ post }: UserProfileProps) => {
   const { user } = useAuth();
 
   return (
@@ -42,7 +46,7 @@ const UserProfile = () => {
           {/* Followers, Following, Posts Count */}
           <div className="flex justify-around w-full max-w-md text-center text-sm light:text-gray-900 font-medium">
             <div className="flex flex-col light:hover:text-zinc-50 dark:hover:text-rose-500 cursor-pointer">
-              <span className="font-extrabold text-xl">10</span>
+              <span className="font-extrabold text-xl">{post}</span>
               Posts
             </div>
             <div className="flex flex-col light:hover:text-zinc-50 dark:hover:text-rose-500 cursor-pointer">

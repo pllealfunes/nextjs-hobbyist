@@ -23,9 +23,13 @@ export async function GET() {
       .eq("published", false)
       .order("created_at", { ascending: false });
 
-    if (error) throw new Error(error.message);
-    if (!posts || posts.length === 0)
-      throw new Error("No post found to update");
+    if (error) {
+      console.error("Error fetching draft posts from Supabase:", error);
+      return NextResponse.json(
+        { error: "Error fetching draft posts" },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json(posts, { status: 200 });
   } catch (error) {

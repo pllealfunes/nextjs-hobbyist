@@ -27,9 +27,8 @@ https://nextjs-hobbyist.vercel.app/
 - [ ] delete post
 - [ ] update user info
 - [ ] upload user photo
-- [ ] check media in database and cloudinary
 - [ ] update user photo
-- [ ] check updated media in database and cloudinary
+- [ ] mark profile private or public
 
 ## Project Tasks:
 

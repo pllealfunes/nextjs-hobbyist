@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Post, Category } from "@/lib/types";
 import { columns } from "@/ui/components/table-columns";
 import { DataTable } from "@/ui/components/data-table";
@@ -11,22 +11,28 @@ export default function Published() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch("/api/posts/published");
-        const data = await response.json(); // Ensure you await this
+  const fetchData = useCallback(async () => {
+    try {
+      const response = await fetch("/api/posts/published");
 
-        if (Array.isArray(data)) {
-          setPosts(data);
-        } else {
-          console.error("Data is not an array:", data);
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    };
 
+      const data = await response.json();
+
+      if (Array.isArray(data)) {
+        setPosts(data); // empty array = no posts, still valid
+      } else {
+        console.warn("Unexpected response structure:", data);
+        setPosts([]); // fallback to empty state
+      }
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+    }
+  }, []);
+
+  useEffect(() => {
     async function loadCategories() {
       try {
         const response = await fetch("/api/categories");
@@ -54,7 +60,7 @@ export default function Published() {
         </div>
         <PostCalendar />
       </div>
-      <DataTable columns={columns(getCategoryName)} data={posts} />
+      <DataTable columns={columns(getCategoryName, fetchData)} data={posts} />
     </div>
   );
 }
