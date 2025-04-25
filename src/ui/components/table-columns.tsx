@@ -6,30 +6,8 @@ import { Checkbox } from "@/ui/components/checkbox";
 import { ArrowUpDown, Trash2, Pencil } from "lucide-react";
 import Link from "next/link";
 import { Post } from "@/lib/types";
-import { toast } from "react-hot-toast";
-
-const deletePost = async (postId: string, onSuccess?: () => void) => {
-  await toast.promise(
-    async () => {
-      const res = await fetch(`/api/posts/${postId}`, {
-        method: "DELETE",
-      });
-
-      if (!res.ok) {
-        const { error } = await res.json();
-        throw new Error(error || "Failed to delete post");
-      }
-
-      if (onSuccess) onSuccess();
-    },
-    {
-      loading: "Deleting post...",
-      success: "Post deleted successfully!",
-      error: (err) =>
-        `Something went wrong while deleting the post: ${err.toString()}`,
-    }
-  );
-};
+import DeleteConfirmationDialog from "@/ui/components/deleteConfirmationDialog";
+import { deletePost } from "@/lib/actions";
 
 export const columns = (
   getCategoryName: (categoryId: number) => string,
@@ -108,9 +86,9 @@ export const columns = (
         <Link href={`/posts/editpost/${row.original.id}`} passHref>
           <Pencil className="text-rose-400 cursor-pointer" />
         </Link>
-        <Trash2
-          className="text-red-500 cursor-pointer"
-          onClick={() => deletePost(row.original.id, onDeleteSuccess)}
+        <DeleteConfirmationDialog
+          trigger={<Trash2 className="text-red-500 cursor-pointer" />}
+          onConfirm={() => deletePost(row.original.id, onDeleteSuccess)}
         />
       </div>
     ),

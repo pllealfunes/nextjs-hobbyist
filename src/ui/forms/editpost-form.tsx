@@ -8,7 +8,7 @@ import { Input } from "@/ui/components/input";
 import { CreatePostSchema } from "@/app/schemas";
 import CoverPhotoUploader from "@/ui/components/coverphoto-uploader";
 import TextEditor from "@/ui/components/TextEditor";
-
+import { Post } from "@/lib/types";
 import {
   Select,
   SelectContent,
@@ -26,26 +26,8 @@ import {
 } from "@/ui/components/form";
 import Image from "next/image";
 
-interface Post {
-  id: string;
-  title: string;
-  coverphoto: string | null | undefined;
-  content: string;
-  category_id: number;
-  published: boolean;
-  private: boolean;
-  author_id: string;
-  created_at: Date;
-  updated_at: Date;
-}
-
 // Define the type for form data
 type FormData = z.infer<typeof CreatePostSchema>;
-
-// type Category = {
-//   id: number;
-//   name: string;
-// };
 
 interface EditPostFormProps {
   categories: { id: number; name: string }[];

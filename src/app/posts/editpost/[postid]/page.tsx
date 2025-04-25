@@ -18,6 +18,8 @@ import {
 } from "@/utils/postHandler";
 import { toast } from "react-hot-toast";
 import { Post, Category } from "@/lib/types";
+import DeleteConfirmationDialog from "@/ui/components/deleteConfirmationDialog";
+import { deletePost } from "@/lib/actions";
 
 interface FinalPayload {
   content: string; // The updated content of the post
@@ -57,6 +59,14 @@ export default function EditPost() {
   const getCategoryName = (categoryId: number): string => {
     const category = categories.find((cat) => cat.id === categoryId);
     return category ? category.name : "Unknown";
+  };
+
+  const onDeleteSuccess = async () => {
+    if (!post) return; // Don't try to delete if post isn't loaded
+
+    await deletePost(post.id, () => {
+      router.push("/dashboard");
+    });
   };
 
   // Define the type for 'data'
@@ -177,7 +187,10 @@ export default function EditPost() {
         <div className="flex flex-col items-center w-full">
           {/* Trash icon aligned to the right */}
           <div className="mx-auto w-full  md:w-4/5 lg:w-2/3 xl:w-3/5 2xl:w-1/2 flex justify-end mb-4">
-            <Trash2 className="text-red-500 cursor-pointer w-9 h-9" />
+            <DeleteConfirmationDialog
+              trigger={<Trash2 className="text-red-500 cursor-pointer" />}
+              onConfirm={() => deletePost(post.id, onDeleteSuccess)}
+            />
           </div>
 
           {/* Centered form underneath */}

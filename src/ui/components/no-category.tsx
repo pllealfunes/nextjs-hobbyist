@@ -1,8 +1,5 @@
 import Link from "next/link";
-
-interface Category {
-  name: string;
-}
+import { Category } from "@/lib/types";
 
 export default function NoResults({
   category,

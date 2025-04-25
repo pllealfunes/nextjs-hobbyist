@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import DashboardPosts from "@/ui/components/dashboard-posts";
 import NoResults from "@/ui/components/no-category";
 import Link from "next/link";
+import { Post, Category } from "@/lib/types";
 import {
   Select,
   SelectContent,
@@ -12,24 +13,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/ui/components/select";
-
-interface Post {
-  id: string;
-  title: string;
-  coverphoto: string | null;
-  content: string | null;
-  category_id: number;
-  published: boolean;
-  private: boolean;
-  author_id: string | null;
-  created_at: Date;
-  updated_at: Date;
-}
-
-interface Category {
-  id: number;
-  name: string;
-}
 
 const CategoryPage = () => {
   const params = useParams();

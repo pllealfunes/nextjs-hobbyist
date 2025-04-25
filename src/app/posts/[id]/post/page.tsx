@@ -12,7 +12,6 @@ import { Separator } from "@/ui/components/separator";
 import { Textarea } from "@/ui/components/textarea";
 import {
   Calendar,
-  Clock,
   ThumbsUp,
   MessageCircle,
   ChevronLeft,
@@ -20,12 +19,16 @@ import {
   Trash2,
 } from "lucide-react";
 import { Post } from "@/lib/types";
+import DeleteConfirmationDialog from "@/ui/components/deleteConfirmationDialog";
+import { deletePost } from "@/lib/actions";
+import { useRouter } from "next/navigation";
 
 export default function PostPage() {
   const { id } = useParams();
   const searchParams = useSearchParams();
   const category = searchParams.get("category") || "Unknown";
   const [post, setPost] = useState<Post | null>(null);
+  const router = useRouter();
 
   const capitalizeFirstLetter = (str?: string) => {
     if (!str) return "This category";
@@ -36,10 +39,6 @@ export default function PostPage() {
 
     return str.charAt(0).toUpperCase() + str.slice(1);
   };
-
-  <Link href={`/category/${category}`} passHref>
-    {capitalizeFirstLetter(category)}
-  </Link>;
 
   useEffect(() => {
     if (id) {
@@ -54,6 +53,11 @@ export default function PostPage() {
   if (!post) {
     return <div>Loading...</div>;
   }
+  const onDeleteSuccess = async () => {
+    await deletePost(post.id, () => {
+      router.push("/dashboard");
+    });
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -67,7 +71,10 @@ export default function PostPage() {
             Back to Profile
           </Link>
           <div className="mx-auto w-full flex justify-end mb-4">
-            <Trash2 className="text-red-500 cursor-pointer w-9 h-9" />
+            <DeleteConfirmationDialog
+              trigger={<Trash2 className="text-red-500 cursor-pointer" />}
+              onConfirm={() => deletePost(post.id, onDeleteSuccess)}
+            />
           </div>
           <article>
             {post.coverphoto && (
