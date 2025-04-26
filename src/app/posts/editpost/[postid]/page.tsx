@@ -182,7 +182,7 @@ export default function EditPost() {
       {post ? (
         <div className="flex flex-col items-center w-full">
           {/* Trash icon aligned to the right */}
-          <div className="mx-auto w-full  md:w-4/5 lg:w-2/3 xl:w-3/5 2xl:w-1/2 flex justify-end mb-4">
+          <div className="mx-auto w-full md:w-4/5 lg:w-2/3 xl:w-3/5 2xl:w-1/2 flex justify-end mb-4">
             <DeleteConfirmationDialog
               trigger={
                 <Trash2 className="text-red-500 cursor-pointer w-9 h-9" />

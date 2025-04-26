@@ -84,10 +84,12 @@ export const columns = (
       <div className="flex justify-evenly items-center gap-3 lg:gap-1">
         {/* Correctly pass the post ID to the Link */}
         <Link href={`/posts/editpost/${row.original.id}`} passHref>
-          <Pencil className="text-rose-400 cursor-pointer" />
+          <Pencil className="text-rose-400 cursor-pointer over:text-rose-600 transition" />
         </Link>
         <DeleteConfirmationDialog
-          trigger={<Trash2 className="text-red-500 cursor-pointer" />}
+          trigger={
+            <Trash2 className="text-red-500 cursor-pointer over:text-red-600 transition" />
+          }
           onConfirm={() => deletePost(row.original.id, onDeleteSuccess)}
         />
       </div>

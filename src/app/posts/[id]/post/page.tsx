@@ -17,6 +17,7 @@ import {
   ChevronLeft,
   Send,
   Trash2,
+  Pencil,
 } from "lucide-react";
 import { Post } from "@/lib/types";
 import DeleteConfirmationDialog from "@/ui/components/deleteConfirmationDialog";
@@ -63,17 +64,21 @@ export default function PostPage() {
         <div className="max-w-4xl mx-auto">
           <Link
             href="/profiles"
-            className="inline-flex items-center hover:text-rose-500 mb-6"
+            className="inline-flex items-center hover:text-rose-600 mb-6 transition"
           >
             <ChevronLeft className="h-4 w-4 mr-2" />
             Back to Profile
           </Link>
-          <div className="mx-auto w-full flex justify-end mb-4">
+          <div className="mx-auto w-full flex justify-end gap-4 mb-4">
+            <Link href={`/posts/editpost/${post.id}`} passHref>
+              <Pencil className="text-rose-400 cursor-pointer w-9 h-9 hover:text-rose-600 transition" />
+            </Link>
+
             <DeleteConfirmationDialog
               trigger={
-                <Trash2 className="text-red-500 cursor-pointer w-9 h-9" />
+                <Trash2 className="text-red-500 cursor-pointer w-9 h-9 hover:text-red-600 transition" />
               }
-              onConfirm={async () => await deletePost(post.id, onDeleteSuccess)}
+              onConfirm={() => deletePost(post.id, onDeleteSuccess)}
             />
           </div>
           <article>
