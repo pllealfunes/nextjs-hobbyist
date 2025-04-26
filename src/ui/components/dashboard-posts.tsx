@@ -26,19 +26,17 @@ export default function DashboardPosts({ post, categories }: PostCardProps) {
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform transform hover:scale-105 duration-300 cursor-pointer">
       {/* Card Image */}
-      <div className="relative">
-        <Image
-          src={
-            post.coverphoto && post.coverphoto.trim() !== ""
-              ? post.coverphoto
-              : "/default-image.jpg"
-          }
-          alt={post.title}
-          width={800}
-          height={400}
-          className="w-full object-cover rounded-lg"
-        />
-      </div>
+      {post.coverphoto && post.coverphoto.trim() !== "" && (
+        <div className="relative">
+          <Image
+            src={post.coverphoto}
+            alt={post.title}
+            width={800}
+            height={400}
+            className="w-full object-cover rounded-lg"
+          />
+        </div>
+      )}
 
       {/* Card Content */}
       <div className="p-5">
