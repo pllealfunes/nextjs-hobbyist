@@ -54,9 +54,7 @@ export default function PostPage() {
     return <div>Loading...</div>;
   }
   const onDeleteSuccess = async () => {
-    await deletePost(post.id, () => {
-      router.push("/dashboard");
-    });
+    router.push("/dashboard");
   };
 
   return (
@@ -72,8 +70,10 @@ export default function PostPage() {
           </Link>
           <div className="mx-auto w-full flex justify-end mb-4">
             <DeleteConfirmationDialog
-              trigger={<Trash2 className="text-red-500 cursor-pointer" />}
-              onConfirm={() => deletePost(post.id, onDeleteSuccess)}
+              trigger={
+                <Trash2 className="text-red-500 cursor-pointer w-9 h-9" />
+              }
+              onConfirm={async () => await deletePost(post.id, onDeleteSuccess)}
             />
           </div>
           <article>

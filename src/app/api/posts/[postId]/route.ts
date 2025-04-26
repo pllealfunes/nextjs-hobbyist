@@ -99,7 +99,7 @@ export async function DELETE(
       .select("id, content, coverphoto")
       .eq("id", postId)
       .eq("author_id", user.id)
-      .single();
+      .maybeSingle();
 
     if (fetchError) throw new Error(fetchError.message);
     if (!postData) {
