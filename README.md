@@ -24,7 +24,6 @@ https://nextjs-hobbyist.vercel.app/
 
 ## Current Tasks:
 
-- [ ] delete post
 - [ ] update user info
 - [ ] upload user photo
 - [ ] update user photo
