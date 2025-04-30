@@ -42,9 +42,6 @@ type AvatarData = z.infer<typeof AvatarSchema>;
 type ProfileData = z.infer<typeof ProfileDetailsSchema>;
 
 export default function UserSettings() {
-  const [name, setName] = useState("John Doe");
-  const [email, setEmail] = useState("john.doe@example.com");
-  const [profile, setProfile] = useState({});
   const user = useAuth();
 
   const [userData, setUserData] = useState<UserProfile | null>(null);
