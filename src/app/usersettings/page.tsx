@@ -353,12 +353,12 @@ export default function UserSettings() {
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
-                    <Input
+                    {/* <Input
                       id="email"
                       type="email"
                       value={user.user?.email || ""}
                       onChange={(e) => setEmail(e.target.value)}
-                    />
+                    /> */}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="current-password">Current Password</Label>
