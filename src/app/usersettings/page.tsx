@@ -44,7 +44,7 @@ type ProfileData = z.infer<typeof ProfileDetailsSchema>;
 export default function UserSettings() {
   const [name, setName] = useState("John Doe");
   const [email, setEmail] = useState("john.doe@example.com");
-  const [bio, setBio] = useState("Passionate hobbyist and lifelong learner.");
+  const [profile, setProfile] = useState({});
   const user = useAuth();
 
   const [userData, setUserData] = useState<UserProfile | null>(null);
@@ -99,7 +99,9 @@ export default function UserSettings() {
     name: "photo",
   });
 
-  const { register, control, handleSubmit, setValue } = useForm({
+  const profileForm = useForm<ProfileData>({
+    mode: "onTouched",
+    resolver: zodResolver(ProfileDetailsSchema),
     defaultValues: {
       name: "",
       bio: "",
@@ -108,21 +110,9 @@ export default function UserSettings() {
   });
 
   const { fields, append, remove } = useFieldArray({
-    control,
+    control: profileForm.control,
     name: "links",
   });
-
-  useEffect(() => {
-    if (userData) {
-      // Set default values once data is fetched
-      setValue("name", userData.name || "");
-      setValue("bio", userData.bio || "");
-      setValue(
-        "links",
-        userData.links ? userData.links : [{ label: "", url: "" }]
-      );
-    }
-  }, [userData, setValue]);
 
   const getUserInitials = (name?: string | null) => {
     if (!name) return "N/A";
@@ -147,7 +137,7 @@ export default function UserSettings() {
     // Send data to Supabase to update the profile
   };
 
-  const onSubmit: SubmitHandler<ProfileData> = (data) => {
+  const updateProfile: SubmitHandler<ProfileData> = (data) => {
     console.log("Submitted data:", data);
     // Send data to Supabase to update the profile
   };
@@ -244,47 +234,112 @@ export default function UserSettings() {
                     </form>
                   </Form>
                   {/* Form */}
-                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="name">Name</Label>
-                      <Input id="name" {...register("name")} />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Links</Label>
-                      {fields.map((field, index) => (
-                        <div key={field.id} className="flex gap-2 mb-2">
-                          <Input
-                            placeholder="Label (e.g., GitHub)"
-                            {...register(`links.${index}.label`)}
-                          />
-                          <Input
-                            placeholder="URL"
-                            type="url"
-                            {...register(`links.${index}.url`)}
-                          />
-                          <Button
-                            type="button"
-                            variant="destructive"
-                            onClick={() => remove(index)}
+                  <Form {...profileForm}>
+                    <form
+                      onSubmit={profileForm.handleSubmit(updateProfile)}
+                      className="space-y-4"
+                    >
+                      <div className="space-y-2">
+                        {/* Name Field */}
+                        <FormField
+                          control={profileForm.control}
+                          name="name"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel htmlFor="title" className="text-lg">
+                                Name:
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  className="mb-2 w-80 text-md px-2 py-1 border rounded-md text-lg"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      {/* Links Field Array */}
+                      <div className="space-y-2">
+                        <FormLabel className="text-lg">Links:</FormLabel>
+                        {fields.map((field, index) => (
+                          <div
+                            key={field.id}
+                            className="flex flex-wrap gap-2 mb-2"
                           >
-                            Remove
-                          </Button>
-                        </div>
-                      ))}
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => append({ label: "", url: "" })}
-                      >
-                        + Add Link
-                      </Button>
-                    </div>
+                            <FormField
+                              control={profileForm.control}
+                              name={`links.${index}.label`}
+                              render={({ field }) => (
+                                <FormItem className="flex-1">
+                                  <FormControl>
+                                    <Input
+                                      placeholder="Label (e.g., GitHub)"
+                                      className="w-80 text-md px-2 py-1"
+                                      {...field}
+                                    />
+                                  </FormControl>
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={profileForm.control}
+                              name={`links.${index}.url`}
+                              render={({ field }) => (
+                                <FormItem className="flex-1">
+                                  <FormControl>
+                                    <Input
+                                      placeholder="URL"
+                                      type="url"
+                                      className="w-80 text-md px-2 py-1"
+                                      {...field}
+                                    />
+                                  </FormControl>
+                                </FormItem>
+                              )}
+                            />
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              onClick={() => remove(index)}
+                            >
+                              Remove
+                            </Button>
+                          </div>
+                        ))}
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => append({ label: "", url: "" })}
+                        >
+                          + Add Link
+                        </Button>
+                      </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="bio">Bio</Label>
-                      <Textarea id="bio" {...register("bio")} />
-                    </div>
-                  </form>
+                      {/* Bio Field */}
+                      <FormField
+                        control={profileForm.control}
+                        name="bio"
+                        render={({ field }) => (
+                          <FormItem className="my-2">
+                            <FormLabel htmlFor="content" className="text-lg">
+                              Bio:
+                            </FormLabel>
+                            <FormControl>
+                              <Textarea
+                                id="bio"
+                                rows={5}
+                                {...field}
+                                className="text-md"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </form>
+                  </Form>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -332,9 +387,9 @@ export default function UserSettings() {
               </Card>
             </TabsContent>
           </Tabs>
-          <div className="mt-8 flex justify-end">
+          {/* <div className="mt-8 flex justify-end">
             <Button onClick={handleSubmit(onSubmit)}>Save Changes</Button>
-          </div>
+          </div> */}
         </div>
       </main>
     </div>
