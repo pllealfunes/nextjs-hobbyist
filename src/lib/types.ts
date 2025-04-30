@@ -15,3 +15,14 @@ export type Category = {
   id: number;
   name: string;
 };
+
+export type UserProfile = {
+  id: string;
+  name: string;
+  username: string;
+  email: string;
+  role: string;
+  bio?: string;
+  photo?: string;
+  links?: { label: string; url: string }[]; // Links as an array of objects with label and url
+};

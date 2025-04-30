@@ -6,7 +6,7 @@ import { z } from "zod";
 import { Button } from "@/ui/components/button";
 import { Input } from "@/ui/components/input";
 import { CreatePostSchema } from "@/app/schemas";
-import CoverPhotoUploader from "@/ui/components/coverphoto-uploader";
+import PhotoUploader from "@/ui/components/photo-uploader";
 import TextEditor from "@/ui/components/TextEditor";
 import { Post } from "@/lib/types";
 import {
@@ -160,7 +160,7 @@ const EditPostForm = ({
                       </Button>
                     </div>
                   ) : (
-                    <CoverPhotoUploader
+                    <PhotoUploader
                       onImageSelect={(image) => {
                         console.log("Selected Image Base64:", image);
                         form.setValue("coverphoto", image ?? undefined);

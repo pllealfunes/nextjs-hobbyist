@@ -5,7 +5,7 @@ import { z } from "zod";
 import { Button } from "@/ui/components/button";
 import { Input } from "@/ui/components/input";
 import { CreatePostSchema } from "@/app/schemas";
-import CoverPhotoUploader from "@/ui/components/coverphoto-uploader";
+import PhotoUploader from "@/ui/components/photo-uploader";
 import TextEditor from "@/ui/components/TextEditor";
 import {
   Select,
@@ -114,7 +114,7 @@ const CreatePostForm: React.FC<{
                   Cover Photo
                 </FormLabel>
                 <FormControl>
-                  <CoverPhotoUploader
+                  <PhotoUploader
                     onImageSelect={(image) => {
                       console.log("Selected Image Base64:", image); // Debugging log
                       form.setValue("coverphoto", image ?? undefined);

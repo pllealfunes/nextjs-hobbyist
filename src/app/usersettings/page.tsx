@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/ui/components/button";
 import { Input } from "@/ui/components/input";
 import { Label } from "@/ui/components/label";
@@ -12,16 +12,117 @@ import {
   CardHeader,
   CardTitle,
 } from "@/ui/components/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/ui/components/form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/components/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/ui/components/avatar";
-import { Camera } from "lucide-react";
+import {
+  useForm,
+  useFieldArray,
+  SubmitHandler,
+  useWatch,
+} from "react-hook-form";
 import { useAuth } from "@/contexts/authContext";
+import { supabase } from "@/lib/supabaseClient";
+import { UserProfile } from "@/lib/types";
+import { ProfileDetailsSchema, AvatarSchema } from "../schemas";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod"; // Import zod
+import PhotoUploader from "@/ui/components/photo-uploader";
+import Image from "next/image";
+
+// Define the type for form data
+type AvatarData = z.infer<typeof AvatarSchema>;
+type ProfileData = z.infer<typeof ProfileDetailsSchema>;
 
 export default function UserSettings() {
   const [name, setName] = useState("John Doe");
   const [email, setEmail] = useState("john.doe@example.com");
   const [bio, setBio] = useState("Passionate hobbyist and lifelong learner.");
   const user = useAuth();
+
+  const [userData, setUserData] = useState<UserProfile | null>(null);
+  const [avatarPhoto, setAvatarPhoto] = useState(userData?.photo || "");
+  const [isDeleted, setIsDeleted] = useState(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const userId = user.user?.id;
+
+      // Fetch user data
+      const { data: userData } = await supabase
+        .from("User")
+        .select("id, name, username, email, role")
+        .eq("id", userId)
+        .single();
+
+      // Fetch profile data
+      const { data: profileData } = await supabase
+        .from("Profile")
+        .select("bio, photo, links")
+        .eq("id", userId)
+        .single();
+
+      if (userData && profileData) {
+        setUserData({
+          id: userData.id,
+          name: userData.name || "",
+          username: userData.username || "",
+          email: userData.email || "",
+          role: userData.role || "USER",
+          bio: profileData.bio || "",
+          links: profileData.links || [],
+        });
+        setAvatarPhoto(profileData.photo || "");
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const avatarForm = useForm<AvatarData>({
+    mode: "onTouched",
+    resolver: zodResolver(AvatarSchema),
+    defaultValues: {
+      photo: undefined,
+    },
+  });
+
+  const watchedPhoto = useWatch({
+    control: avatarForm.control,
+    name: "photo",
+  });
+
+  const { register, control, handleSubmit, setValue } = useForm({
+    defaultValues: {
+      name: "",
+      bio: "",
+      links: [{ label: "", url: "" }],
+    },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "links",
+  });
+
+  useEffect(() => {
+    if (userData) {
+      // Set default values once data is fetched
+      setValue("name", userData.name || "");
+      setValue("bio", userData.bio || "");
+      setValue(
+        "links",
+        userData.links ? userData.links : [{ label: "", url: "" }]
+      );
+    }
+  }, [userData, setValue]);
 
   const getUserInitials = (name?: string | null) => {
     if (!name) return "N/A";
@@ -31,14 +132,24 @@ export default function UserSettings() {
       .join("");
   };
 
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-    // Here you would typically send the updated data to your backend
-    console.log("Settings updated:", {
-      name,
-      email,
-      bio,
-    });
+  const handleDeleteAvatarPhoto = async () => {
+    try {
+      setAvatarPhoto("");
+      setIsDeleted(true);
+      avatarForm.setValue("photo", undefined);
+    } catch (error) {
+      console.error("Error deleting avatar photo:", error);
+    }
+  };
+
+  const uploadAvatar: SubmitHandler<AvatarData> = (data) => {
+    console.log("Submitted data:", data);
+    // Send data to Supabase to update the profile
+  };
+
+  const onSubmit: SubmitHandler<ProfileData> = (data) => {
+    console.log("Submitted data:", data);
+    // Send data to Supabase to update the profile
   };
 
   return (
@@ -62,51 +173,123 @@ export default function UserSettings() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="flex items-center space-x-4">
-                    <Avatar className="w-20 h-20">
-                      <AvatarImage
-                        src="/placeholder.svg?height=80&width=80"
-                        alt={
-                          user.user?.name || getUserInitials(user.user?.name)
-                        }
-                      />
-                      <AvatarFallback>
-                        {user ? (
-                          <p>{getUserInitials(user.user?.name)}</p>
-                        ) : (
-                          <p>Loading...</p>
+                  <Avatar className="w-20 h-20">
+                    <AvatarImage
+                      src="/placeholder.svg?height=80&width=80"
+                      alt={user.user?.name || getUserInitials(user.user?.name)}
+                    />
+                    <AvatarFallback>
+                      {user ? (
+                        <p>{getUserInitials(user.user?.name)}</p>
+                      ) : (
+                        <p>Loading...</p>
+                      )}
+                    </AvatarFallback>
+                  </Avatar>
+                  {/* Cover Photo Field */}
+                  <Form {...avatarForm}>
+                    <form
+                      onSubmit={avatarForm.handleSubmit(uploadAvatar)}
+                      className="flex justify-start items-end"
+                    >
+                      <FormField
+                        control={avatarForm.control}
+                        name="photo"
+                        render={() => (
+                          <FormItem className="my-2">
+                            <FormLabel htmlFor="photo" className="text-lg">
+                              Avatar Photo:
+                            </FormLabel>
+                            <FormControl>
+                              {userData?.photo && !isDeleted ? (
+                                <div>
+                                  <Image
+                                    src={avatarPhoto}
+                                    alt="Avatar Photo Preview"
+                                    width={200}
+                                    height={200}
+                                    className="rounded-lg"
+                                  />
+                                  <Button
+                                    className="mt-4"
+                                    onClick={handleDeleteAvatarPhoto}
+                                  >
+                                    Remove Photo
+                                  </Button>
+                                </div>
+                              ) : (
+                                <PhotoUploader
+                                  onImageSelect={(image) => {
+                                    console.log(
+                                      "Selected Image Base64:",
+                                      image
+                                    );
+                                    avatarForm.setValue(
+                                      "photo",
+                                      image ?? undefined
+                                    );
+                                  }}
+                                />
+                              )}
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
                         )}
-                      </AvatarFallback>
-                    </Avatar>
-                    <Button variant="outline">
-                      <Camera className="mr-2 h-4 w-4" />
-                      Change Avatar
-                    </Button>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Name</Label>
-                    <Input
-                      id="name"
-                      value={user.user?.name || ""}
-                      onChange={(e) => setName(e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="bio">Bio</Label>
-                    <Textarea
-                      id="bio"
-                      value={bio}
-                      onChange={(e) => setBio(e.target.value)}
-                    />
-                    {/* <Textarea
-                      id="bio"
-                      value={user.user?.bio || ""}
-                      onChange={(e) => setBio(e.target.value)}
-                    /> */}
-                  </div>
+                      />
+                      {watchedPhoto && (
+                        <Button type="submit" className="mb-2">
+                          Save Avatar
+                        </Button>
+                      )}
+                    </form>
+                  </Form>
+                  {/* Form */}
+                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="name">Name</Label>
+                      <Input id="name" {...register("name")} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Links</Label>
+                      {fields.map((field, index) => (
+                        <div key={field.id} className="flex gap-2 mb-2">
+                          <Input
+                            placeholder="Label (e.g., GitHub)"
+                            {...register(`links.${index}.label`)}
+                          />
+                          <Input
+                            placeholder="URL"
+                            type="url"
+                            {...register(`links.${index}.url`)}
+                          />
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            onClick={() => remove(index)}
+                          >
+                            Remove
+                          </Button>
+                        </div>
+                      ))}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => append({ label: "", url: "" })}
+                      >
+                        + Add Link
+                      </Button>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="bio">Bio</Label>
+                      <Textarea id="bio" {...register("bio")} />
+                    </div>
+                  </form>
                 </CardContent>
               </Card>
             </TabsContent>
+
+            {/* Account Settings Section */}
             <TabsContent value="account">
               <Card>
                 <CardHeader>
@@ -150,7 +333,7 @@ export default function UserSettings() {
             </TabsContent>
           </Tabs>
           <div className="mt-8 flex justify-end">
-            <Button onClick={handleSubmit}>Save Changes</Button>
+            <Button onClick={handleSubmit(onSubmit)}>Save Changes</Button>
           </div>
         </div>
       </main>

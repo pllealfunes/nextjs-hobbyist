@@ -52,3 +52,20 @@ export const CreatePostSchema = z.object({
   ),
   published: z.boolean(),
 });
+
+export const ProfileDetailsSchema = z.object({
+  name: z.string().min(1, "Name is required"), // Name must not be empty
+  bio: z.string().optional(), // Bio is optional
+  links: z
+    .array(
+      z.object({
+        label: z.string().min(1, "Label is required"), // Label must not be empty
+        url: z.string().url("Must be a valid URL"), // URL must be a valid URL
+      })
+    )
+    .min(1, "At least one link is required"), // Must have at least one link
+});
+
+export const AvatarSchema = z.object({
+  photo: z.instanceof(File).optional(),
+});
