@@ -21,7 +21,7 @@ export type UserProfile = {
   name: string;
   username: string;
   email: string;
-  role: string;
+  role: "ADMIN" | "USER";
   bio?: string;
   photo?: string;
   links?: { label: string; url: string }[]; // Links as an array of objects with label and url

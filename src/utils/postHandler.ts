@@ -1,4 +1,4 @@
-import { Post } from "@/lib/types";
+import { Post, UserProfile } from "@/lib/types";
 
 type ExtractedImages = {
   newImages: string[]; // Base64 or temporary URLs
@@ -205,4 +205,40 @@ export const deleteImageFromCloudinary = async (imageUrl: string) => {
   } catch (error) {
     console.error("Error calling delete image API:", error);
   }
+};
+
+export const avatarToCloudinary = async (
+  image: string,
+  user: UserProfile
+): Promise<string> => {
+  const blob = base64ToBlob(image);
+  const res = await fetch("/api/sign-avatar", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userId: user.id }),
+  });
+  const { signature, timestamp, public_id, api_key } = await res.json();
+  if (!signature) throw new Error("Signature missing");
+
+  const formData = new FormData();
+  formData.append("file", blob);
+  formData.append("signature", signature);
+  formData.append("timestamp", timestamp);
+  formData.append("public_id", public_id);
+  formData.append("api_key", api_key);
+  formData.append("eager", "w_400,h_300,c_pad|w_260,h_200,c_crop");
+
+  const uploadRes = await fetch(
+    `
+https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload
+`,
+
+    {
+      method: "POST",
+      body: formData,
+    }
+  );
+  if (!uploadRes.ok) throw new Error("Image upload failed");
+
+  return (await uploadRes.json()).secure_url;
 };
