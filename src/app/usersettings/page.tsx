@@ -139,7 +139,7 @@ export default function UserSettings() {
     await toast.promise(
       (async () => {
         // 1. Delete the avatar from cloud storage
-        const avatarToDelete = await deleteImageFromCloudinary(avatarPhoto);
+        await deleteImageFromCloudinary(avatarPhoto);
 
         // 2. Update the user profile to remove the photo reference
         const profileRes = await fetch("/api/profile", {

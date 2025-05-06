@@ -3,7 +3,7 @@ import crypto from "crypto";
 
 export async function POST(request: Request) {
   try {
-    const { userId, postId } = await request.json();
+    const { userId } = await request.json();
 
     // Cloudinary Signature
     const timestamp = Math.round(new Date().getTime() / 1000);
