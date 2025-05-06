@@ -29,13 +29,12 @@ import {
   useWatch,
 } from "react-hook-form";
 import { useAuth } from "@/contexts/authContext";
-import { supabase } from "@/lib/supabaseClient";
 import { UserProfile } from "@/lib/types";
 import { ProfileDetailsSchema, AvatarSchema } from "../schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod"; // Import zod
 import PhotoUploader from "@/ui/components/photo-uploader";
-import Image from "next/image";
+import DeleteAvatarConfirmation from "@/ui/components/deleteAvatarConfirmation";
 import { Skeleton } from "@/ui/components/skeleton";
 import { toast } from "react-hot-toast";
 import {
@@ -50,9 +49,8 @@ type ProfileData = z.infer<typeof ProfileDetailsSchema>;
 
 export default function UserSettings() {
   const user = useAuth();
-
   const [userData, setUserData] = useState<UserProfile | null>(null);
-  const [avatarPhoto, setAvatarPhoto] = useState(userData?.photo || "");
+  const [avatarPhoto, setAvatarPhoto] = useState(userData?.photo || null);
   const [isDeleted, setIsDeleted] = useState(false);
 
   useEffect(() => {
@@ -89,7 +87,7 @@ export default function UserSettings() {
           bio: profileInfo.bio || "",
           links: profileInfo.links || [],
         });
-        setAvatarPhoto(profileInfo.photo || "");
+        setAvatarPhoto(profileInfo.photo || null);
       }
     };
 
@@ -133,65 +131,93 @@ export default function UserSettings() {
   };
 
   const handleDeleteAvatarPhoto = async () => {
-    try {
-      setAvatarPhoto("");
-      setIsDeleted(true);
-      avatarForm.setValue("photo", undefined);
-    } catch (error) {
-      console.error("Error deleting avatar photo:", error);
+    if (!avatarPhoto) {
+      toast.error("Avatar photo not loaded.");
+      return;
     }
+
+    await toast.promise(
+      (async () => {
+        // 1. Delete the avatar from cloud storage
+        const avatarToDelete = await deleteImageFromCloudinary(avatarPhoto);
+
+        // 2. Update the user profile to remove the photo reference
+        const profileRes = await fetch("/api/profile", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ photo: null }),
+        });
+
+        if (!profileRes.ok) {
+          const { error } = await profileRes.json();
+          throw new Error(error || "Failed to update profile.");
+        }
+
+        // 3. Update client state
+        setAvatarPhoto(null);
+        setIsDeleted(false);
+        avatarForm.reset({ photo: undefined });
+      })(),
+      {
+        loading: "Deleting Avatar...",
+        success: "Avatar Deleted Successfully!",
+        error: (err) =>
+          `Failed to delete avatar: ${err.message || err.toString()}`,
+      }
+    );
   };
 
   const uploadAvatar: SubmitHandler<AvatarData> = async (data) => {
-    try {
-      if (!userData) throw new Error("User data not loaded.");
-
-      const finalPayload: Partial<UserProfile> = {};
-
-      await toast.promise(
-        (async () => {
-          if (isDeleted && avatarPhoto && !data.photo) {
-            await deleteImageFromCloudinary(avatarPhoto);
-          }
-
-          let photoUrl: string | null = null;
-
-          if (data.photo instanceof File) {
-            const base64 = await fileToBase64(data.photo);
-            photoUrl = await avatarToCloudinary(base64, userData);
-          } else if (
-            typeof data.photo === "string" &&
-            data.photo === avatarPhoto
-          ) {
-            photoUrl = avatarPhoto;
-          }
-
-          if (isDeleted && !data.photo && avatarPhoto) {
-            finalPayload.photo = undefined;
-          } else if (photoUrl) {
-            finalPayload.photo = photoUrl;
-          }
-
-          const finalResponse = await fetch(`/api/profile/${userData.id}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(finalPayload),
-          });
-
-          if (!finalResponse.ok) {
-            throw new Error("Failed to update user avatar.");
-          }
-        })(),
-        {
-          loading: "Saving changes...",
-          success: "Avatar saved successfully!",
-          error: (err) => `Something went wrong: ${err.toString()}`,
-        }
-      );
-    } catch (err) {
-      console.error("Upload avatar error:", err);
+    if (!userData) {
+      toast.error("User data not loaded.");
+      return;
     }
+
+    await toast.promise(
+      (async () => {
+        let photoUrl: string | null = null;
+
+        if (data.photo instanceof File) {
+          const base64 = await fileToBase64(data.photo);
+          photoUrl = await avatarToCloudinary(base64, userData);
+        } else if (
+          typeof data.photo === "string" &&
+          data.photo === avatarPhoto
+        ) {
+          photoUrl = avatarPhoto;
+        }
+
+        if (!photoUrl && isDeleted) {
+          setAvatarPhoto(null);
+          return;
+        }
+
+        const finalPayload: Partial<UserProfile> = {
+          photo: photoUrl || undefined,
+        };
+
+        const res = await fetch("/api/profile", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(finalPayload),
+        });
+
+        if (!res.ok) {
+          throw new Error("Failed to update avatar.");
+        }
+
+        setAvatarPhoto(photoUrl || null);
+        setIsDeleted(false);
+      })(),
+      {
+        loading: "Updating Avatar...",
+        success: "Avatar Updated Successfully!",
+        error: (err) =>
+          `Failed to upload avatar: ${err.message || err.toString()}`,
+      }
+    );
   };
+
   const updateProfile: SubmitHandler<ProfileData> = (data) => {
     console.log("Submitted data:", data);
     // Send data to Supabase to update the profile
@@ -224,49 +250,34 @@ export default function UserSettings() {
                   <CardContent className="space-y-4">
                     <Avatar className="w-20 h-20">
                       <AvatarImage
-                        src={
-                          avatarPhoto || "/placeholder.svg?height=80&width=80"
-                        }
+                        src={avatarPhoto || undefined}
                         alt={getUserInitials(user?.user?.name)}
                       />
                       <AvatarFallback>
                         {user ? getUserInitials(user.user?.name) : "?"}
                       </AvatarFallback>
                     </Avatar>
-
-                    {/* Avatar Upload */}
-                    <Form {...avatarForm}>
-                      <form
-                        onSubmit={avatarForm.handleSubmit(uploadAvatar)}
-                        className="flex justify-start items-end gap-4"
-                      >
-                        <FormField
-                          control={avatarForm.control}
-                          name="photo"
-                          render={() => (
-                            <FormItem className="my-2">
-                              <FormLabel htmlFor="photo" className="text-lg">
-                                Avatar Photo:
-                              </FormLabel>
-                              <FormControl>
-                                {avatarPhoto && !isDeleted ? (
-                                  <div>
-                                    <Image
-                                      src={avatarPhoto}
-                                      alt="Avatar"
-                                      width={200}
-                                      height={200}
-                                      className="rounded-lg"
-                                    />
-                                    <Button
-                                      type="button"
-                                      className="mt-4"
-                                      onClick={handleDeleteAvatarPhoto}
-                                    >
-                                      Remove Photo
-                                    </Button>
-                                  </div>
-                                ) : (
+                    {/* Delete Avatar Confirmation */}
+                    {avatarPhoto && !isDeleted ? (
+                      <DeleteAvatarConfirmation
+                        onConfirm={handleDeleteAvatarPhoto}
+                      />
+                    ) : (
+                      <Form {...avatarForm}>
+                        <form
+                          onSubmit={avatarForm.handleSubmit(uploadAvatar)}
+                          className="flex justify-start items-end gap-4"
+                        >
+                          <FormField
+                            control={avatarForm.control}
+                            name="photo"
+                            render={() => (
+                              <FormItem className="my-2">
+                                <FormLabel
+                                  htmlFor="photo"
+                                  className="text-lg"
+                                ></FormLabel>
+                                <FormControl>
                                   <PhotoUploader
                                     onImageSelect={(image) =>
                                       avatarForm.setValue(
@@ -275,19 +286,24 @@ export default function UserSettings() {
                                       )
                                     }
                                   />
-                                )}
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        {watchedPhoto && (
-                          <Button type="submit" className="mb-2">
-                            Save Avatar
-                          </Button>
-                        )}
-                      </form>
-                    </Form>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          {/* Save Avatar Button Logic */}
+                          {watchedPhoto &&
+                            (watchedPhoto instanceof File ||
+                              (typeof watchedPhoto === "string" &&
+                                watchedPhoto !== avatarPhoto)) && (
+                              <Button type="submit" className="mb-2">
+                                Save Avatar
+                              </Button>
+                            )}
+                        </form>
+                      </Form>
+                    )}
 
                     {/* Profile Details Form */}
                     <Form {...profileForm}>

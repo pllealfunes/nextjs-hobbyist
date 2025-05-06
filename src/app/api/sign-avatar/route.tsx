@@ -1,5 +1,4 @@
 import { v2 as cloudinary } from "cloudinary";
-import { timeStamp } from "console";
 import crypto from "crypto";
 
 export async function POST(request: Request) {
@@ -16,7 +15,7 @@ export async function POST(request: Request) {
       .digest("hex");
 
     // Use the hashed ID in your public_id
-    const public_id = `avatars_photos/${hashedUserId}_${timeStamp}`;
+    const public_id = `avatar_photos/${hashedUserId}_${timestamp}`;
 
     const paramsToSign = {
       timestamp,
