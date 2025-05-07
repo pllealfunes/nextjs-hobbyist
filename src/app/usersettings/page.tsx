@@ -106,6 +106,7 @@ export default function UserSettings() {
             id: userInfo.id,
             name: userInfo.name || "",
             username: userInfo.username || "",
+            photo: profileInfo.photo || undefined,
             email: userInfo.email || "",
             role: userInfo.role || "USER",
             bio: profileInfo.bio || "",
@@ -113,7 +114,7 @@ export default function UserSettings() {
           };
 
           setUserData(fetchedUserData);
-
+          setAvatarPhoto(profileInfo.photo);
           // Reset form values when userData is fetched
           profileForm.reset({
             name: fetchedUserData.name,
