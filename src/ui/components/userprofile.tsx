@@ -68,10 +68,10 @@ const UserProfileDetails = ({ post }: UserProfileProps) => {
             <Avatar className="w-36 h-36">
               <AvatarImage
                 src={userData?.photo || undefined}
-                alt={getUserInitials(userData?.name)}
+                alt={getUserInitials(userData?.username)}
               />
               <AvatarFallback>
-                {userData ? getUserInitials(userData.name) : "?"}
+                {userData ? getUserInitials(userData.username) : "?"}
               </AvatarFallback>
             </Avatar>
             {user ? (
