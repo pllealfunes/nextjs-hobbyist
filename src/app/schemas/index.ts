@@ -12,11 +12,11 @@ export const LoginSchema = z.object({
 export const SignUpSchema = z.object({
   name: z
     .string()
-    .min(5, { message: "Name must be at least 5 characters." })
+    .min(2, { message: "Name must be at least 2 characters." })
     .max(15),
   username: z
     .string()
-    .min(5, { message: "Username must be at least 2 characters." })
+    .min(2, { message: "Username must be at least 2 characters." })
     .max(15),
   email: z.string().email({
     message: "Enter a valid email.",
@@ -54,16 +54,23 @@ export const CreatePostSchema = z.object({
 });
 
 export const ProfileDetailsSchema = z.object({
-  name: z.string().min(1, "Name is required"), // Name must not be empty
-  bio: z.string().optional(), // Bio is optional
+  name: z
+    .string()
+    .min(2, { message: "Name must be at least 2 characters." })
+    .max(15),
+  username: z
+    .string()
+    .min(2, { message: "Username must be at least 2 characters." })
+    .max(15),
+  bio: z.string().optional(),
   links: z
     .array(
       z.object({
-        label: z.string().min(1, "Label is required"), // Label must not be empty
-        url: z.string().url("Must be a valid URL"), // URL must be a valid URL
+        label: z.string().min(2, "Label is required"),
+        url: z.string().url("Must be a valid URL"),
       })
     )
-    .min(1, "At least one link is required"), // Must have at least one link
+    .min(1, "At least one link is required"),
 });
 
 export const AvatarSchema = z.object({

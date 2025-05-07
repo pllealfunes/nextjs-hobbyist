@@ -46,53 +46,17 @@ import {
 // Define the type for form data
 type AvatarData = z.infer<typeof AvatarSchema>;
 type ProfileData = z.infer<typeof ProfileDetailsSchema>;
+type ProfileDetails = {
+  id: string;
+  bio?: string;
+  links?: { label: string; url: string }[];
+};
 
 export default function UserSettings() {
   const user = useAuth();
   const [userData, setUserData] = useState<UserProfile | null>(null);
   const [avatarPhoto, setAvatarPhoto] = useState(userData?.photo || null);
   const [isDeleted, setIsDeleted] = useState(false);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const userId = user.user?.id;
-
-      if (!userId) return;
-
-      // Fetch user data
-      const userRes = await fetch("/api/user");
-
-      if (!userRes.ok) {
-        throw new Error("Failed to fetch user data");
-      }
-
-      const userInfo = await userRes.json();
-
-      // Fetch profile data
-      const profileRes = await fetch("/api/profile");
-
-      if (!profileRes.ok) {
-        throw new Error("Failed to fetch user data");
-      }
-
-      const profileInfo = await profileRes.json();
-
-      if (userInfo && profileInfo) {
-        setUserData({
-          id: userInfo.id,
-          name: userInfo.name || "",
-          username: userInfo.username || "",
-          email: userInfo.email || "",
-          role: userInfo.role || "USER",
-          bio: profileInfo.bio || "",
-          links: profileInfo.links || [],
-        });
-        setAvatarPhoto(profileInfo.photo || null);
-      }
-    };
-
-    fetchData();
-  }, [user]);
 
   const avatarForm = useForm<AvatarData>({
     mode: "onTouched",
@@ -111,9 +75,10 @@ export default function UserSettings() {
     mode: "onTouched",
     resolver: zodResolver(ProfileDetailsSchema),
     defaultValues: {
-      name: "",
-      bio: "",
-      links: [{ label: "", url: "" }],
+      name: userData?.name || "",
+      username: userData?.username || "",
+      bio: userData?.bio || "",
+      links: userData?.links ?? [{ label: "", url: "" }],
     },
   });
 
@@ -121,6 +86,49 @@ export default function UserSettings() {
     control: profileForm.control,
     name: "links",
   });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const userId = user.user?.id;
+      if (!userId) return;
+
+      try {
+        const userRes = await fetch("/api/user");
+        if (!userRes.ok) throw new Error("Failed to fetch user data");
+        const userInfo = await userRes.json();
+
+        const profileRes = await fetch("/api/profile");
+        if (!profileRes.ok) throw new Error("Failed to fetch profile data");
+        const profileInfo = await profileRes.json();
+
+        if (userInfo && profileInfo) {
+          const fetchedUserData = {
+            id: userInfo.id,
+            name: userInfo.name || "",
+            username: userInfo.username || "",
+            email: userInfo.email || "",
+            role: userInfo.role || "USER",
+            bio: profileInfo.bio || "",
+            links: profileInfo.links || [{ label: "", url: "" }],
+          };
+
+          setUserData(fetchedUserData);
+
+          // Reset form values when userData is fetched
+          profileForm.reset({
+            name: fetchedUserData.name,
+            username: fetchedUserData.username,
+            bio: fetchedUserData.bio,
+            links: fetchedUserData.links,
+          });
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchData();
+  }, [user, profileForm]);
 
   const getUserInitials = (name?: string | null) => {
     if (!name) return "N/A";
@@ -218,9 +226,59 @@ export default function UserSettings() {
     );
   };
 
-  const updateProfile: SubmitHandler<ProfileData> = (data) => {
+  const updateProfile: SubmitHandler<ProfileData> = async (data) => {
     console.log("Submitted data:", data);
-    // Send data to Supabase to update the profile
+
+    if (!userData) {
+      toast.error("User data not loaded.");
+      return;
+    }
+    if (!data) {
+      toast.error("Data not loaded or available.");
+      return;
+    }
+
+    await toast.promise(
+      (async () => {
+        const profileFinalPayload: ProfileDetails = {
+          id: userData.id,
+          bio: data.bio || undefined,
+          links: data.links || undefined,
+        };
+
+        const resProfile = await fetch("/api/profile", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(profileFinalPayload),
+        });
+
+        if (!resProfile.ok) {
+          throw new Error("Failed to update avatar.");
+        }
+
+        const userFinalPayload: Partial<UserProfile> = {
+          id: userData.id,
+          name: data.name,
+          username: data.username,
+        };
+
+        const resUser = await fetch("/api/user", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(userFinalPayload),
+        });
+
+        if (!resUser.ok) {
+          throw new Error("Failed to update user details.");
+        }
+      })(),
+      {
+        loading: "Updating Profile Details...",
+        success: "Profile Details Successfully!",
+        error: (err) =>
+          `Failed to update profile details: ${err.message || err.toString()}`,
+      }
+    );
   };
 
   return (
@@ -251,10 +309,10 @@ export default function UserSettings() {
                     <Avatar className="w-20 h-20">
                       <AvatarImage
                         src={avatarPhoto || undefined}
-                        alt={getUserInitials(user?.user?.name)}
+                        alt={getUserInitials(userData.name)}
                       />
                       <AvatarFallback>
-                        {user ? getUserInitials(user.user?.name) : "?"}
+                        {userData ? getUserInitials(userData.name) : "?"}
                       </AvatarFallback>
                     </Avatar>
                     {/* Delete Avatar Confirmation */}
@@ -318,6 +376,21 @@ export default function UserSettings() {
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Name:</FormLabel>
+                              <FormControl>
+                                <Input {...field} className="w-80 text-md" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        {/* Username */}
+                        <FormField
+                          control={profileForm.control}
+                          name="username"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Username:</FormLabel>
                               <FormControl>
                                 <Input {...field} className="w-80 text-md" />
                               </FormControl>
@@ -397,8 +470,9 @@ export default function UserSettings() {
                             + Add Link
                           </Button>
                         </div>
-
-                        <Button type="submit">Save Profile</Button>
+                        <div className="flex justify-end">
+                          <Button type="submit">Save Profile</Button>
+                        </div>
                       </form>
                     </Form>
                   </CardContent>
