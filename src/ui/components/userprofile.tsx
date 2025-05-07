@@ -70,7 +70,7 @@ const UserProfileDetails = ({ post }: UserProfileProps) => {
                 src={userData?.photo || undefined}
                 alt={getUserInitials(userData?.username)}
               />
-              <AvatarFallback>
+              <AvatarFallback className="text-7xl">
                 {userData ? getUserInitials(userData.username) : "?"}
               </AvatarFallback>
             </Avatar>

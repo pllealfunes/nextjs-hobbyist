@@ -39,8 +39,8 @@ export default function DeleteConfirmationDialog({
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Delete Post</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-slate-900">Delete Post</DialogTitle>
+          <DialogDescription className="text-slate-700">
             Are you sure you want to delete this post? This action cannot be
             undone.
           </DialogDescription>

@@ -25,8 +25,10 @@ export default function DeleteAvatarConfirmation({
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent>
-          <DialogTitle>Delete Avatar Photo</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-slate-900">
+            Delete Avatar Photo
+          </DialogTitle>
+          <DialogDescription className="text-slate-700">
             Are you sure you want to delete your avatar photo? This action
             cannot be undone.
           </DialogDescription>
@@ -36,7 +38,7 @@ export default function DeleteAvatarConfirmation({
             </Button>
             <Button
               onClick={() => {
-                onConfirm(); // Make sure this only runs when clicked
+                onConfirm();
                 setIsOpen(false);
               }}
               variant="destructive"
