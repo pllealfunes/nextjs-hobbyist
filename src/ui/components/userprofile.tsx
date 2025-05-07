@@ -1,21 +1,63 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/ui/components/avatar";
 import { Button } from "@/ui/components/button";
-import {
-  InstagramLogoIcon,
-  TwitterLogoIcon,
-  LinkedInLogoIcon,
-  GlobeIcon,
-} from "@radix-ui/react-icons";
+import { ExternalLinkIcon } from "@radix-ui/react-icons";
 import { useAuth } from "@/contexts/authContext";
+import { UserProfile } from "@/lib/types";
 
 interface UserProfileProps {
   post: number;
 }
 
-const UserProfile = ({ post }: UserProfileProps) => {
-  const { user } = useAuth();
+const UserProfileDetails = ({ post }: UserProfileProps) => {
+  const user = useAuth();
+  const [userData, setUserData] = useState<UserProfile | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const userId = user.user?.id;
+      if (!userId) return;
+
+      try {
+        const userRes = await fetch("/api/user");
+        if (!userRes.ok) throw new Error("Failed to fetch user data");
+        const userInfo = await userRes.json();
+
+        const profileRes = await fetch("/api/profile");
+        if (!profileRes.ok) throw new Error("Failed to fetch profile data");
+        const profileInfo = await profileRes.json();
+
+        if (userInfo && profileInfo) {
+          const fetchedUserData = {
+            id: userInfo.id,
+            name: userInfo.name || "",
+            username: userInfo.username || "",
+            photo: profileInfo.photo || undefined,
+            email: userInfo.email || "",
+            role: userInfo.role || "USER",
+            bio: profileInfo.bio || "",
+            links: profileInfo.links || [{ label: "", url: "" }],
+          };
+
+          setUserData(fetchedUserData);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchData();
+  }, [user]);
+
+  const getUserInitials = (name?: string | null) => {
+    if (!name) return "N/A";
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("");
+  };
 
   return (
     <div>
@@ -23,13 +65,18 @@ const UserProfile = ({ post }: UserProfileProps) => {
         <div className="py-12 sm:py-20 rounded-3xl flex flex-col justify-center items-center gap-8 px-4 sm:px-10">
           {/* Avatar and Name */}
           <div className="flex flex-col items-center gap-4">
-            <Avatar className="w-36 h-36 shadow-md">
-              <AvatarImage src="https://github.com/shadcn.png" />
-              <AvatarFallback>CN</AvatarFallback>
+            <Avatar className="w-36 h-36">
+              <AvatarImage
+                src={userData?.photo || undefined}
+                alt={getUserInitials(userData?.name)}
+              />
+              <AvatarFallback>
+                {userData ? getUserInitials(userData.name) : "?"}
+              </AvatarFallback>
             </Avatar>
             {user ? (
               <h2 className="text-4xl font-extrabold tracking-tight light:text-gray-900">
-                {user.username}
+                {userData?.username}
               </h2>
             ) : (
               <h2 className="text-4xl font-extrabold tracking-tight light:text-gray-900">
@@ -40,7 +87,7 @@ const UserProfile = ({ post }: UserProfileProps) => {
 
           {/* Bio */}
           <div className="text-center text-lg light:text-gray-800 max-w-lg">
-            Brother. Plumber. Hero. Fear of Ghosts. Loves Green.
+            {userData?.bio}
           </div>
 
           {/* Followers, Following, Posts Count */}
@@ -65,42 +112,20 @@ const UserProfile = ({ post }: UserProfileProps) => {
 
           {/* Social Media Links */}
           <div className="flex gap-4 mt-6">
-            <a
-              href="https://twitter.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="light:text-gray-900 light:hover:text-zinc-50 dark:hover:text-rose-500 transition duration-300"
-              aria-label="Twitter"
-            >
-              <TwitterLogoIcon className="h-8 w-8" />
-            </a>
-            <a
-              href="https://linkedin.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="light:text-gray-900 light:hover:text-zinc-50 dark:hover:text-rose-500  transition duration-300"
-              aria-label="LinkedIn"
-            >
-              <LinkedInLogoIcon className="h-8 w-8" />
-            </a>
-            <a
-              href="https://instagram.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="light:text-gray-900 light:hover:text-zinc-50 dark:hover:text-rose-500  transition duration-300"
-              aria-label="Instagram"
-            >
-              <InstagramLogoIcon className="h-8 w-8" />
-            </a>
-            <a
-              href="https://personalwebsite.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="light:text-gray-900 light:hover:text-zinc-50 dark:hover:text-rose-500  transition duration-300"
-              aria-label="Website"
-            >
-              <GlobeIcon className="h-8 w-8" />
-            </a>
+            <div className="space-y-3 mt-4">
+              {userData?.links?.map((link, index) => (
+                <a
+                  key={index}
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 hover:text-rose-900 transition-all duration-300 font-semibold text-lg"
+                >
+                  <ExternalLinkIcon className="w-5 h-5" />
+                  {link.label}
+                </a>
+              ))}
+            </div>
           </div>
 
           {/* Buttons */}
@@ -118,4 +143,4 @@ const UserProfile = ({ post }: UserProfileProps) => {
   );
 };
 
-export default UserProfile;
+export default UserProfileDetails;
