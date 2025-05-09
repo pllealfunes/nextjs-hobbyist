@@ -76,3 +76,20 @@ export const ProfileDetailsSchema = z.object({
 export const AvatarSchema = z.object({
   photo: z.instanceof(File).optional(),
 });
+
+export const EmailSchema = z.object({
+  email: z.string().email({
+    message: "Enter a valid email.",
+  }),
+});
+
+export const PasswordSchema = z.object({
+  password: z
+    .string()
+    .min(5, { message: "Please choose a strong password." })
+    .max(15),
+  passConfirmation: z
+    .string()
+    .min(5, { message: "Please confirm the password by typing it again." })
+    .max(15),
+});

@@ -1,45 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 
-export async function GET() {
-  try {
-    const supabase = await createClient();
-
-    // Get the authenticated user
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    // Fetch only the user's published posts
-    const { data: userInfo, error } = await supabase
-      .from("User")
-      .select("id, name, username, email")
-      .eq("id", user.id)
-      .single();
-
-    if (error) {
-      console.error("Error fetching user from Supabase:", error);
-      return NextResponse.json(
-        { error: "Error fetching user" },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json(userInfo, { status: 200 });
-  } catch (error) {
-    console.error("Error in API route /api/user:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
-  }
-}
-
 export async function PUT(req: Request) {
   try {
     // Extract new user details from the request body
@@ -58,15 +19,12 @@ export async function PUT(req: Request) {
     // Validate input
     if (
       !user.id ||
-      !updatedFields.name ||
-      !updatedFields.username ||
-      updatedFields.name.trim() === "" ||
-      updatedFields.username.trim() === ""
+      !updatedFields.email.trim() ||
+      updatedFields.email.trim() === ""
     ) {
       return NextResponse.json(
         {
-          error:
-            "Invalid input data. Ensure newName, and newUsername are provided.",
+          error: "Invalid input data. Ensure new email are provided.",
         },
         { status: 400 }
       );
@@ -74,10 +32,7 @@ export async function PUT(req: Request) {
 
     // **Step 1: Update `auth.users` in Supabase**
     const { error: authError } = await supabase.auth.updateUser({
-      data: {
-        name: updatedFields.name.trim(),
-        username: updatedFields.username.trim(),
-      }, // Update metadata
+      email: updatedFields.email.trim(),
     });
 
     if (authError) {
@@ -98,7 +53,7 @@ export async function PUT(req: Request) {
 
     return NextResponse.json(
       {
-        message: "User updated successfully",
+        message: "Email updated successfully",
       },
       { status: 200 }
     );

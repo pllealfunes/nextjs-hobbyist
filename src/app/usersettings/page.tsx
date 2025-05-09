@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/ui/components/button";
 import { Input } from "@/ui/components/input";
-import { Label } from "@/ui/components/label";
+//import { Label } from "@/ui/components/label";
 import { Textarea } from "@/ui/components/textarea";
 import {
   Card,
@@ -30,7 +30,12 @@ import {
 } from "react-hook-form";
 import { useAuth } from "@/contexts/authContext";
 import { UserProfile } from "@/lib/types";
-import { ProfileDetailsSchema, AvatarSchema } from "../schemas";
+import {
+  ProfileDetailsSchema,
+  AvatarSchema,
+  EmailSchema,
+  PasswordSchema,
+} from "../schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod"; // Import zod
 import PhotoUploader from "@/ui/components/photo-uploader";
@@ -42,21 +47,20 @@ import {
   avatarToCloudinary,
   deleteImageFromCloudinary,
 } from "@/utils/postHandler";
+import { useRouter } from "next/navigation";
 
-// Define the type for form data
+// Define the type for forms data
 type AvatarData = z.infer<typeof AvatarSchema>;
 type ProfileData = z.infer<typeof ProfileDetailsSchema>;
-type ProfileDetails = {
-  id: string;
-  bio?: string;
-  links?: { label: string; url: string }[];
-};
+type EmailData = z.infer<typeof EmailSchema>;
+type PasswordData = z.infer<typeof PasswordSchema>;
 
 export default function UserSettings() {
   const user = useAuth();
   const [userData, setUserData] = useState<UserProfile | null>(null);
   const [avatarPhoto, setAvatarPhoto] = useState(userData?.photo || null);
   const [isDeleted, setIsDeleted] = useState(false);
+  const router = useRouter();
 
   const avatarForm = useForm<AvatarData>({
     mode: "onTouched",
@@ -85,6 +89,23 @@ export default function UserSettings() {
   const { fields, append, remove } = useFieldArray({
     control: profileForm.control,
     name: "links",
+  });
+
+  const emailForm = useForm<EmailData>({
+    mode: "onTouched",
+    resolver: zodResolver(EmailSchema),
+    defaultValues: {
+      email: userData?.email,
+    },
+  });
+
+  const passwordForm = useForm<PasswordData>({
+    mode: "onTouched",
+    resolver: zodResolver(PasswordSchema),
+    defaultValues: {
+      password: userData?.email,
+      passConfirmation: "",
+    },
   });
 
   useEffect(() => {
@@ -121,6 +142,9 @@ export default function UserSettings() {
             username: fetchedUserData.username,
             bio: fetchedUserData.bio,
             links: fetchedUserData.links,
+          });
+          emailForm.reset({
+            email: fetchedUserData.email,
           });
         }
       } catch (error) {
@@ -220,7 +244,7 @@ export default function UserSettings() {
       })(),
       {
         loading: "Updating Avatar...",
-        success: "Avatar Updated Successfully!",
+        success: "Successfully Updated Avatar!",
         error: (err) =>
           `Failed to upload avatar: ${err.message || err.toString()}`,
       }
@@ -241,8 +265,7 @@ export default function UserSettings() {
 
     await toast.promise(
       (async () => {
-        const profileFinalPayload: ProfileDetails = {
-          id: userData.id,
+        const profileFinalPayload: Partial<ProfileData> = {
           bio: data.bio || undefined,
           links: data.links || undefined,
         };
@@ -274,10 +297,49 @@ export default function UserSettings() {
         }
       })(),
       {
-        loading: "Updating Profile Details...",
-        success: "Profile Details Successfully!",
+        loading: "Updating Profile...",
+        success: "Successfully Updated Profile!",
         error: (err) =>
-          `Failed to update profile details: ${err.message || err.toString()}`,
+          `Failed to update profile: ${err.message || err.toString()}`,
+      }
+    );
+  };
+
+  const updateEmail: SubmitHandler<EmailData> = async (data) => {
+    console.log("Submitted data:", data);
+
+    if (!userData) {
+      toast.error("User data not loaded.");
+      return;
+    }
+    if (!data) {
+      toast.error("Data not loaded or available.");
+      return;
+    }
+
+    await toast.promise(
+      (async () => {
+        const emailFinalPayload: Partial<EmailData> = {
+          email: data.email || userData.email,
+        };
+
+        const res = await fetch("/api/email", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(emailFinalPayload),
+        });
+
+        if (!res.ok) {
+          throw new Error("Failed to update email.");
+        }
+
+        return router.push("/verify-email");
+      })(),
+      {
+        loading: "Updating Email...",
+        success: "Successfully Updated Email!",
+        error: (err) =>
+          `Failed to update email: ${err.message || err.toString()}`,
       }
     );
   };
@@ -491,27 +553,65 @@ export default function UserSettings() {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        value={user?.user?.email || ""}
-                        readOnly
-                      />
+                      <Form {...emailForm}>
+                        <form
+                          onSubmit={emailForm.handleSubmit(updateEmail)}
+                          className="space-y-4"
+                        >
+                          {/* Email */}
+                          <FormField
+                            control={emailForm.control}
+                            name="email"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Email:</FormLabel>
+                                <FormControl>
+                                  <Input {...field} className="w-80 text-md" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <Button type="submit">Save Email</Button>
+                        </form>
+                      </Form>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="current-password">Current Password</Label>
-                      <Input id="current-password" type="password" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="new-password">New Password</Label>
-                      <Input id="new-password" type="password" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="confirm-password">
-                        Confirm New Password
-                      </Label>
-                      <Input id="confirm-password" type="password" />
+                      <Form {...passwordForm}>
+                        <form
+                          onSubmit={emailForm.handleSubmit(updateEmail)}
+                          className="space-y-4"
+                        >
+                          {/* Password */}
+                          <FormField
+                            control={passwordForm.control}
+                            name="password"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Current Password:</FormLabel>
+                                <FormControl>
+                                  <Input {...field} className="w-80 text-md" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={passwordForm.control}
+                            name="passConfirmation"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Confirm New Password:</FormLabel>
+                                <FormControl>
+                                  <Input {...field} className="w-80 text-md" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </form>
+                        <Button type="submit">Save Password</Button>
+                      </Form>
                     </div>
                   </CardContent>
                 </Card>
