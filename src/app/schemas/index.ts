@@ -12,7 +12,7 @@ export const LoginSchema = z.object({
 export const SignUpSchema = z.object({
   name: z
     .string()
-    .min(2, { message: "Name must be at least 2 characters." })
+    .min(8, { message: "Name must be at least 8 characters." })
     .max(15),
   username: z
     .string()
@@ -84,12 +84,20 @@ export const EmailSchema = z.object({
 });
 
 export const PasswordSchema = z.object({
-  password: z
+  currentPassword: z
     .string()
-    .min(5, { message: "Please choose a strong password." })
+    .min(8, {
+      message: "Please choose a strong password with a min of 8 characters.",
+    })
+    .max(15),
+  newPassword: z
+    .string()
+    .min(8, {
+      message: "Please choose a strong password with a min of 8 characters.",
+    })
     .max(15),
   passConfirmation: z
     .string()
-    .min(5, { message: "Please confirm the password by typing it again." })
+    .min(8, { message: "Please confirm the password by typing it again." })
     .max(15),
 });

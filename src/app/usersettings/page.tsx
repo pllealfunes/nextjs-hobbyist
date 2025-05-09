@@ -103,7 +103,8 @@ export default function UserSettings() {
     mode: "onTouched",
     resolver: zodResolver(PasswordSchema),
     defaultValues: {
-      password: userData?.email,
+      currentPassword: "",
+      newPassword: "",
       passConfirmation: "",
     },
   });
@@ -281,7 +282,6 @@ export default function UserSettings() {
         }
 
         const userFinalPayload: Partial<UserProfile> = {
-          id: userData.id,
           name: data.name,
           username: data.username,
         };
@@ -340,6 +340,45 @@ export default function UserSettings() {
         success: "Successfully Updated Email!",
         error: (err) =>
           `Failed to update email: ${err.message || err.toString()}`,
+      }
+    );
+  };
+
+  const updatePassword: SubmitHandler<PasswordData> = async (data) => {
+    if (!userData) {
+      toast.error("User data not loaded.");
+      return;
+    }
+    if (!data) {
+      toast.error("Data not loaded or available.");
+      return;
+    }
+
+    await toast.promise(
+      (async () => {
+        const passwordFinalPayload: PasswordData = {
+          currentPassword: data.currentPassword,
+          newPassword: data.newPassword,
+          passConfirmation: data.passConfirmation,
+        };
+
+        const res = await fetch("/api/change-password", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(passwordFinalPayload),
+        });
+
+        if (!res.ok) {
+          throw new Error("Failed to update password.");
+        }
+
+        return router.push("/login");
+      })(),
+      {
+        loading: "Updating Password...",
+        success: "Successfully Updated Password! Please Log in Again",
+        error: (err) =>
+          `Failed to update password: ${err.message || err.toString()}`,
       }
     );
   };
@@ -579,13 +618,13 @@ export default function UserSettings() {
                     <div className="space-y-2">
                       <Form {...passwordForm}>
                         <form
-                          onSubmit={emailForm.handleSubmit(updateEmail)}
+                          onSubmit={passwordForm.handleSubmit(updatePassword)}
                           className="space-y-4"
                         >
                           {/* Password */}
                           <FormField
                             control={passwordForm.control}
-                            name="password"
+                            name="currentPassword"
                             render={({ field }) => (
                               <FormItem>
                                 <FormLabel>Current Password:</FormLabel>
@@ -596,6 +635,20 @@ export default function UserSettings() {
                               </FormItem>
                             )}
                           />
+                          <FormField
+                            control={passwordForm.control}
+                            name="newPassword"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>New Password:</FormLabel>
+                                <FormControl>
+                                  <Input {...field} className="w-80 text-md" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
                           <FormField
                             control={passwordForm.control}
                             name="passConfirmation"
@@ -609,8 +662,8 @@ export default function UserSettings() {
                               </FormItem>
                             )}
                           />
+                          <Button type="submit">Save Password</Button>
                         </form>
-                        <Button type="submit">Save Password</Button>
                       </Form>
                     </div>
                   </CardContent>
