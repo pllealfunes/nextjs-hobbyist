@@ -24,8 +24,6 @@ https://nextjs-hobbyist.vercel.app/
 
 ## Current Tasks:
 
-- [ ] update user email
-- [ ] upload user password
 - [ ] mark profile private or public
 
 ## Project Tasks:
