@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { createClient } from "@/utils/supabase/server";
 import {
   changeEmail,
   changePassword,
@@ -190,7 +191,7 @@ export default function UserSettings() {
         const result = await deleteAvatarPhoto();
 
         if (!result.success) {
-          throw new Error(result.error);
+          toast.error(`Failed to delete image: ${result.error}`);
         }
 
         setAvatarPhoto(null);
@@ -221,7 +222,12 @@ export default function UserSettings() {
         // Convert image to Base64 in the client
         if (data.photo instanceof File) {
           const base64 = await fileToBase64(data.photo);
-          photoUrl = await avatarToCloudinary(base64, userData); // Upload to Cloudinary from frontend
+
+          if (!base64) {
+            throw new Error("Failed to convert image to Base64.");
+          }
+
+          photoUrl = await avatarToCloudinary(base64, userData);
         }
 
         if (!photoUrl) {
@@ -316,6 +322,10 @@ export default function UserSettings() {
         if (!result.success) {
           throw new Error(result.error);
         }
+
+        const supabase = await createClient();
+
+        await supabase.auth.signOut();
 
         return router.push("/verify-email");
       })(),

@@ -181,14 +181,15 @@ export const extractPublicIdFromUrl = (url: string): string | null => {
 };
 
 // Deletes image from Cloudinary via your API route
-export const deleteImageFromCloudinary = async (imageUrl: string) => {
+export const deleteImageFromCloudinary = async (
+  imageUrl: string
+): Promise<{ success: boolean; error?: string }> => {
   const public_id = extractPublicIdFromUrl(imageUrl);
 
   if (!public_id) {
     console.warn("Could not extract public_id from image URL:", imageUrl);
-    return;
+    return { success: false, error: "Invalid image URL" };
   }
-  console.log("Extracted Public ID:", public_id);
 
   try {
     const response = await fetch("/api/delete-image", {
@@ -197,14 +198,22 @@ export const deleteImageFromCloudinary = async (imageUrl: string) => {
       body: JSON.stringify({ public_id }),
     });
 
+    if (!response.ok) {
+      throw new Error(`API responded with status ${response.status}`);
+    }
+
     const data = await response.json();
     if (data.error) {
-      console.error("Error deleting image from Cloudinary:", data.error);
-    } else {
-      console.log("Image deleted from Cloudinary:", data);
+      throw new Error(data.error);
     }
+
+    return { success: true };
   } catch (error) {
-    console.error("Error calling delete image API:", error);
+    console.error("Error deleting image from Cloudinary:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error occurred",
+    };
   }
 };
 
@@ -239,7 +248,13 @@ https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}
       body: formData,
     }
   );
-  if (!uploadRes.ok) throw new Error("Image upload failed");
+
+  if (!uploadRes.ok) {
+    const errorData = await uploadRes.json();
+    throw new Error(
+      `Cloudinary upload failed: ${errorData.error.message || "Unknown error"}`
+    );
+  }
 
   return (await uploadRes.json()).secure_url;
 };
