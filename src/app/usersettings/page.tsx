@@ -1,6 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import {
+  changeEmail,
+  changePassword,
+  updateProfileDetails,
+  updateAvatarPhoto,
+  deleteAvatarPhoto,
+} from "@/app/usersettings/actions";
 import { Button } from "@/ui/components/button";
 import { Input } from "@/ui/components/input";
 //import { Label } from "@/ui/components/label";
@@ -37,7 +44,7 @@ import {
   PasswordSchema,
 } from "../schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod"; // Import zod
+import { z } from "zod";
 import PhotoUploader from "@/ui/components/photo-uploader";
 import DeleteAvatarConfirmation from "@/ui/components/deleteAvatarConfirmation";
 import { Skeleton } from "@/ui/components/skeleton";
@@ -60,6 +67,10 @@ export default function UserSettings() {
   const [userData, setUserData] = useState<UserProfile | null>(null);
   const [avatarPhoto, setAvatarPhoto] = useState(userData?.photo || null);
   const [isDeleted, setIsDeleted] = useState(false);
+  const [isEmailDisabled, setIsEmailDisabled] = useState(false);
+  const [isPasswordDisabled, setIsPasswordDisabled] = useState(false);
+  const [isAvatarDisabled, setIsAvatarDisabled] = useState(false);
+  const [isProfileDisabled, setIsProfileDisabled] = useState(false);
   const router = useRouter();
 
   const avatarForm = useForm<AvatarData>({
@@ -172,22 +183,16 @@ export default function UserSettings() {
 
     await toast.promise(
       (async () => {
-        // 1. Delete the avatar from cloud storage
+        // Step 1: Delete the avatar from Cloudinary (client-side)
         await deleteImageFromCloudinary(avatarPhoto);
 
-        // 2. Update the user profile to remove the photo reference
-        const profileRes = await fetch("/api/profile", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ photo: null }),
-        });
+        // Step 2: Update the profile in Supabase via server action
+        const result = await deleteAvatarPhoto();
 
-        if (!profileRes.ok) {
-          const { error } = await profileRes.json();
-          throw new Error(error || "Failed to update profile.");
+        if (!result.success) {
+          throw new Error(result.error);
         }
 
-        // 3. Update client state
         setAvatarPhoto(null);
         setIsDeleted(false);
         avatarForm.reset({ photo: undefined });
@@ -207,49 +212,42 @@ export default function UserSettings() {
       return;
     }
 
+    setIsAvatarDisabled(true);
+
     await toast.promise(
       (async () => {
         let photoUrl: string | null = null;
 
+        // Convert image to Base64 in the client
         if (data.photo instanceof File) {
           const base64 = await fileToBase64(data.photo);
-          photoUrl = await avatarToCloudinary(base64, userData);
-        } else if (
-          typeof data.photo === "string" &&
-          data.photo === avatarPhoto
-        ) {
-          photoUrl = avatarPhoto;
+          photoUrl = await avatarToCloudinary(base64, userData); // Upload to Cloudinary from frontend
         }
 
-        if (!photoUrl && isDeleted) {
-          setAvatarPhoto(null);
-          return;
+        if (!photoUrl) {
+          throw new Error("Failed to upload avatar.");
         }
 
-        const finalPayload: Partial<UserProfile> = {
-          photo: photoUrl || undefined,
-        };
+        // Now, update the user profile with the Cloudinary URL via the server action
+        const result = await updateAvatarPhoto(photoUrl);
 
-        const res = await fetch("/api/profile", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(finalPayload),
-        });
-
-        if (!res.ok) {
-          throw new Error("Failed to update avatar.");
+        if (!result.success) {
+          throw new Error(result.error);
         }
 
-        setAvatarPhoto(photoUrl || null);
-        setIsDeleted(false);
+        setAvatarPhoto(result.photo || null);
       })(),
       {
-        loading: "Updating Avatar...",
-        success: "Successfully Updated Avatar!",
-        error: (err) =>
-          `Failed to upload avatar: ${err.message || err.toString()}`,
+        loading: "Uploading Avatar...",
+        success: "Avatar Uploaded Successfully!",
+        error: (err) => {
+          setIsAvatarDisabled(false);
+          return `Failed to upload avatar: ${err.message || err.toString()}`;
+        },
       }
     );
+
+    setIsAvatarDisabled(false);
   };
 
   const updateProfile: SubmitHandler<ProfileData> = async (data) => {
@@ -264,45 +262,37 @@ export default function UserSettings() {
       return;
     }
 
+    if (!data.bio && !data.links && !data.name && !data.username) {
+      toast.error("Please provide at least one field to update.");
+      return;
+    }
+
+    setIsProfileDisabled(true);
     await toast.promise(
       (async () => {
         const profileFinalPayload: Partial<ProfileData> = {
-          bio: data.bio || undefined,
-          links: data.links || undefined,
+          bio: data.bio?.trim() || undefined,
+          links: data.links?.length ? data.links : undefined,
+          name: data.name?.trim() || undefined,
+          username: data.username?.trim() || undefined,
         };
 
-        const resProfile = await fetch("/api/profile", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(profileFinalPayload),
-        });
+        const result = await updateProfileDetails(profileFinalPayload);
 
-        if (!resProfile.ok) {
-          throw new Error("Failed to update avatar.");
-        }
-
-        const userFinalPayload: Partial<UserProfile> = {
-          name: data.name,
-          username: data.username,
-        };
-
-        const resUser = await fetch("/api/user", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(userFinalPayload),
-        });
-
-        if (!resUser.ok) {
-          throw new Error("Failed to update user details.");
+        if (!result.success) {
+          throw new Error(result.error);
         }
       })(),
       {
         loading: "Updating Profile...",
         success: "Successfully Updated Profile!",
-        error: (err) =>
-          `Failed to update profile: ${err.message || err.toString()}`,
+        error: (err) => {
+          setIsProfileDisabled(false);
+          return `Failed to update avatar: ${err.message || err.toString()}`;
+        },
       }
     );
+    setIsProfileDisabled(false);
   };
 
   const updateEmail: SubmitHandler<EmailData> = async (data) => {
@@ -312,25 +302,19 @@ export default function UserSettings() {
       toast.error("User data not loaded.");
       return;
     }
-    if (!data) {
-      toast.error("Data not loaded or available.");
+    if (!data.email) {
+      toast.error("Please enter a new email.");
       return;
     }
 
+    setIsEmailDisabled(true);
+
     await toast.promise(
       (async () => {
-        const emailFinalPayload: Partial<EmailData> = {
-          email: data.email || userData.email,
-        };
+        const result = await changeEmail(data.email);
 
-        const res = await fetch("/api/email", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(emailFinalPayload),
-        });
-
-        if (!res.ok) {
-          throw new Error("Failed to update email.");
+        if (!result.success) {
+          throw new Error(result.error);
         }
 
         return router.push("/verify-email");
@@ -338,10 +322,13 @@ export default function UserSettings() {
       {
         loading: "Updating Email...",
         success: "Successfully Updated Email!",
-        error: (err) =>
-          `Failed to update email: ${err.message || err.toString()}`,
+        error: (err) => {
+          setIsEmailDisabled(false);
+          return `Failed to update email: ${err.message || err.toString()}`;
+        },
       }
     );
+    setIsEmailDisabled(false);
   };
 
   const updatePassword: SubmitHandler<PasswordData> = async (data) => {
@@ -354,22 +341,17 @@ export default function UserSettings() {
       return;
     }
 
+    setIsPasswordDisabled(true);
     await toast.promise(
       (async () => {
-        const passwordFinalPayload: PasswordData = {
-          currentPassword: data.currentPassword,
-          newPassword: data.newPassword,
-          passConfirmation: data.passConfirmation,
-        };
+        const result = await changePassword(
+          data.currentPassword,
+          data.newPassword,
+          data.passConfirmation
+        );
 
-        const res = await fetch("/api/change-password", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(passwordFinalPayload),
-        });
-
-        if (!res.ok) {
-          throw new Error("Failed to update password.");
+        if (!result.success) {
+          throw new Error(result.error);
         }
 
         return router.push("/login");
@@ -377,10 +359,13 @@ export default function UserSettings() {
       {
         loading: "Updating Password...",
         success: "Successfully Updated Password! Please Log in Again",
-        error: (err) =>
-          `Failed to update password: ${err.message || err.toString()}`,
+        error: (err) => {
+          setIsPasswordDisabled(false);
+          return `Failed to update password: ${err.message || err.toString()}`;
+        },
       }
     );
+    setIsPasswordDisabled(false);
   };
 
   return (
@@ -457,7 +442,11 @@ export default function UserSettings() {
                             (watchedPhoto instanceof File ||
                               (typeof watchedPhoto === "string" &&
                                 watchedPhoto !== avatarPhoto)) && (
-                              <Button type="submit" className="mb-2">
+                              <Button
+                                type="submit"
+                                className="mb-2"
+                                disabled={isAvatarDisabled}
+                              >
                                 Save Avatar
                               </Button>
                             )}
@@ -573,7 +562,9 @@ export default function UserSettings() {
                           </Button>
                         </div>
                         <div className="flex justify-end">
-                          <Button type="submit">Save Profile</Button>
+                          <Button type="submit" disabled={isProfileDisabled}>
+                            Save Profile
+                          </Button>
                         </div>
                       </form>
                     </Form>
@@ -611,7 +602,9 @@ export default function UserSettings() {
                               </FormItem>
                             )}
                           />
-                          <Button type="submit">Save Email</Button>
+                          <Button type="submit" disabled={isEmailDisabled}>
+                            Save Email
+                          </Button>
                         </form>
                       </Form>
                     </div>
@@ -662,7 +655,9 @@ export default function UserSettings() {
                               </FormItem>
                             )}
                           />
-                          <Button type="submit">Save Password</Button>
+                          <Button type="submit" disabled={isPasswordDisabled}>
+                            Save Password
+                          </Button>
                         </form>
                       </Form>
                     </div>

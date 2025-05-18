@@ -29,6 +29,11 @@ const nextConfig = {
     ],
   },
   serverExternalPackages: ["yjs"],
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "5mb",
+    },
+  },
 };
 
 export default nextConfig;

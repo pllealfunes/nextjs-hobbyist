@@ -57,12 +57,21 @@ export const ProfileDetailsSchema = z.object({
   name: z
     .string()
     .min(2, { message: "Name must be at least 2 characters." })
-    .max(15),
+    .max(30, { message: "Name cannot exceed 30 characters." }),
+
   username: z
     .string()
     .min(2, { message: "Username must be at least 2 characters." })
-    .max(15),
-  bio: z.string().optional(),
+    .max(20, { message: "Username cannot exceed 20 characters." })
+    .regex(/^[a-zA-Z0-9_]+$/, {
+      message: "Username can only contain letters, numbers, and underscores.",
+    }),
+
+  bio: z
+    .string()
+    .max(160, { message: "Bio cannot exceed 160 characters." })
+    .optional(),
+
   links: z
     .array(
       z.object({
@@ -70,7 +79,7 @@ export const ProfileDetailsSchema = z.object({
         url: z.string().url("Must be a valid URL"),
       })
     )
-    .min(1, "At least one link is required"),
+    .optional(),
 });
 
 export const AvatarSchema = z.object({

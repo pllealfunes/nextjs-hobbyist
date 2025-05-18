@@ -24,7 +24,7 @@ https://nextjs-hobbyist.vercel.app/
 
 ## Current Tasks:
 
-- [ ] mark profile private or public
+- [ ] convert POST CRUD logic to server actions if needed
 
 ## Project Tasks:
 
@@ -37,6 +37,7 @@ https://nextjs-hobbyist.vercel.app/
 - [ ] create like functionality
 
 - [ ] follow and unfollow users
+- [ ] mark profile private or public
 - [ ] follow and unfollow categories
 
 - [ ] display data in charts

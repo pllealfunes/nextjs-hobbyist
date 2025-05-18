@@ -19,7 +19,7 @@ import {
 import { toast } from "react-hot-toast";
 import { Post, Category } from "@/lib/types";
 import DeleteConfirmationDialog from "@/ui/components/deleteConfirmationDialog";
-import { deletePost } from "@/lib/actions";
+import { deletePost } from "@/app/posts/actions";
 
 interface FinalPayload {
   content: string; // The updated content of the post

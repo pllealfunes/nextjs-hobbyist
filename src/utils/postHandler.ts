@@ -188,6 +188,7 @@ export const deleteImageFromCloudinary = async (imageUrl: string) => {
     console.warn("Could not extract public_id from image URL:", imageUrl);
     return;
   }
+  console.log("Extracted Public ID:", public_id);
 
   try {
     const response = await fetch("/api/delete-image", {
