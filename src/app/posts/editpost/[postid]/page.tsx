@@ -20,11 +20,6 @@ import { Post, Category } from "@/lib/types";
 import DeleteConfirmationDialog from "@/ui/components/deleteConfirmationDialog";
 import { deletePost, updatePost } from "@/app/server/postActions";
 
-interface FinalPayload {
-  content: string; // The updated content of the post
-  coverphoto?: string | null | undefined; // Optional Cloudinary URL for the cover photo
-}
-
 // Define the type for form data
 type FormData = z.infer<typeof CreatePostSchema>;
 

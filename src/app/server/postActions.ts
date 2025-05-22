@@ -1,6 +1,5 @@
 "use server";
 
-import { toast } from "react-hot-toast";
 import { createClient } from "@/utils/supabase/server";
 import { v2 as cloudinary } from "cloudinary";
 import { extractImages } from "@/app/server/utils/postUtils";
