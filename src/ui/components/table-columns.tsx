@@ -7,7 +7,7 @@ import { ArrowUpDown, Trash2, Pencil } from "lucide-react";
 import Link from "next/link";
 import { Post } from "@/lib/types";
 import DeleteConfirmationDialog from "@/ui/components/deleteConfirmationDialog";
-import { deletePost } from "@/app/posts/actions";
+import { deleteSinglePost } from "@/app/posts/actions";
 
 export const columns = (
   getCategoryName: (categoryId: number) => string,
@@ -90,7 +90,7 @@ export const columns = (
           trigger={
             <Trash2 className="text-red-500 cursor-pointer over:text-red-600 transition" />
           }
-          onConfirm={() => deletePost(row.original.id, onDeleteSuccess)}
+          onConfirm={() => deleteSinglePost(row.original.id, onDeleteSuccess)}
         />
       </div>
     ),

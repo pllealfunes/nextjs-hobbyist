@@ -9,17 +9,16 @@ import { CreatePostSchema } from "@/app/schemas";
 import { Skeleton } from "@/ui/components/skeleton";
 import { Trash2 } from "lucide-react";
 import {
-  extractImages,
   fileToBase64,
   uploadImageToCloudinary,
   coverphotoImageToCloudinary,
-  deleteImageFromCloudinary,
-  removeDeletedCloudinaryImages,
 } from "@/utils/postHandler";
+import { deleteImageFromCloudinary } from "@/app/server/utils/cloudinaryUtils";
+import { processPostImages } from "@/app/server/processPostImages";
 import { toast } from "react-hot-toast";
 import { Post, Category } from "@/lib/types";
 import DeleteConfirmationDialog from "@/ui/components/deleteConfirmationDialog";
-import { deletePost } from "@/app/posts/actions";
+import { deletePost, updatePost } from "@/app/server/postActions";
 
 interface FinalPayload {
   content: string; // The updated content of the post
@@ -65,7 +64,6 @@ export default function EditPost() {
     router.push("/dashboard");
   };
 
-  // Define the type for 'data'
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     if (!post) {
       throw new Error("Post is null. Cannot proceed.");
@@ -73,38 +71,33 @@ export default function EditPost() {
 
     await toast.promise(
       (async () => {
-        const { existingImages: oldImages } = extractImages(post.content);
-        const { newImages, existingImages: newExistingImages } = extractImages(
+        const result = await processPostImages(
+          post.id,
+          post.content,
           data.content
         );
 
-        const imagesToDelete = oldImages.filter(
-          (img) => !newExistingImages.includes(img)
-        );
-
-        for (const imageUrl of imagesToDelete) {
-          await deleteImageFromCloudinary(imageUrl);
+        if (!result.success) {
+          toast.error(`Failed to process images: ${result.error}`);
+          return;
         }
 
-        let cleanedContent = removeDeletedCloudinaryImages(
-          data.content,
-          imagesToDelete
-        );
+        let cleanedContent = result.cleanedContent;
+        const newImages = result.newImages;
 
         const payload = {
           title: data.title,
           category_id: parseInt(data.category, 10),
-          content: data.content,
+          content: cleanedContent,
           published: data.published,
         };
 
-        const response = await fetch(`/api/posts/${post?.id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
+        const postUpdateResult = await updatePost(post.id, payload);
 
-        if (!response.ok) throw new Error("Failed to update post details");
+        if (!postUpdateResult.success) {
+          toast.error(`Failed to update post: ${postUpdateResult.error}`);
+          return; // ❌ Prevent image deletion if the post update fails
+        }
 
         const uploadedImageUrls = await Promise.all(
           newImages.map(async (image) => {
@@ -122,10 +115,6 @@ export default function EditPost() {
           cleanedContent = cleanedContent.replace(original, cloudinaryUrl);
         });
 
-        if (isDeleted && post.coverphoto && !data.coverphoto) {
-          await deleteImageFromCloudinary(post.coverphoto);
-        }
-
         let coverPhotoUrl = null;
 
         if (data.coverphoto instanceof File) {
@@ -141,7 +130,9 @@ export default function EditPost() {
           coverPhotoUrl = post.coverphoto;
         }
 
-        const finalPayload: FinalPayload = { content: cleanedContent };
+        const finalPayload: { content: string; coverphoto?: string | null } = {
+          content: cleanedContent,
+        };
 
         if (isDeleted && !data.coverphoto && post.coverphoto) {
           finalPayload.coverphoto = null;
@@ -149,18 +140,25 @@ export default function EditPost() {
           finalPayload.coverphoto = coverPhotoUrl;
         }
 
-        const finalResponse = await fetch(`/api/posts/${post?.id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(finalPayload),
-        });
+        const finalResponse = await updatePost(post.id, finalPayload);
 
-        if (!finalResponse.ok) {
-          throw new Error("Failed to update post with Cloudinary URLs");
+        if (!finalResponse.success) {
+          toast.error(`Failed to update post: ${finalResponse.error}`);
+          return;
         }
 
-        const getCategory = getCategoryName(Number(data.category));
+        await Promise.all(
+          result.imagesToDelete.map(async (imageUrl) => {
+            await deleteImageFromCloudinary(imageUrl);
+          })
+        );
 
+        if (post.coverphoto && isDeleted && !data.coverphoto) {
+          await deleteImageFromCloudinary(post.coverphoto);
+        }
+
+        // Redirect after successful edit
+        const getCategory = getCategoryName(Number(data.category));
         router.push(
           data.published
             ? `/posts/${post?.id}/post?category=${getCategory.toLowerCase()}`
@@ -170,7 +168,7 @@ export default function EditPost() {
       {
         loading: "Saving changes...",
         success: data.published
-          ? "Post created successfully!"
+          ? "Post updated successfully!"
           : "Draft saved successfully!",
         error: (err) => `Something went wrong while saving: ${err.toString()}`,
       }
@@ -187,7 +185,20 @@ export default function EditPost() {
               trigger={
                 <Trash2 className="text-red-500 cursor-pointer w-9 h-9" />
               }
-              onConfirm={() => deletePost(post.id, onDeleteSuccess)}
+              onConfirm={async () => {
+                try {
+                  const result = await deletePost(post.id);
+
+                  if (!result.success) {
+                    toast.error(`Failed to delete post: ${result.error}`);
+                  } else {
+                    toast.success("Post deleted successfully!");
+                    onDeleteSuccess();
+                  }
+                } catch (error) {
+                  toast.error(`Unexpected error: ${error}`);
+                }
+              }}
             />
           </div>
 

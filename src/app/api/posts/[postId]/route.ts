@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
-import { extractImages } from "@/utils/postHandler";
+import { extractImages } from "@/app/server/utils/postUtils";
 import { v2 as cloudinary } from "cloudinary";
 import { extractPublicIdFromUrl } from "@/utils/postHandler";
 

@@ -6,6 +6,7 @@ import { DataTable } from "@/ui/components/data-table";
 import PostCalendar from "@/ui/components/calendar";
 import { LikesCommentsChart } from "@/ui/components/likescomments-chart";
 import { Post, Category } from "@/lib/types";
+import { getDraftPosts } from "@/app/server/postActions";
 
 export default function Drafts() {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -13,14 +14,7 @@ export default function Drafts() {
 
   const fetchData = useCallback(async () => {
     try {
-      const response = await fetch("/api/posts/drafts");
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-
+      const data = await getDraftPosts();
       if (Array.isArray(data)) {
         setPosts(data); // empty array = no posts, still valid
       } else {

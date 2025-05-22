@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import { Post } from "@/lib/types";
 import DeleteConfirmationDialog from "@/ui/components/deleteConfirmationDialog";
-import { deletePost } from "@/app/posts/actions";
+import { deleteSinglePost } from "@/app/posts/actions";
 import { useRouter } from "next/navigation";
 
 export default function PostPage() {
@@ -54,6 +54,7 @@ export default function PostPage() {
   if (!post) {
     return <div>Loading...</div>;
   }
+
   const onDeleteSuccess = async () => {
     router.push("/dashboard");
   };
@@ -78,7 +79,7 @@ export default function PostPage() {
               trigger={
                 <Trash2 className="text-red-500 cursor-pointer w-9 h-9 hover:text-red-600 transition" />
               }
-              onConfirm={() => deletePost(post.id, onDeleteSuccess)}
+              onConfirm={() => deleteSinglePost(post.id, onDeleteSuccess)}
             />
           </div>
           <article>

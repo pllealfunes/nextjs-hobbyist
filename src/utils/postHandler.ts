@@ -1,30 +1,30 @@
 import { Post, UserProfile } from "@/lib/types";
 
-type ExtractedImages = {
-  newImages: string[]; // Base64 or temporary URLs
-  existingImages: string[]; // Cloudinary URLs
-};
+// type ExtractedImages = {
+//   newImages: string[]; // Base64 or temporary URLs
+//   existingImages: string[]; // Cloudinary URLs
+// };
 
-export const extractImages = (content: string): ExtractedImages => {
-  const imageRegex = /<img[^>]*src="([^"]+)"[^>]*>/g; // Regex to extract image `src`
-  const cloudinaryUrlPrefix = "https://res.cloudinary.com"; // Cloudinary URL prefix
+// export const extractImages = (content: string): ExtractedImages => {
+//   const imageRegex = /<img[^>]*src="([^"]+)"[^>]*>/g; // Regex to extract image `src`
+//   const cloudinaryUrlPrefix = "https://res.cloudinary.com"; // Cloudinary URL prefix
 
-  const newImages: string[] = [];
-  const existingImages: string[] = [];
+//   const newImages: string[] = [];
+//   const existingImages: string[] = [];
 
-  let match;
-  while ((match = imageRegex.exec(content)) !== null) {
-    const imageUrl = match[1]; // Extract the `src` attribute value
+//   let match;
+//   while ((match = imageRegex.exec(content)) !== null) {
+//     const imageUrl = match[1]; // Extract the `src` attribute value
 
-    if (imageUrl.startsWith(cloudinaryUrlPrefix)) {
-      existingImages.push(imageUrl); // Categorize as existing Cloudinary image
-    } else {
-      newImages.push(imageUrl); // Categorize as a new image (base64 or temporary URL)
-    }
-  }
+//     if (imageUrl.startsWith(cloudinaryUrlPrefix)) {
+//       existingImages.push(imageUrl); // Categorize as existing Cloudinary image
+//     } else {
+//       newImages.push(imageUrl); // Categorize as a new image (base64 or temporary URL)
+//     }
+//   }
 
-  return { newImages, existingImages };
-};
+//   return { newImages, existingImages };
+// };
 
 export const base64ToBlob = (base64: string): Blob => {
   if (!base64 || !base64.includes(",")) {
@@ -66,6 +66,22 @@ export const fileToBase64 = (file: File): Promise<string> => {
     reader.onerror = (error) => reject(error);
     reader.readAsDataURL(file);
   });
+};
+
+export const replaceBase64WithCloudinaryUrls = (
+  html: string,
+  uploadedImageUrls: { original: string; cloudinaryUrl: string }[]
+) => {
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  const imgs = doc.querySelectorAll("img");
+
+  imgs.forEach((img) => {
+    const src = img.getAttribute("src");
+    const match = uploadedImageUrls.find((u) => u.original === src);
+    if (match) img.setAttribute("src", match.cloudinaryUrl);
+  });
+
+  return doc.body.innerHTML;
 };
 
 export const uploadImageToCloudinary = async (
@@ -136,36 +152,20 @@ export const coverphotoImageToCloudinary = async (
   return (await uploadRes.json()).secure_url;
 };
 
-export const removeDeletedCloudinaryImages = (
-  content: string,
-  imagesToDelete: string[]
-): string => {
-  let cleanedContent = content;
+// export const removeDeletedCloudinaryImages = (
+//   content: string,
+//   imagesToDelete: string[]
+// ): string => {
+//   let cleanedContent = content;
 
-  for (const imageUrl of imagesToDelete) {
-    const escapedUrl = imageUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const regex = new RegExp(`<img[^>]*src="${escapedUrl}"[^>]*>`, "g");
-    cleanedContent = cleanedContent.replace(regex, "");
-  }
+//   for (const imageUrl of imagesToDelete) {
+//     const escapedUrl = imageUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+//     const regex = new RegExp(`<img[^>]*src="${escapedUrl}"[^>]*>`, "g");
+//     cleanedContent = cleanedContent.replace(regex, "");
+//   }
 
-  return cleanedContent;
-};
-
-export const replaceBase64WithCloudinaryUrls = (
-  html: string,
-  uploadedImageUrls: { original: string; cloudinaryUrl: string }[]
-) => {
-  const doc = new DOMParser().parseFromString(html, "text/html");
-  const imgs = doc.querySelectorAll("img");
-
-  imgs.forEach((img) => {
-    const src = img.getAttribute("src");
-    const match = uploadedImageUrls.find((u) => u.original === src);
-    if (match) img.setAttribute("src", match.cloudinaryUrl);
-  });
-
-  return doc.body.innerHTML;
-};
+//   return cleanedContent;
+// };
 
 export const extractPublicIdFromUrl = (url: string): string | null => {
   try {
@@ -181,41 +181,41 @@ export const extractPublicIdFromUrl = (url: string): string | null => {
 };
 
 // Deletes image from Cloudinary via your API route
-export const deleteImageFromCloudinary = async (
-  imageUrl: string
-): Promise<{ success: boolean; error?: string }> => {
-  const public_id = extractPublicIdFromUrl(imageUrl);
+// export const deleteImageFromCloudinary = async (
+//   imageUrl: string
+// ): Promise<{ success: boolean; error?: string }> => {
+//   const public_id = extractPublicIdFromUrl(imageUrl);
 
-  if (!public_id) {
-    console.warn("Could not extract public_id from image URL:", imageUrl);
-    return { success: false, error: "Invalid image URL" };
-  }
+//   if (!public_id) {
+//     console.warn("Could not extract public_id from image URL:", imageUrl);
+//     return { success: false, error: "Invalid image URL" };
+//   }
 
-  try {
-    const response = await fetch("/api/delete-image", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ public_id }),
-    });
+//   try {
+//     const response = await fetch("/api/delete-image", {
+//       method: "POST",
+//       headers: { "Content-Type": "application/json" },
+//       body: JSON.stringify({ public_id }),
+//     });
 
-    if (!response.ok) {
-      throw new Error(`API responded with status ${response.status}`);
-    }
+//     if (!response.ok) {
+//       throw new Error(`API responded with status ${response.status}`);
+//     }
 
-    const data = await response.json();
-    if (data.error) {
-      throw new Error(data.error);
-    }
+//     const data = await response.json();
+//     if (data.error) {
+//       throw new Error(data.error);
+//     }
 
-    return { success: true };
-  } catch (error) {
-    console.error("Error deleting image from Cloudinary:", error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Unknown error occurred",
-    };
-  }
-};
+//     return { success: true };
+//   } catch (error) {
+//     console.error("Error deleting image from Cloudinary:", error);
+//     return {
+//       success: false,
+//       error: error instanceof Error ? error.message : "Unknown error occurred",
+//     };
+//   }
+// };
 
 export const avatarToCloudinary = async (
   image: string,

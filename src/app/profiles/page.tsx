@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import DashboardPosts from "@/ui/components/dashboard-posts";
 import UserProfile from "@/ui/components/userprofile";
 import { Post, Category } from "@/lib/types";
+import { getPublishedPosts } from "@/app/server/postActions";
 import { useAuth } from "@/contexts/authContext";
 
 export default function Profile() {
@@ -14,8 +15,7 @@ export default function Profile() {
   useEffect(() => {
     async function getPosts() {
       try {
-        const response = await fetch("/api/posts/published");
-        const data = await response.json();
+        const data = await getPublishedPosts();
 
         const categoriesResponse = await fetch("/api/categories");
         const categoriesData: Category[] = await categoriesResponse.json();

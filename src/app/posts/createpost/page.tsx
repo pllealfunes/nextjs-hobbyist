@@ -8,13 +8,14 @@ import { z } from "zod";
 import { Skeleton } from "@/ui/components/skeleton";
 import { Category } from "@/lib/types";
 import {
-  extractImages,
   fileToBase64,
   uploadImageToCloudinary,
   coverphotoImageToCloudinary,
   replaceBase64WithCloudinaryUrls,
 } from "@/utils/postHandler";
+import { extractImages } from "@/app/server/utils/postUtils";
 import { toast } from "react-hot-toast";
+import { createPost, updatePost } from "@/app/server/postActions";
 
 // Define the type for form data
 type FormData = z.infer<typeof CreatePostSchema>;
@@ -48,26 +49,26 @@ export default function CreatePost() {
     await toast.promise(
       (async () => {
         // STEP 1 — Create the post (no images yet)
-        const createRes = await fetch("/api/posts", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            title: data.title,
-            category_id: parseInt(data.category, 10),
-            content: data.content,
-            published: data.published,
-          }),
-        });
+        const formData = {
+          title: data.title,
+          category_id: parseInt(data.category, 10),
+          content: data.content,
+          published: data.published,
+        };
 
-        if (!createRes.ok) throw new Error("Failed to create post");
-        const post = await createRes.json();
+        const post = await createPost(formData);
+
+        if (!post.success) {
+          toast.error(`Failed to create post: ${post.error}`);
+          return;
+        }
 
         // STEP 2 — Upload content images to Cloudinary
         const { newImages } = extractImages(data.content);
         const uploadedImageUrls = await Promise.all(
           newImages.map(async (base64) => ({
             original: base64,
-            cloudinaryUrl: await uploadImageToCloudinary(base64, post),
+            cloudinaryUrl: await uploadImageToCloudinary(base64, post.post),
           }))
         );
 
@@ -77,35 +78,43 @@ export default function CreatePost() {
           uploadedImageUrls
         );
 
-        // STEP 4 — Update post with Cloudinary image URLs
-        const updateContentRes = await fetch(`/api/posts/${post.id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ content: updatedContent }),
+        // STEP 4 — Update the post with new Cloudinary image URLs
+        const updateContentResult = await updatePost(post.post.id, {
+          content: updatedContent,
         });
 
-        if (!updateContentRes.ok) throw new Error("Failed to update content");
+        if (!updateContentResult.success) {
+          toast.error(
+            `Failed to update post content: ${updateContentResult.error}`
+          );
+          return;
+        }
 
         // STEP 5 — Upload cover photo (if file exists)
         if (data.coverphoto instanceof File) {
           const base64 = await fileToBase64(data.coverphoto);
-          const coverPhotoUrl = await coverphotoImageToCloudinary(base64, post);
+          const coverPhotoUrl = await coverphotoImageToCloudinary(
+            base64,
+            post.post
+          );
 
-          const updateCoverRes = await fetch(`/api/posts/${post.id}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ coverphoto: coverPhotoUrl }),
+          const result = await updatePost(post.post.id, {
+            coverphoto: coverPhotoUrl,
           });
 
-          if (!updateCoverRes.ok)
-            throw new Error("Failed to update cover photo");
+          if (!result.success) {
+            toast.error(`Failed to update post: ${result.error}`);
+            return;
+          }
         }
 
         // STEP 6 — Redirect
         const categoryName = getCategoryName(Number(data.category));
         router.push(
           data.published
-            ? `/posts/${post.id}/post?category=${categoryName.toLowerCase()}`
+            ? `/posts/${
+                post.post.id
+              }/post?category=${categoryName.toLowerCase()}`
             : "/posts/drafts"
         );
       })(),

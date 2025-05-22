@@ -1,5 +1,6 @@
 "use server";
 import { createClient } from "@/utils/supabase/server";
+import { deleteImageFromCloudinary } from "@/app/server/utils/cloudinaryUtils";
 
 export async function changeEmail(newEmail: string) {
   try {
@@ -214,7 +215,7 @@ export async function deleteAvatarPhoto() {
   try {
     const supabase = await createClient();
 
-    // Get the authenticated user
+    // Get authenticated user
     const {
       data: { user },
       error: authError,
@@ -224,19 +225,33 @@ export async function deleteAvatarPhoto() {
       throw new Error("Unauthorized");
     }
 
-    // Remove avatar reference in Supabase
-    const { error } = await supabase
+    // Get user's current avatar
+    const { data: profile, error: fetchError } = await supabase
+      .from("Profile")
+      .select("photo")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (fetchError) throw new Error(fetchError.message);
+    if (!profile || !profile.photo) {
+      throw new Error("No avatar to delete.");
+    }
+
+    // Step 1️⃣: Delete the avatar from Cloudinary
+    await deleteImageFromCloudinary(profile.photo);
+
+    // Step 2️⃣: Remove avatar reference in Supabase
+    const { error: updateError } = await supabase
       .from("Profile")
       .update({ photo: null })
       .eq("id", user.id);
 
-    if (error) {
-      throw new Error(`Failed to update profile: ${error.message}`);
-    }
+    if (updateError)
+      throw new Error(`Failed to update profile: ${updateError.message}`);
 
     return { success: true, message: "Avatar deleted successfully!" };
   } catch (error) {
-    console.error("Avatar delete error:", error);
+    console.error("Error deleting avatar:", error);
     return {
       success: false,
       error: error instanceof Error ? error.message : "Internal Server Error",

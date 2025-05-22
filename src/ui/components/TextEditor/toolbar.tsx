@@ -295,7 +295,7 @@ export default function ToolBar({ editor }: ToolBarProps) {
         </DialogTrigger>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Add Video</DialogTitle>
+            <DialogTitle className="text-slate-800">Add Video</DialogTitle>
             <DialogDescription>
               Paste a link from YouTube or Vimeo.
             </DialogDescription>
@@ -309,6 +309,7 @@ export default function ToolBar({ editor }: ToolBarProps) {
                 value={videoUrl}
                 onChange={(e) => setVideoUrl(e.target.value)}
                 placeholder="https://www.youtube.com/embed/..."
+                className="text-slate-800"
               />
             </div>
           </div>

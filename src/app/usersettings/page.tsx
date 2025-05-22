@@ -50,11 +50,7 @@ import PhotoUploader from "@/ui/components/photo-uploader";
 import DeleteAvatarConfirmation from "@/ui/components/deleteAvatarConfirmation";
 import { Skeleton } from "@/ui/components/skeleton";
 import { toast } from "react-hot-toast";
-import {
-  fileToBase64,
-  avatarToCloudinary,
-  deleteImageFromCloudinary,
-} from "@/utils/postHandler";
+import { fileToBase64, avatarToCloudinary } from "@/utils/postHandler";
 import { useRouter } from "next/navigation";
 
 // Define the type for forms data
@@ -184,10 +180,6 @@ export default function UserSettings() {
 
     await toast.promise(
       (async () => {
-        // Step 1: Delete the avatar from Cloudinary (client-side)
-        await deleteImageFromCloudinary(avatarPhoto);
-
-        // Step 2: Update the profile in Supabase via server action
         const result = await deleteAvatarPhoto();
 
         if (!result.success) {

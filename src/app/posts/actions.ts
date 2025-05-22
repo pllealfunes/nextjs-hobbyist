@@ -1,24 +1,26 @@
 import { toast } from "react-hot-toast";
+import { deletePost } from "@/app/server/postActions";
 
-export const deletePost = async (postId: string, onSuccess?: () => void) => {
+export const deleteSinglePost = async (
+  postId: string,
+  onSuccess?: () => void
+) => {
   await toast.promise(
     async () => {
-      const res = await fetch(`/api/posts/${postId}`, {
-        method: "DELETE",
-      });
+      const deletedPost = await deletePost(postId);
 
-      if (!res.ok) {
-        const { error } = await res.json();
-        throw new Error(error || "Failed to delete post");
+      if (!deletedPost.success) {
+        throw new Error(deletedPost.error || "Failed to delete post");
       }
 
-      onSuccess?.();
+      if (onSuccess) {
+        onSuccess();
+      }
     },
     {
       loading: "Deleting post...",
       success: "Post deleted successfully!",
-      error: (err) =>
-        `Something went wrong while deleting the post: ${err.toString()}`,
+      error: (err) => `Something went wrong: ${err.toString()}`,
     }
   );
 };

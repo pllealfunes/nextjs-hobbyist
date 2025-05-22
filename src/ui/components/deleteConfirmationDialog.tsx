@@ -13,7 +13,7 @@ import { Button } from "@/ui/components/button";
 import { useState } from "react";
 
 type DeleteConfirmationDialogProps = {
-  onConfirm: () => Promise<void>; // must return a Promise
+  onConfirm: () => Promise<void>;
   trigger: React.ReactNode;
 };
 

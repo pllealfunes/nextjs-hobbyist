@@ -6,6 +6,7 @@ import { columns } from "@/ui/components/table-columns";
 import { DataTable } from "@/ui/components/data-table";
 import PostCalendar from "@/ui/components/calendar";
 import { LikesCommentsChart } from "@/ui/components/likescomments-chart";
+import { getPublishedPosts } from "@/app/server/postActions";
 
 export default function Published() {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -13,13 +14,7 @@ export default function Published() {
 
   const fetchData = useCallback(async () => {
     try {
-      const response = await fetch("/api/posts/published");
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
+      const data = await getPublishedPosts();
 
       if (Array.isArray(data)) {
         setPosts(data); // empty array = no posts, still valid
