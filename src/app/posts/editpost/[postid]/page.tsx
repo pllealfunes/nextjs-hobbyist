@@ -19,35 +19,45 @@ import { toast } from "react-hot-toast";
 import { Post, Category } from "@/lib/types";
 import DeleteConfirmationDialog from "@/ui/components/deleteConfirmationDialog";
 import { deletePost, updatePost } from "@/app/server/postActions";
+import { getPostById } from "@/app/server/postActions";
 
 // Define the type for form data
 type FormData = z.infer<typeof CreatePostSchema>;
 
 export default function EditPost() {
   const { postid } = useParams();
-  //const searchParams = useSearchParams();
   const [post, setPost] = useState<Post | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const router = useRouter();
   const [isDeleted, setIsDeleted] = useState(false);
 
+  const safePostId = typeof postid === "string" ? postid : "";
+
   useEffect(() => {
-    async function loadCategories() {
+    async function loadData() {
       try {
-        const resCategories = await fetch("/api/categories");
-        const categoriesFecthed = await resCategories.json();
+        // ✅ Use server actions instead of API requests
+        const categoryRresponse = await fetch("/api/categories");
+        const categoryData = await categoryRresponse.json();
+        const postResponse = await getPostById(safePostId);
 
-        const resPost = await fetch(`/api/posts/post?id=${postid}`);
-        const postFetched = await resPost.json();
+        if (!categoryData || !postResponse.success) {
+          console.error(
+            "Error fetching data:",
+            categoryData.error,
+            postResponse.error
+          );
+          return;
+        }
 
-        setCategories(categoriesFecthed);
-        setPost(postFetched);
+        setCategories(categoryData);
+        setPost(postResponse.post);
       } catch (error) {
-        console.error("Error fetching categories", error);
+        console.error("❌ Error fetching data:", error);
       }
     }
 
-    loadCategories();
+    loadData();
   }, [postid]);
 
   const getCategoryName = (categoryId: number): string => {

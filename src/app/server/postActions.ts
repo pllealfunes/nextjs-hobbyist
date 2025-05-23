@@ -5,6 +5,38 @@ import { v2 as cloudinary } from "cloudinary";
 import { extractImages } from "@/app/server/utils/postUtils";
 import { extractPublicIdFromUrl } from "@/utils/postHandler";
 
+export async function getPostById(postId: string) {
+  try {
+    const supabase = await createClient();
+
+    if (!postId) {
+      throw new Error("Post ID is required");
+    }
+
+    console.log("🔍 Fetching post with ID:", postId);
+
+    // Fetch post data by ID
+    const { data: post, error } = await supabase
+      .from("Post")
+      .select("*")
+      .eq("id", postId)
+      .maybeSingle(); // ✅ Ensures single result or null
+
+    if (error) throw new Error(`Error fetching post: ${error.message}`);
+    if (!post) throw new Error("Post not found");
+
+    console.log("📌 Found post:", post);
+
+    return { success: true, post };
+  } catch (error) {
+    console.error("❌ Error fetching post:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Internal server error",
+    };
+  }
+}
+
 export async function getPublishedPosts() {
   try {
     const supabase = await createClient();

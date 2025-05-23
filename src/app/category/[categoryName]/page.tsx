@@ -13,6 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/ui/components/select";
+import { getCategoryWithPosts } from "@/app/server/categoryActions";
 
 const CategoryPage = () => {
   const params = useParams();
@@ -45,14 +46,14 @@ const CategoryPage = () => {
 
         const [categoriesResponse, postsResponse] = await Promise.all([
           fetch("/api/categories"),
-          fetch(`/api/categories/category?category=${categoryName}`),
+          getCategoryWithPosts(categoryName),
         ]);
 
         const categoriesData: Category[] = await categoriesResponse.json();
-        const postsData = await postsResponse.json();
+        const postsData = postsResponse.posts;
 
         setCategories(categoriesData);
-        setPosts(postsData);
+        setPosts(postsData ?? []);
         setDisplayCategory(
           capitalizeFirstLetter(decodeURIComponent(categoryName))
         );
