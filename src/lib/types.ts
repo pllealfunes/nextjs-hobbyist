@@ -1,7 +1,7 @@
 export interface Post {
   id: string;
   title: string;
-  coverphoto: string | null | undefined;
+  coverphoto?: string;
   content: string;
   category_id: number;
   published: boolean;
@@ -11,12 +11,31 @@ export interface Post {
   updated_at: Date;
 }
 
-export type Category = {
+export interface Category {
   id: number;
   name: string;
-};
+}
 
-export type UserProfile = {
+export interface Comment {
+  id: string;
+  post_id: string;
+  author_id: string;
+  comment: string;
+  created_at: string;
+  updated_at?: string;
+  author: {
+    id: string;
+    username: string;
+    photo?: string;
+  };
+}
+
+export interface SocialLink {
+  label: string;
+  url: string;
+}
+
+export interface UserProfile {
   id: string;
   name: string;
   username: string;
@@ -24,5 +43,5 @@ export type UserProfile = {
   role: "ADMIN" | "USER";
   bio?: string;
   photo?: string;
-  links?: { label: string; url: string }[]; // Links as an array of objects with label and url
-};
+  links?: SocialLink[];
+}

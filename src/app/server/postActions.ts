@@ -20,10 +20,9 @@ export async function getPostById(postId: string) {
       .from("Post")
       .select("*")
       .eq("id", postId)
-      .maybeSingle(); // ✅ Ensures single result or null
+      .maybeSingle();
 
     if (error) throw new Error(`Error fetching post: ${error.message}`);
-    if (!post) throw new Error("Post not found");
 
     console.log("📌 Found post:", post);
 
