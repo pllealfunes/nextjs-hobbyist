@@ -24,14 +24,12 @@ https://nextjs-hobbyist.vercel.app/
 
 ## Current Tasks:
 
-- [ ] convert POST CRUD logic to server actions if needed
-
-## Project Tasks:
-
 - [ ] create new comment
 - [ ] view updated comment
 - [ ] update new comment
 - [ ] delete comment
+
+## Project Tasks:
 
 - [ ] search posts
 - [ ] create like functionality
