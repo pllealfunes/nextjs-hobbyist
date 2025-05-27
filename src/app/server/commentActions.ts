@@ -155,10 +155,14 @@ export async function deleteComment(commentId: string) {
 
     // Delete comment from supabase
 
-    const { error } = await supabase
+    const { error: commentError } = await supabase
       .from("Comment")
       .delete()
       .eq("comment_id", commentId);
+
+    if (commentError) {
+      throw new Error("Error deleting comment:", commentError);
+    }
 
     return { success: true, message: "Comment deleted" };
   } catch (error) {
