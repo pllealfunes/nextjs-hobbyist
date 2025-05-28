@@ -53,6 +53,13 @@ export const CreatePostSchema = z.object({
   published: z.boolean(),
 });
 
+export const CreateCommentSchema = z.object({
+  content: z
+    .string()
+    .min(5, "A minimium of at least 5 characters is required")
+    .max(200),
+});
+
 export const ProfileDetailsSchema = z.object({
   name: z
     .string()

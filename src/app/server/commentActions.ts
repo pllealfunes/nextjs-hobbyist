@@ -17,7 +17,7 @@ export async function getCommentsById(postId: string) {
         id,
         post_id,
         author_id,
-        comment,
+        content,
         created_at,
         updated_at,
         User:author_id (id, username),
@@ -44,10 +44,10 @@ export async function getCommentsById(postId: string) {
 
 export async function createComment({
   postId,
-  comment,
+  content,
 }: {
   postId: string;
-  comment: string;
+  content: string;
 }) {
   try {
     const supabase = await createClient();
@@ -66,8 +66,8 @@ export async function createComment({
       .from("Comment")
       .insert([
         {
+          content: content,
           post_id: postId,
-          comment: comment,
           author_id: user.id,
         },
       ])

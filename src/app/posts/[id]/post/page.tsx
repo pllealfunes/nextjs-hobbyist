@@ -20,17 +20,30 @@ import {
   Pencil,
 } from "lucide-react";
 import { Post, Comment } from "@/lib/types";
+import { CreateCommentSchema } from "@/app/schemas";
 import DeleteConfirmationDialog from "@/ui/components/deleteConfirmationDialog";
 import { deleteSinglePost } from "@/app/posts/actions";
 import { useRouter } from "next/navigation";
 import {
   getCommentsById,
-  // createComment,
+  createComment,
   // updateComment,
   // deleteComment,
 } from "@/app/server/commentActions";
 import { getPostById } from "@/app/server/postActions";
 import PostSkeleton from "@/ui/components/postSkeleton";
+import { toast } from "react-hot-toast";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/ui/components/form";
 
 export default function PostPage() {
   const { id } = useParams();
@@ -68,13 +81,13 @@ export default function PostPage() {
           id: comment.id,
           post_id: comment.post_id,
           author_id: comment.author_id,
-          comment: comment.comment,
+          comment: comment.content,
           created_at: comment.created_at,
           updated_at: comment.updated_at,
 
           // ✅ Restructure `User` + `Profile` data into a single `author` object
           author: {
-            id: comment.author_id, // ✅ Fix missing comma issue
+            id: comment.author_id,
             username: comment.User?.[0]?.username || "Anonymous",
             profileImage: comment.Profile?.[0]?.photo || "",
           },
@@ -105,6 +118,45 @@ export default function PostPage() {
 
   const onDeleteSuccess = async () => {
     router.push("/dashboard");
+  };
+
+  const form = useForm<z.infer<typeof CreateCommentSchema>>({
+    resolver: zodResolver(CreateCommentSchema),
+    defaultValues: {
+      content: "",
+    },
+  });
+
+  const onSubmit: SubmitHandler<z.infer<typeof CreateCommentSchema>> = async (
+    data
+  ) => {
+    const submitComment = async () => {
+      if (!post?.id) {
+        toast.error("Post ID is missing. Cannot create a comment.");
+        return;
+      }
+
+      // STEP 1 — Create the comment
+      const formData = {
+        content: data.content,
+        postId: post?.id ?? "",
+      };
+
+      const comment = await createComment(formData);
+
+      if (!comment.success) {
+        throw new Error(`Failed to create comment: ${comment.error}`);
+      }
+
+      return comment;
+    };
+
+    await toast.promise(submitComment(), {
+      loading: "Creating Comment...",
+      success: "Comment Created Successfully!",
+      error: (err) =>
+        `Something went wrong while creating the comment: ${err.message}`,
+    });
   };
 
   return (
@@ -235,16 +287,40 @@ export default function PostPage() {
                 Leave a Comment
               </h3>
               <div className="bg-white rounded-lg shadow p-4">
-                <Textarea
-                  placeholder="Write your comment here..."
-                  className="mb-4 border-blue-200 focus:border-blue-500 focus:ring-blue-500"
-                />
-                <div className="flex justify-end">
-                  <Button className="bg-rose-500 hover:bg-rose-600 text-white">
-                    <Send className="h-4 w-4 mr-2" />
-                    Post Comment
-                  </Button>
-                </div>
+                <Form {...form}>
+                  <form
+                    onSubmit={form.handleSubmit(onSubmit)}
+                    className="space-y-4"
+                  >
+                    <FormField
+                      control={form.control}
+                      name="content"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="hidden">Comment:</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              {...field}
+                              rows={5}
+                              placeholder="Write your comment here..."
+                              className="mb-4 border-blue-200 focus:border-blue-500 focus:ring-blue-500 text-gray-900"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <div className="flex justify-end">
+                      <Button
+                        className="bg-rose-500 hover:bg-rose-600 text-white"
+                        type="submit"
+                      >
+                        <Send className="h-4 w-4 mr-2" />
+                        Comment
+                      </Button>
+                    </div>
+                  </form>
+                </Form>
               </div>
             </div>
             <section className="mt-12">
