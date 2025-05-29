@@ -26,8 +26,8 @@ export async function getCommentsById(postId: string) {
       .select("id, username")
       .in("id", authorIds); // Ensure it is a proper array
 
-    if (!users || users.length === 0) {
-      throw new Error("No users found");
+    if (!users || users.length === 0 || userError) {
+      throw new Error(`Unable to find users: ${userError}`);
     }
 
     const { data: profiles = [], error: profileError } = await supabase
@@ -35,8 +35,8 @@ export async function getCommentsById(postId: string) {
       .select("id, photo")
       .in("id", authorIds);
 
-    if (!profiles || profiles.length === 0) {
-      throw new Error("No comments found");
+    if (!profiles || profiles.length === 0 || profileError) {
+      throw new Error(`Unable to find users: ${profileError}`);
     }
 
     // Merge data manually
