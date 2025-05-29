@@ -76,23 +76,22 @@ export default function PostPage() {
         return;
       }
 
-      setComments(
+      const formattedComments =
         response.comments?.map((comment) => ({
           id: comment.id,
           post_id: comment.post_id,
           author_id: comment.author_id,
-          comment: comment.content,
+          comment: comment.content, // ✅ Rename `content` → `comment`
           created_at: comment.created_at,
           updated_at: comment.updated_at,
-
-          // ✅ Restructure `User` + `Profile` data into a single `author` object
           author: {
             id: comment.author_id,
-            username: comment.User?.[0]?.username || "Anonymous",
-            profileImage: comment.Profile?.[0]?.photo || "",
+            username: comment.user?.username,
+            profileImage: comment.profile?.photo,
           },
-        })) ?? []
-      );
+        })) ?? [];
+
+      setComments(formattedComments); // ✅ Ensure type matches `Comment[]`
     } catch (error) {
       console.error("Error fetching comments:", error);
     }
@@ -115,6 +114,14 @@ export default function PostPage() {
 
     loadPost();
   }, [safePostId]);
+
+  const getUserInitials = (name?: string | null) => {
+    if (!name) return "N/A";
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("");
+  };
 
   const onDeleteSuccess = async () => {
     router.push("/dashboard");
@@ -339,13 +346,16 @@ export default function PostPage() {
                           {comment.author.photo ? (
                             <AvatarImage
                               src={comment.author.photo}
-                              alt={comment.author.username || "Unknown User"}
+                              alt={
+                                comment.author.username ||
+                                getUserInitials(comment.author.username)
+                              }
                             />
                           ) : (
                             <AvatarFallback>
                               {comment.author.username
-                                ? comment.author.username[0]
-                                : "U"}
+                                ? getUserInitials(comment.author.username)
+                                : "?"}
                             </AvatarFallback>
                           )}
                         </Avatar>
@@ -368,6 +378,14 @@ export default function PostPage() {
                       <p className="text-zinc-900">
                         {comment.comment || "No content available."}
                       </p>
+                      <div className="flex justify-end gap-2">
+                        <Button className="bg-rose-500 hover:bg-rose-600 text-white">
+                          Edit
+                        </Button>
+                        <Button className="bg-rose-500 hover:bg-rose-600 text-white">
+                          Delete
+                        </Button>
+                      </div>
                     </div>
                   ))
                 ) : (

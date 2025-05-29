@@ -9,30 +9,52 @@ export async function getCommentsById(postId: string) {
       throw new Error("Post ID is required");
     }
 
-    // Fetch post data by ID
-    const { data: comments, error } = await supabase
+    const { data: comments, error: commentError } = await supabase
       .from("Comment")
-      .select(
-        `
-        id,
-        post_id,
-        author_id,
-        content,
-        created_at,
-        updated_at,
-        User:author_id (id, username),
-        Profile:author_id (photo)
-      `
-      )
+      .select("id, post_id, author_id, content, created_at, updated_at")
       .eq("post_id", postId)
       .order("created_at", { ascending: false });
 
-    if (error) throw new Error(`Error fetching comments: ${error.message}`);
-    if (!comments || comments.length === 0) {
+    if (commentError)
+      throw new Error(`Error fetching comments: ${commentError.message}`);
+
+    // Fetch user and profile data separately
+    const authorIds = comments.map((c) => c.author_id).filter(Boolean);
+
+    const { data: users = [], error: userError } = await supabase
+      .from("User")
+      .select("id, username")
+      .in("id", authorIds); // Ensure it is a proper array
+
+    if (!users || users.length === 0) {
+      throw new Error("No users found");
+    }
+
+    const { data: profiles = [], error: profileError } = await supabase
+      .from("Profile")
+      .select("id, photo")
+      .in("id", authorIds);
+
+    if (!profiles || profiles.length === 0) {
       throw new Error("No comments found");
     }
 
-    return { success: true, comments };
+    // Merge data manually
+    const enrichedComments = comments.map((comment) => {
+      return {
+        ...comment,
+        user: users.find((u) => u.id === comment.author_id) || {
+          id: comment.author_id,
+          username: "Unknown User",
+        },
+        profile: profiles.find((p) => p.id === comment.author_id) || {
+          id: comment.author_id,
+          photo: null,
+        },
+      };
+    });
+
+    return { success: true, comments: enrichedComments };
   } catch (error) {
     console.error("❌ Error fetching comments:", error);
     return {
