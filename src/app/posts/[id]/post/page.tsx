@@ -52,7 +52,6 @@ export default function PostPage() {
   const [post, setPost] = useState<Post | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editContent, setEditContent] = useState("");
   const router = useRouter();
   const safePostId = typeof id === "string" ? id : "";
 
@@ -204,7 +203,6 @@ export default function PostPage() {
     };
 
     setEditingId(null);
-    setEditContent("");
 
     await toast.promise(submitComment(), {
       loading: "Updating Comment...",
@@ -218,7 +216,6 @@ export default function PostPage() {
 
   const handleCancelEdit = () => {
     setEditingId(null);
-    setEditContent("");
   };
 
   const handleDeleteComment = async (commentId: string) => {
