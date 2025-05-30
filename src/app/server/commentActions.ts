@@ -18,8 +18,10 @@ export async function getCommentsById(postId: string) {
     if (commentError)
       throw new Error(`Error fetching comments: ${commentError.message}`);
 
-    // Fetch user and profile data separately
-    const authorIds = comments.map((c) => c.author_id).filter(Boolean);
+    const authorIds = comments?.map((c) => c.author_id).filter(Boolean); // Remove null/undefined values
+    if (!authorIds.length) {
+      return { success: true, comments: [] }; // Return empty comments instead of querying invalid data
+    }
 
     const { data: users = [], error: userError } = await supabase
       .from("User")
@@ -112,7 +114,7 @@ export async function createComment({
 export async function updateComment(
   postId: string,
   commentId: string,
-  comment: string
+  content: string
 ) {
   try {
     const supabase = await createClient();
@@ -134,7 +136,7 @@ export async function updateComment(
     // Update the comment
     const { data, error } = await supabase
       .from("Comment")
-      .update({ comment })
+      .update({ content })
       .eq("id", commentId)
       .eq("post_id", postId)
       .eq("author_id", user.id)
@@ -180,7 +182,7 @@ export async function deleteComment(commentId: string) {
     const { error: commentError } = await supabase
       .from("Comment")
       .delete()
-      .eq("comment_id", commentId);
+      .eq("id", commentId);
 
     if (commentError) {
       throw new Error("Error deleting comment:", commentError);

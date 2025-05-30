@@ -24,10 +24,7 @@ https://nextjs-hobbyist.vercel.app/
 
 ## Current Tasks:
 
-- [ ] create new comment
-- [ ] view updated comment
-- [ ] update new comment
-- [ ] delete comment
+- [ ] delete comment modal
 
 ## Project Tasks:
 
@@ -35,7 +32,6 @@ https://nextjs-hobbyist.vercel.app/
 - [ ] create like functionality
 
 - [ ] follow and unfollow users
-- [ ] mark profile private or public
 - [ ] follow and unfollow categories
 
 - [ ] display data in charts
@@ -49,6 +45,7 @@ https://nextjs-hobbyist.vercel.app/
 Leftovers
 
 - [ ] protected routes
+- [ ] mark profile private or public
 - [ ] fix layout of calendar and chart in pblished and drafts pages
 - [ ] fix how chart looks on md screens in dashboard
 - [ ] fix charts display - does not show bars

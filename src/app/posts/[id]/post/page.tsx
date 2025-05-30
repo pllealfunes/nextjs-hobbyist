@@ -27,8 +27,8 @@ import { useRouter } from "next/navigation";
 import {
   getCommentsById,
   createComment,
-  // updateComment,
-  // deleteComment,
+  updateComment,
+  deleteComment,
 } from "@/app/server/commentActions";
 import { getPostById } from "@/app/server/postActions";
 import PostSkeleton from "@/ui/components/postSkeleton";
@@ -51,6 +51,8 @@ export default function PostPage() {
   const category = searchParams.get("category") || "Unknown";
   const [post, setPost] = useState<Post | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editContent, setEditContent] = useState("");
   const router = useRouter();
   const safePostId = typeof id === "string" ? id : "";
 
@@ -64,7 +66,7 @@ export default function PostPage() {
     return str.charAt(0).toUpperCase() + str.slice(1);
   };
 
-  const fetchData = useCallback(async () => {
+  const fetchComments = useCallback(async () => {
     try {
       if (!safePostId) return;
 
@@ -81,7 +83,7 @@ export default function PostPage() {
           id: comment.id,
           post_id: comment.post_id,
           author_id: comment.author_id,
-          comment: comment.content, // ✅ Rename `content` → `comment`
+          comment: comment.content,
           created_at: comment.created_at,
           updated_at: comment.updated_at,
           author: {
@@ -91,7 +93,7 @@ export default function PostPage() {
           },
         })) ?? [];
 
-      setComments(formattedComments); // ✅ Ensure type matches `Comment[]`
+      setComments(formattedComments);
     } catch (error) {
       console.error("Error fetching comments:", error);
     }
@@ -109,7 +111,7 @@ export default function PostPage() {
       }
 
       setPost(response.post);
-      fetchData();
+      fetchComments();
     }
 
     loadPost();
@@ -134,6 +136,13 @@ export default function PostPage() {
     },
   });
 
+  const editForm = useForm<z.infer<typeof CreateCommentSchema>>({
+    resolver: zodResolver(CreateCommentSchema),
+    defaultValues: {
+      content: "",
+    },
+  });
+
   const onSubmit: SubmitHandler<z.infer<typeof CreateCommentSchema>> = async (
     data
   ) => {
@@ -143,7 +152,6 @@ export default function PostPage() {
         return;
       }
 
-      // STEP 1 — Create the comment
       const formData = {
         content: data.content,
         postId: post?.id ?? "",
@@ -164,6 +172,76 @@ export default function PostPage() {
       error: (err) =>
         `Something went wrong while creating the comment: ${err.message}`,
     });
+
+    fetchComments();
+  };
+
+  const handleEditClick = (commentId: string, currentContent: string) => {
+    setEditingId(commentId);
+    editForm.reset({ content: currentContent });
+  };
+
+  const handleSaveEdit: SubmitHandler<
+    z.infer<typeof CreateCommentSchema>
+  > = async (data) => {
+    const submitComment = async () => {
+      if (!post?.id) {
+        toast.error("Post ID is missing. Cannot create a comment.");
+        return;
+      }
+
+      const editedComment = await updateComment(
+        post?.id ?? "",
+        editingId ?? "",
+        data.content
+      );
+
+      if (!editedComment.success) {
+        throw new Error(`Failed to create comment: ${editedComment.error}`);
+      }
+
+      return editedComment;
+    };
+
+    setEditingId(null);
+    setEditContent("");
+
+    await toast.promise(submitComment(), {
+      loading: "Updating Comment...",
+      success: "Comment Updated Successfully!",
+      error: (err) =>
+        `Something went wrong while updating the comment: ${err.message}`,
+    });
+
+    fetchComments();
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setEditContent("");
+  };
+
+  const handleDeleteComment = async (commentId: string) => {
+    await toast.promise(
+      (async () => {
+        const deletedComment = await deleteComment(commentId);
+
+        if (!deletedComment?.success) {
+          throw new Error(`Failed to delete comment: ${deletedComment?.error}`);
+        }
+
+        return deletedComment;
+      })(),
+      {
+        loading: "Deleting Comment...",
+        success: "Comment Deleted Successfully!",
+        error: (err) =>
+          `Something went wrong while deleting the comment: ${err.message}`,
+      }
+    );
+
+    // Refresh comments after successful deletion
+    fetchComments(); // Ensure this updates the UI with fresh data
   };
 
   return (
@@ -335,26 +413,26 @@ export default function PostPage() {
                 Comments
               </h2>
               <div className="space-y-6">
-                {comments?.length > 0 ? (
-                  comments.map((comment, index) => (
+                {comments && comments.length > 0 ? (
+                  (comments || []).map((comment, index) => (
                     <div
                       key={comment.id || index}
                       className="bg-white rounded-lg shadow p-4"
                     >
                       <div className="flex items-center space-x-4 mb-4">
                         <Avatar>
-                          {comment.author.photo ? (
+                          {comment.author?.photo ? (
                             <AvatarImage
                               src={comment.author.photo}
                               alt={
-                                comment.author.username ||
-                                getUserInitials(comment.author.username)
+                                comment.author?.username ||
+                                getUserInitials(comment.author?.username || "?")
                               }
                             />
                           ) : (
                             <AvatarFallback>
-                              {comment.author.username
-                                ? getUserInitials(comment.author.username)
+                              {comment.author?.username
+                                ? getUserInitials(comment.author?.username)
                                 : "?"}
                             </AvatarFallback>
                           )}
@@ -375,16 +453,75 @@ export default function PostPage() {
                           </p>
                         </div>
                       </div>
-                      <p className="text-zinc-900">
-                        {comment.comment || "No content available."}
-                      </p>
-                      <div className="flex justify-end gap-2">
-                        <Button className="bg-rose-500 hover:bg-rose-600 text-white">
-                          Edit
-                        </Button>
-                        <Button className="bg-rose-500 hover:bg-rose-600 text-white">
-                          Delete
-                        </Button>
+
+                      {/* Action Buttons */}
+                      <div>
+                        {editingId === comment.id ? (
+                          <>
+                            <Form {...editForm}>
+                              <form
+                                onSubmit={editForm.handleSubmit(handleSaveEdit)}
+                                className="space-y-4"
+                              >
+                                <FormField
+                                  control={editForm.control}
+                                  name="content"
+                                  render={({ field }) => (
+                                    <FormItem>
+                                      <FormLabel className="hidden">
+                                        Comment:
+                                      </FormLabel>
+                                      <FormControl>
+                                        <Textarea
+                                          {...field}
+                                          rows={5}
+                                          placeholder="Write your comment here..."
+                                          className="mb-4 border-blue-200 focus:border-blue-500 focus:ring-blue-500 text-gray-900"
+                                        />
+                                      </FormControl>
+                                      <FormMessage />
+                                    </FormItem>
+                                  )}
+                                />
+                                <div className="flex justify-end gap-2">
+                                  <Button
+                                    className="bg-green-500 hover:bg-green-600 text-white"
+                                    type="submit"
+                                  >
+                                    Save
+                                  </Button>
+                                  <Button
+                                    onClick={handleCancelEdit}
+                                    variant="outline"
+                                    className="border-zinc-300 hover:bg-slate-500"
+                                  >
+                                    Cancel
+                                  </Button>
+                                </div>
+                              </form>
+                            </Form>
+                          </>
+                        ) : (
+                          <>
+                            <p className="text-zinc-900">{comment.comment}</p>
+                            <div className="flex justify-end gap-2">
+                              <Button
+                                onClick={() =>
+                                  handleEditClick(comment.id, comment.comment)
+                                }
+                                className="bg-rose-500 hover:bg-rose-600 text-white"
+                              >
+                                Edit
+                              </Button>
+                              <Button
+                                onClick={() => handleDeleteComment(comment.id)}
+                                className="bg-rose-500 hover:bg-rose-600 text-white"
+                              >
+                                Delete
+                              </Button>
+                            </div>
+                          </>
+                        )}
                       </div>
                     </div>
                   ))
