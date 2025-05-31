@@ -86,9 +86,9 @@ export default function About() {
             <li>User profiles</li>
             <li>Ability to follow users and categories</li>
             <li>Personalized feeds</li>
-            <li>Enhanced search functionality</li>
+            <li>Improved search</li>
             <li>User to User chat</li>
-            <li>Improved UI/UX design</li>
+            <li>Improved UI/UX</li>
             <li>Responsive layout for all devices</li>
           </ul>
         </section>
