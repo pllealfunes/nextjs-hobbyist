@@ -44,6 +44,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/ui/components/form";
+import DeleteCommentConfirmation from "@/ui/components/deleteCommentConfirmation";
 
 export default function PostPage() {
   const { id } = useParams();
@@ -164,6 +165,8 @@ export default function PostPage() {
 
       return comment;
     };
+
+    form.reset();
 
     await toast.promise(submitComment(), {
       loading: "Creating Comment...",
@@ -482,7 +485,7 @@ export default function PostPage() {
                                 />
                                 <div className="flex justify-end gap-2">
                                   <Button
-                                    className="bg-green-500 hover:bg-green-600 text-white"
+                                    className="bg-rose-500 hover:bg-rose-600 text-white"
                                     type="submit"
                                   >
                                     Save
@@ -502,20 +505,16 @@ export default function PostPage() {
                           <>
                             <p className="text-zinc-900">{comment.comment}</p>
                             <div className="flex justify-end gap-2">
-                              <Button
+                              <Pencil
                                 onClick={() =>
                                   handleEditClick(comment.id, comment.comment)
                                 }
-                                className="bg-rose-500 hover:bg-rose-600 text-white"
-                              >
-                                Edit
-                              </Button>
-                              <Button
-                                onClick={() => handleDeleteComment(comment.id)}
-                                className="bg-rose-500 hover:bg-rose-600 text-white"
-                              >
-                                Delete
-                              </Button>
+                                className="text-rose-400 cursor-pointer w-7 h-7 hover:text-rose-600 transition"
+                              />
+                              <DeleteCommentConfirmation
+                                onConfirm={handleDeleteComment}
+                                commentId={comment.id}
+                              />
                             </div>
                           </>
                         )}
