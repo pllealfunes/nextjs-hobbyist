@@ -55,6 +55,7 @@ export default function PostPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const router = useRouter();
   const safePostId = typeof id === "string" ? id : "";
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const capitalizeFirstLetter = (str?: string) => {
     if (!str) return "This category";
@@ -146,6 +147,8 @@ export default function PostPage() {
   const onSubmit: SubmitHandler<z.infer<typeof CreateCommentSchema>> = async (
     data
   ) => {
+    setIsSubmitting(true);
+
     const submitComment = async () => {
       if (!post?.id) {
         toast.error("Post ID is missing. Cannot create a comment.");
@@ -174,7 +177,7 @@ export default function PostPage() {
       error: (err) =>
         `Something went wrong while creating the comment: ${err.message}`,
     });
-
+    setIsSubmitting(false);
     fetchComments();
   };
 
@@ -399,9 +402,16 @@ export default function PostPage() {
                       <Button
                         className="bg-rose-500 hover:bg-rose-600 text-white"
                         type="submit"
+                        disabled={isSubmitting}
                       >
-                        <Send className="h-4 w-4 mr-2" />
-                        Comment
+                        {isSubmitting ? (
+                          "Submitting..."
+                        ) : (
+                          <>
+                            {" "}
+                            <Send className="h-4 w-4 mr-2" /> Comment{" "}
+                          </>
+                        )}
                       </Button>
                     </div>
                   </form>
@@ -449,7 +459,9 @@ export default function PostPage() {
                               ? new Date(
                                   comment.created_at
                                 ).toLocaleDateString()
-                              : "Unknown Date"}
+                              : new Date(
+                                  comment.created_at
+                                ).toLocaleDateString()}
                           </p>
                         </div>
                       </div>
