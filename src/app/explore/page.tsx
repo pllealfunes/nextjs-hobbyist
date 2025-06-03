@@ -1,15 +1,72 @@
+"use client";
+
 //import DashboardPosts from "@/ui/components/dashboard-posts";
-import { Input } from "@/ui/components/input";
-import { Label } from "@/ui/components/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/ui/components/select";
+import { useState, useEffect } from "react";
+import { getAllPosts } from "@/app/explore/action";
+import { Post, Category } from "@/lib/types";
+import { useForm, SubmitHandler } from "react-hook-form";
+import SearchForm from "@/ui/forms/search-posts";
+import { z } from "zod";
 
 export default function Explore() {
+  const [state, setState] = useState<{
+    posts: Post[];
+    latestPosts: Post[];
+    searchResults: Post[];
+    view: string;
+  }>({
+    posts: [],
+    latestPosts: [],
+    searchResults: [],
+    view: "latest",
+  });
+
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  const SearchFormSchema = z.object({
+    search: z.string().min(1, "Search is required"),
+    category: z.string().optional(),
+  });
+
+  // Define the type for form data
+  type SearchFormValues = z.infer<typeof SearchFormSchema>;
+
+  const onSubmit: SubmitHandler<SearchFormValues> = async (data) => {
+    console.log("Form submitted with data:", data);
+  };
+
+  useEffect(() => {
+    async function fetchPosts() {
+      try {
+        const response = await getAllPosts();
+        if (response.success) {
+          setState((prev) => ({
+            ...prev,
+            posts: response.posts ?? [], // Directly assign the posts array
+            latestPosts: (response.posts ?? []).slice(-8).reverse(),
+            view: "latest",
+          }));
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    async function loadCategories() {
+      try {
+        const response = await fetch("/api/categories");
+        const data = await response.json();
+
+        setCategories(data);
+      } catch (error) {
+        console.error("Error fetching categories", error);
+      }
+    }
+
+    loadCategories();
+    fetchPosts();
+  }, []);
+
   return (
     <>
       <section>
@@ -26,35 +83,8 @@ export default function Explore() {
           </div>
 
           {/* Form Section */}
-          <div className="mb-6 flex justify-center items-center gap-2">
-            <Label htmlFor="search" className="sr-only">
-              Search posts
-            </Label>
-            <Input
-              id="search"
-              type="text"
-              placeholder="Search posts..."
-              className="md:w-1/3 p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <Label htmlFor="filter" className="sr-only">
-              Filter posts
-            </Label>
-            <Select>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="latest"></SelectItem>
-                <SelectItem value="collecting">Collecting</SelectItem>
-                <SelectItem value="creative">Creative</SelectItem>
-                <SelectItem value="food">Food</SelectItem>
-                <SelectItem value="games+puzzles">Games+Puzzles</SelectItem>
-                <SelectItem value="mental">Mental</SelectItem>
-                <SelectItem value="musical">Musical</SelectItem>
-                <SelectItem value="physical">Physical</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+
+          <SearchForm categories={categories} onSubmit={onSubmit} />
 
           {/* Posts Section */}
           {/* <DashboardPosts /> */}
