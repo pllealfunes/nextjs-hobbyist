@@ -1,9 +1,6 @@
 "use server";
 
 import { createClient } from "@/utils/supabase/server";
-import { v2 as cloudinary } from "cloudinary";
-import { extractImages } from "@/app/server/utils/postUtils";
-import { extractPublicIdFromUrl } from "@/utils/postHandler";
 
 export async function getAllPosts() {
   try {

@@ -4,9 +4,11 @@
 import { useState, useEffect } from "react";
 import { getAllPosts } from "@/app/explore/action";
 import { Post, Category } from "@/lib/types";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { SubmitHandler } from "react-hook-form";
 import SearchForm from "@/ui/forms/search-posts";
 import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 export default function Explore() {
   const [state, setState] = useState<{
@@ -30,6 +32,10 @@ export default function Explore() {
 
   // Define the type for form data
   type SearchFormValues = z.infer<typeof SearchFormSchema>;
+
+  const form = useForm<SearchFormValues>({
+    resolver: zodResolver(SearchFormSchema), // ✅ Actively using the schema
+  });
 
   const onSubmit: SubmitHandler<SearchFormValues> = async (data) => {
     console.log("Form submitted with data:", data);
@@ -65,6 +71,7 @@ export default function Explore() {
 
     loadCategories();
     fetchPosts();
+    console.log(state);
   }, []);
 
   return (
