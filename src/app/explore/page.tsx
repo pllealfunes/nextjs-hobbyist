@@ -6,9 +6,6 @@ import { getAllPosts } from "@/app/explore/action";
 import { Post, Category } from "@/lib/types";
 import { SubmitHandler } from "react-hook-form";
 import SearchForm from "@/ui/forms/search-posts";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { SearchFormValues } from "@/ui/forms/search-posts";
 
 export default function Explore() {
