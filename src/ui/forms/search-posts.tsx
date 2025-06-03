@@ -25,7 +25,7 @@ const SearchFormSchema = z.object({
 });
 
 // Define the type for form data
-type SearchFormValues = z.infer<typeof SearchFormSchema>;
+export type SearchFormValues = z.infer<typeof SearchFormSchema>;
 
 type Category = {
   id: number;

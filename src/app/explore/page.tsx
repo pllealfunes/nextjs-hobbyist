@@ -9,6 +9,7 @@ import SearchForm from "@/ui/forms/search-posts";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { SearchFormValues } from "@/ui/forms/search-posts";
 
 export default function Explore() {
   const [state, setState] = useState<{
@@ -24,18 +25,6 @@ export default function Explore() {
   });
 
   const [categories, setCategories] = useState<Category[]>([]);
-
-  const SearchFormSchema = z.object({
-    search: z.string().min(1, "Search is required"),
-    category: z.string().optional(),
-  });
-
-  // Define the type for form data
-  type SearchFormValues = z.infer<typeof SearchFormSchema>;
-
-  const form = useForm<SearchFormValues>({
-    resolver: zodResolver(SearchFormSchema), // ✅ Actively using the schema
-  });
 
   const onSubmit: SubmitHandler<SearchFormValues> = async (data) => {
     console.log("Form submitted with data:", data);
