@@ -32,10 +32,15 @@ type Category = {
   name: string;
 };
 
-const SearchForm: React.FC<{
+const SearchForm = ({
+  categories,
+  onSubmit,
+  resetResults,
+}: {
   categories: Category[];
   onSubmit: SubmitHandler<SearchFormValues>;
-}> = ({ categories, onSubmit }) => {
+  resetResults: () => void;
+}) => {
   const form = useForm<SearchFormValues>({
     mode: "onTouched",
     resolver: zodResolver(SearchFormSchema),
@@ -107,7 +112,15 @@ const SearchForm: React.FC<{
           />
           <div className="flex flex-col sm:flex-row gap-4 mt-4">
             <Button type="submit">Search</Button>
-            <Button type="reset">Reset</Button>
+            <Button
+              type="reset"
+              onClick={() => {
+                form.reset();
+                resetResults();
+              }}
+            >
+              Reset
+            </Button>
           </div>
         </form>
       </Form>

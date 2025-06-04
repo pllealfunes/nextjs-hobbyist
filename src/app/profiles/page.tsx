@@ -6,6 +6,7 @@ import UserProfile from "@/ui/components/userprofile";
 import { Post, Category } from "@/lib/types";
 import { getPublishedPosts } from "@/app/server/postActions";
 import { useAuth } from "@/contexts/authContext";
+import { FileText } from "lucide-react";
 
 export default function Profile() {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -55,7 +56,17 @@ export default function Profile() {
         </section>
       ) : (
         <section className="m-32 text-center">
-          <h2 className="text-3xl">Create A Post To See It Here!</h2>
+          <div className="col-span-full flex flex-col items-center justify-center py-24 px-4">
+            <div className="flex items-center justify-center w-16 h-16 bg-rose-100 rounded-full mb-6">
+              <FileText className="w-8 h-8 text-rose-400" />
+            </div>
+            <h3 className="text-2xl font-semibold text-gray-900 mb-2">
+              No Posts Found
+            </h3>
+            <p className="text-gray-500 text-center max-w-md mb-6">
+              Create a post to see it here!
+            </p>
+          </div>
         </section>
       )}
     </div>

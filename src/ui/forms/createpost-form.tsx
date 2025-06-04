@@ -31,10 +31,13 @@ type Category = {
   name: string;
 };
 
-const CreatePostForm: React.FC<{
+const CreatePostForm = ({
+  categories,
+  onSubmit,
+}: {
   categories: Category[];
   onSubmit: SubmitHandler<FormData>;
-}> = ({ categories, onSubmit }) => {
+}) => {
   const form = useForm<FormData>({
     mode: "onTouched",
     resolver: zodResolver(CreatePostSchema),
