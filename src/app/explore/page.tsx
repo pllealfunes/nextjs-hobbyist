@@ -111,7 +111,7 @@ export default function Explore() {
             ) : showLatest ? (
               /* Latest Posts */
               <div className="transition-opacity duration-500 opacity-100 flex flex-col items-center">
-                <h3 className="font-bold text-xl mb-5">Latest Posts</h3>
+                <h3 className="font-bold text-3xl mb-5">Latest Posts</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-7">
                   {latestPosts.map((post) => (
                     <DashboardPosts
@@ -138,10 +138,10 @@ export default function Explore() {
                 <div className="flex items-center justify-center w-16 h-16 bg-rose-100 rounded-full mb-6">
                   <FileText className="w-8 h-8 text-rose-400" />
                 </div>
-                <h3 className="text-2xl font-semibold mb-2">No Posts Found</h3>
+                <h3 className="text-3xl font-semibold mb-2">No Posts Found</h3>
                 <p className="max-w-md mb-6">
-                  We couldn't find any posts matching your search criteria. Try
-                  adjusting your filters or search terms.
+                  We couldn&apos;t find any posts matching your search criteria.
+                  Try adjusting your filters or search terms.
                 </p>
                 <div className="flex items-center gap-2 text-sm">
                   <Search className="w-4 h-4 text-rose-400" />
