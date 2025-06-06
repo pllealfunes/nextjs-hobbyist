@@ -24,12 +24,10 @@ https://nextjs-hobbyist.vercel.app/
 
 ## Current Tasks:
 
-- [ ] search posts
-
-## Project Tasks:
-
 - [ ] follow and unfollow users
 - [ ] follow and unfollow categories
+
+## Project Tasks:
 
 - [ ] feed
 

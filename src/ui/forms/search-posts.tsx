@@ -19,10 +19,15 @@ import {
   FormMessage,
 } from "@/ui/components/form";
 
-const SearchFormSchema = z.object({
-  search: z.string().min(1, "Search is required"), // Ensures search is required
-  category: z.string().optional(), // Allows category to be optional
-});
+const SearchFormSchema = z
+  .object({
+    search: z.string().optional(),
+    category: z.string().optional(),
+  })
+  .refine((data) => data.search || data.category, {
+    message: "Either search or category is required",
+    path: ["search"],
+  });
 
 // Define the type for form data
 export type SearchFormValues = z.infer<typeof SearchFormSchema>;
@@ -89,12 +94,12 @@ const SearchForm = ({
                   <Select
                     value={field.value}
                     onValueChange={(value) => field.onChange(value)}
-                    required
                   >
                     <SelectTrigger className="w-full sm:w-auto" id="category">
-                      <SelectValue placeholder="Select a category" />
+                      <SelectValue placeholder="Select a Category" />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="None">Select a Category</SelectItem>
                       {categories.map((category) => (
                         <SelectItem
                           key={category.id}
