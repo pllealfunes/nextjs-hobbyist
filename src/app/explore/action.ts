@@ -23,21 +23,25 @@ export async function getAllPosts() {
   }
 }
 
-export async function getLatestPosts() {
+export async function getLatestPosts({ page = 1, pageSize = 3 }) {
   try {
     const supabase = await createClient();
+
+    const start = (page - 1) * pageSize;
+    const end = start + pageSize - 1;
+    const { count } = await supabase
+      .from("Post")
+      .select("*", { count: "exact" });
 
     const { data, error } = await supabase
       .from("Post")
       .select("*")
-      .order("created_at", { ascending: false }) // Latest posts first
-      .limit(3); // Limit results for performance
+      .order("created_at", { ascending: false })
+      .range(start, end);
 
     if (error) throw new Error(`Error fetching latest posts: ${error.message}`);
 
-    console.log("📌 Latest posts retrieved:", data);
-
-    return { success: true, posts: data };
+    return { success: true, posts: data, totalCount: count };
   } catch (error) {
     console.error("❌ Error fetching latest posts:", error);
     return {
@@ -50,22 +54,23 @@ export async function getLatestPosts() {
 export async function getMatchingPosts({
   search,
   category,
+  page = 1,
+  pageSize = 5,
 }: {
   search: string;
   category?: number;
+  page?: number;
+  pageSize?: number;
 }) {
   try {
     const supabase = await createClient();
 
     let query = supabase.from("Post").select("*");
 
-    // Apply search filter if provided
     if (search) {
-      query = query.ilike("title", `%${search}%`); // Case-insensitive match
+      query = query.ilike("title", `%${search}%`);
     }
-    console.log(category);
 
-    // Apply category filter if provided
     if (category !== undefined && category !== null) {
       query = query.eq("category_id", category);
     }
@@ -74,13 +79,17 @@ export async function getMatchingPosts({
       throw new Error("Error fetching posts");
     }
 
-    const { data, error } = await query;
+    const start = (page - 1) * pageSize;
+    const end = start + pageSize - 1;
+    const { count } = await supabase
+      .from("Post")
+      .select("*", { count: "exact" });
+
+    const { data, error } = await query.range(start, end);
 
     if (error) throw new Error(`Error fetching posts: ${error.message}`);
 
-    console.log("📌 Found posts", data);
-
-    return { success: true, posts: data };
+    return { success: true, posts: data, totalCount: count };
   } catch (error) {
     console.error("❌ Error fetching posts:", error);
     return {

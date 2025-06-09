@@ -9,6 +9,15 @@ import SearchForm from "@/ui/forms/search-posts";
 import { SearchFormValues } from "@/ui/forms/search-posts";
 import { Skeleton } from "@/ui/components/skeleton";
 import { Search, FileText } from "lucide-react";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationPrevious,
+  PaginationItem,
+  PaginationNext,
+  PaginationLink,
+  PaginationEllipsis,
+} from "@/ui/components/pagination";
 
 export default function Explore() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -16,14 +25,20 @@ export default function Explore() {
   const [showLatest, setShowLatest] = useState(true);
   const [latestPosts, setLatestPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 3;
+  const [searchPage, setSearchPage] = useState(1);
+  const searchPageSize = 5;
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
-    setIsLoading(true);
-    async function fetchLatestPosts() {
+    async function fetchLatestPosts(page = 1) {
+      setIsLoading(true);
       try {
-        const response = await getLatestPosts();
+        const response = await getLatestPosts({ page, pageSize });
         if (response.success) {
           setLatestPosts(response.posts ?? []);
+          setTotalPages(Math.ceil((response?.totalCount ?? 1) / pageSize));
         }
       } catch (error) {
         console.error(error);
@@ -42,14 +57,25 @@ export default function Explore() {
     }
 
     loadCategories();
-    fetchLatestPosts();
+    fetchLatestPosts(currentPage);
     setIsLoading(false);
   }, []);
+
+  const handleNextPage = () => {
+    if (latestPosts.length === pageSize) setCurrentPage((prev) => prev + 1);
+  };
+  const handlePrevPage = () => setCurrentPage((prev) => Math.max(1, prev - 1));
+
+  const handleNextSearchPage = () => {
+    if (results.length === searchPageSize) setSearchPage((prev) => prev + 1);
+  };
+  const handlePrevSearchPage = () =>
+    setSearchPage((prev) => Math.max(1, prev - 1));
 
   const onSubmit: SubmitHandler<SearchFormValues> = async (data) => {
     setShowLatest(false);
     setResults([]);
-    setIsLoading(true); // Start loading
+    setIsLoading(true);
 
     try {
       const requestData = {
@@ -58,17 +84,16 @@ export default function Explore() {
         search: data.search ?? "",
       };
 
-      const searchResults = await getMatchingPosts(requestData);
+      const searchResults = await getMatchingPosts({
+        ...requestData,
+        page: searchPage,
+      });
 
-      if (!searchResults.success) {
-        setResults([]);
-      } else {
-        setResults(searchResults.posts ?? []);
-      }
+      setResults(searchResults.success ? searchResults.posts ?? [] : []);
     } catch (error) {
-      console.error("Error fetching posts:", error);
+      console.error("❌ Error fetching posts:", error);
     } finally {
-      setIsLoading(false); // Stop loading regardless of success or failure
+      setIsLoading(false);
     }
   };
 
@@ -110,7 +135,7 @@ export default function Explore() {
               </div>
             ) : showLatest ? (
               /* Latest Posts */
-              <div className="transition-opacity duration-500 opacity-100 flex flex-col items-center">
+              <div className="flex flex-col items-center">
                 <h3 className="font-bold text-3xl mb-5">Latest Posts</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-7">
                   {latestPosts.map((post) => (
@@ -121,16 +146,86 @@ export default function Explore() {
                     />
                   ))}
                 </div>
+                {totalPages > 1 && (
+                  <Pagination className="mt-5">
+                    <PaginationContent>
+                      <PaginationPrevious
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault(); // Stops the page reload
+                          if (currentPage > 1)
+                            setCurrentPage((prev) => prev - 1);
+                        }}
+                      />
+                      {Array.from({ length: totalPages }, (_, index) => (
+                        <PaginationItem key={index}>
+                          <PaginationLink
+                            href="#"
+                            isActive={index + 1 === currentPage}
+                            onClick={() => setCurrentPage(index + 1)}
+                          >
+                            {index + 1}
+                          </PaginationLink>
+                        </PaginationItem>
+                      ))}
+                      <PaginationNext
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault(); // Stops the page reload
+                          if (currentPage < totalPages)
+                            setCurrentPage((prev) => prev + 1);
+                        }}
+                      />
+                    </PaginationContent>
+                  </Pagination>
+                )}
               </div>
             ) : results.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-7">
-                {results.map((post) => (
-                  <DashboardPosts
-                    key={post.id}
-                    post={post}
-                    categories={categories}
-                  />
-                ))}
+              /* Search Results */
+              <div className="flex flex-col items-center">
+                <h3 className="font-bold text-3xl mb-5">Search Results</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-7">
+                  {results.map((post) => (
+                    <DashboardPosts
+                      key={post.id}
+                      post={post}
+                      categories={categories}
+                    />
+                  ))}
+                </div>
+                {totalPages > 1 && (
+                  <Pagination className="mt-5">
+                    <PaginationContent>
+                      <PaginationPrevious
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault(); // Stops the page reload
+                          if (currentPage > 1)
+                            setCurrentPage((prev) => prev - 1);
+                        }}
+                      />
+                      {Array.from({ length: totalPages }, (_, index) => (
+                        <PaginationItem key={index}>
+                          <PaginationLink
+                            href="#"
+                            isActive={index + 1 === searchPage}
+                            onClick={() => setSearchPage(index + 1)}
+                          >
+                            {index + 1}
+                          </PaginationLink>
+                        </PaginationItem>
+                      ))}
+                      <PaginationNext
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault(); // Stops the page reload
+                          if (currentPage < totalPages)
+                            setCurrentPage((prev) => prev + 1);
+                        }}
+                      />
+                    </PaginationContent>
+                  </Pagination>
+                )}
               </div>
             ) : (
               /* No Posts Found */
