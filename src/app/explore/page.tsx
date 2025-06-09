@@ -16,7 +16,6 @@ import {
   PaginationItem,
   PaginationNext,
   PaginationLink,
-  PaginationEllipsis,
 } from "@/ui/components/pagination";
 
 export default function Explore() {
@@ -28,6 +27,7 @@ export default function Explore() {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 3;
   const [searchPage, setSearchPage] = useState(1);
+  const latestPageSize = 4;
   const searchPageSize = 5;
   const [totalPages, setTotalPages] = useState(1);
 
@@ -35,10 +35,15 @@ export default function Explore() {
     async function fetchLatestPosts(page = 1) {
       setIsLoading(true);
       try {
-        const response = await getLatestPosts({ page, pageSize });
+        const response = await getLatestPosts({
+          page,
+          pageSize: latestPageSize,
+        });
         if (response.success) {
           setLatestPosts(response.posts ?? []);
-          setTotalPages(Math.ceil((response?.totalCount ?? 1) / pageSize));
+          setTotalPages(
+            Math.ceil((response?.totalCount ?? 1) / latestPageSize)
+          );
         }
       } catch (error) {
         console.error(error);
@@ -61,17 +66,6 @@ export default function Explore() {
     setIsLoading(false);
   }, []);
 
-  const handleNextPage = () => {
-    if (latestPosts.length === pageSize) setCurrentPage((prev) => prev + 1);
-  };
-  const handlePrevPage = () => setCurrentPage((prev) => Math.max(1, prev - 1));
-
-  const handleNextSearchPage = () => {
-    if (results.length === searchPageSize) setSearchPage((prev) => prev + 1);
-  };
-  const handlePrevSearchPage = () =>
-    setSearchPage((prev) => Math.max(1, prev - 1));
-
   const onSubmit: SubmitHandler<SearchFormValues> = async (data) => {
     setShowLatest(false);
     setResults([]);
@@ -87,6 +81,7 @@ export default function Explore() {
       const searchResults = await getMatchingPosts({
         ...requestData,
         page: searchPage,
+        pageSize: searchPageSize,
       });
 
       setResults(searchResults.success ? searchResults.posts ?? [] : []);
@@ -171,7 +166,7 @@ export default function Explore() {
                       <PaginationNext
                         href="#"
                         onClick={(e) => {
-                          e.preventDefault(); // Stops the page reload
+                          e.preventDefault();
                           if (currentPage < totalPages)
                             setCurrentPage((prev) => prev + 1);
                         }}
@@ -199,9 +194,8 @@ export default function Explore() {
                       <PaginationPrevious
                         href="#"
                         onClick={(e) => {
-                          e.preventDefault(); // Stops the page reload
-                          if (currentPage > 1)
-                            setCurrentPage((prev) => prev - 1);
+                          e.preventDefault();
+                          if (searchPage > 1) setSearchPage((prev) => prev - 1);
                         }}
                       />
                       {Array.from({ length: totalPages }, (_, index) => (
@@ -218,9 +212,9 @@ export default function Explore() {
                       <PaginationNext
                         href="#"
                         onClick={(e) => {
-                          e.preventDefault(); // Stops the page reload
-                          if (currentPage < totalPages)
-                            setCurrentPage((prev) => prev + 1);
+                          e.preventDefault();
+                          if (searchPage < totalPages)
+                            setSearchPage((prev) => prev + 1);
                         }}
                       />
                     </PaginationContent>
