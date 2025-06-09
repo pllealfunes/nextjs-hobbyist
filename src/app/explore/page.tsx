@@ -25,7 +25,6 @@ export default function Explore() {
   const [latestPosts, setLatestPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 3;
   const [searchPage, setSearchPage] = useState(1);
   const latestPageSize = 4;
   const searchPageSize = 5;
