@@ -3,17 +3,23 @@
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import DashboardPosts from "@/ui/components/dashboard-posts";
-import NoResults from "@/ui/components/no-category";
+import NoResults from "@/ui/components/no-results";
 import Link from "next/link";
 import { Post, Category } from "@/lib/types";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/ui/components/select";
 import { getCategoryWithPosts } from "@/app/server/categoryActions";
+import { getMatchingPosts, getLatestPosts } from "@/app/explore/action";
+import { SubmitHandler } from "react-hook-form";
+import SearchForm from "@/ui/forms/search-form";
+import { SearchFormValues } from "@/ui/forms/search-form";
+import { Skeleton } from "@/ui/components/skeleton";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationPrevious,
+  PaginationItem,
+  PaginationNext,
+  PaginationLink,
+} from "@/ui/components/pagination";
 
 const CategoryPage = () => {
   const params = useParams();
@@ -23,8 +29,14 @@ const CategoryPage = () => {
   );
   const [categories, setCategories] = useState<Category[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [showLatest, setShowLatest] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [results, setResults] = useState<Post[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchPage, setSearchPage] = useState(1);
+  const latestPageSize = 4;
+  const searchPageSize = 5;
+  const [totalPages, setTotalPages] = useState(1);
 
   const capitalizeFirstLetter = (str?: string) => {
     if (!str) return "This category";
@@ -42,7 +54,7 @@ const CategoryPage = () => {
     const fetchData = async () => {
       try {
         console.log("Fetching posts for category:", categoryName);
-        setLoading(true); // Start loading before fetching
+        setIsLoading(true); // Start loading before fetching
 
         const [categoriesResponse, postsResponse] = await Promise.all([
           fetch("/api/categories"),
@@ -58,98 +70,142 @@ const CategoryPage = () => {
           capitalizeFirstLetter(decodeURIComponent(categoryName))
         );
       } catch (error) {
-        setError("Error fetching posts");
-        console.error(error);
+        console.error("Error fetching posts", error);
       } finally {
-        setLoading(false); // Stop loading after fetching
+        setIsLoading(false); // Stop loading after fetching
       }
     };
 
     fetchData();
   }, [categoryName]);
 
-  if (loading) return <p>Loading...</p>;
-  console.log(error);
+  const onSubmit: SubmitHandler<SearchFormValues> = (data) => {
+    setIsLoading(true);
+    setShowLatest(false);
+    setResults([]);
+    try {
+      const searchTerm = data.search?.toLowerCase().trim() || "";
+
+      const matchingPosts =
+        searchTerm.length > 0
+          ? posts.filter((post) => {
+              const title = post.title?.toLowerCase() || "";
+              const content = post.content?.toLowerCase() || "";
+              return title.includes(searchTerm) || content.includes(searchTerm);
+            })
+          : [];
+
+      const totalFilteredPages = Math.ceil(
+        matchingPosts.length / searchPageSize
+      );
+      setTotalPages(totalFilteredPages);
+      setSearchPage(1);
+
+      const paginatedResults = matchingPosts.slice(0, searchPageSize);
+      setResults(paginatedResults);
+    } catch (error) {
+      console.error("❌ Error filtering posts:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const resetResults = () => {
+    setResults(posts);
+  };
 
   return (
     <div>
-      {posts.length > 0 ? (
-        <>
-          {/* Title Section */}
-          <div>
-            <h2 className="text-4xl md:text-5xl font-bold text-center mb-2">
-              {displayCategory}
-            </h2>
-            <div className="h-1 w-1/4 bg-rose-500 mx-auto mb-6"></div>
-            <p className="text-center light:text-gray-600 text-lg mb-6">
-              Stay updated with the latest posts and insights from our
-              community.
-            </p>
-          </div>
+      {/* Title Section */}
+      <div>
+        <h2 className="text-4xl md:text-5xl font-bold text-center mb-2">
+          {displayCategory}
+        </h2>
+        <div className="h-1 w-1/4 bg-rose-500 mx-auto mb-6"></div>
+        <p className="text-center text-lg mb-6">
+          Stay updated with the latest posts and insights from our community.
+        </p>
+      </div>
 
-          {/* Form Section */}
-          <div className="mb-6 flex justify-center items-center gap-2">
-            <label htmlFor="search" className="sr-only">
-              Search posts
-            </label>
-            <input
-              id="search"
-              type="text"
-              placeholder="Search posts..."
-              className="md:w-1/3 p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <label htmlFor="filter" className="sr-only">
-              Filter posts
-            </label>
-            <Select>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Filter" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="latest">Latest</SelectItem>
-                {categories.map((category) => (
-                  <SelectItem
-                    key={category.name}
-                    value={category.name.toLowerCase()}
-                  >
-                    <Link
-                      href={`/category/${category.name.toLowerCase()}`}
-                      className="w-full block"
-                      aria-label={`Explore ${category.name} category`}
-                    >
-                      {category.name}
-                    </Link>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+      {/* Form Section */}
+      <SearchForm
+        categories={categories}
+        onSubmit={onSubmit}
+        resetResults={resetResults}
+      />
 
-          <div className="mt-10 flex flex-wrap justify-center gap-4">
-            {categories.map((category) => (
-              <Link
-                key={category.name}
-                href={`/category/${category.name.toLowerCase()}`}
-                className="bg-rose-500 hover:bg-rose-600 text-white font-semibold py-2 px-4 rounded-full shadow-md flex items-center gap-2 transition duration-300"
-                aria-label={`Explore ${category.name} category`}
-              >
-                {category.name}
-              </Link>
+      {/* Posts Section */}
+      <div className="w-full min-h-[50vh] flex flex-col items-center justify-center">
+        {isLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-7">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <Skeleton key={index} className="w-full h-24 rounded-md" />
             ))}
           </div>
-          <div className="grid gap-6 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 p-6">
-            {posts.map((post) => (
-              <DashboardPosts
-                key={post.id}
-                post={post}
-                categories={categories}
-              />
-            ))}
+        ) : results.length > 0 ? (
+          <div className="flex flex-col items-center">
+            <h3 className="font-bold text-3xl mb-5">Search Results</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-7">
+              {results.map((post) => (
+                <DashboardPosts
+                  key={post.id}
+                  post={post}
+                  categories={categories}
+                />
+              ))}
+            </div>
           </div>
-        </>
-      ) : (
-        <NoResults category={categoryName} categories={categories} />
-      )}
+        ) : showLatest ? (
+          <div className="flex flex-col items-center">
+            <h3 className="font-bold text-3xl mb-5">
+              {displayCategory} Latest Posts
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-7">
+              {posts.map((post) => (
+                <DashboardPosts
+                  key={post.id}
+                  post={post}
+                  categories={categories}
+                />
+              ))}
+            </div>
+            {totalPages > 1 && (
+              <Pagination className="mt-5">
+                <PaginationContent>
+                  <PaginationPrevious
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (currentPage > 1) setCurrentPage((prev) => prev - 1);
+                    }}
+                  />
+                  {Array.from({ length: totalPages }, (_, index) => (
+                    <PaginationItem key={index}>
+                      <PaginationLink
+                        href="#"
+                        isActive={index + 1 === currentPage}
+                        onClick={() => setCurrentPage(index + 1)}
+                      >
+                        {index + 1}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
+                  <PaginationNext
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (currentPage < totalPages)
+                        setCurrentPage((prev) => prev + 1);
+                    }}
+                  />
+                </PaginationContent>
+              </Pagination>
+            )}
+          </div>
+        ) : (
+          <NoResults />
+        )}
+      </div>
     </div>
   );
 };
