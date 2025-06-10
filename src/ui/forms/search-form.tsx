@@ -4,13 +4,6 @@ import { z } from "zod";
 import { Button } from "@/ui/components/button";
 import { Input } from "@/ui/components/input";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/ui/components/select";
-import {
   Form,
   FormControl,
   FormField,
@@ -38,7 +31,6 @@ type Category = {
 };
 
 const SearchForm = ({
-  categories,
   onSubmit,
   resetResults,
 }: {

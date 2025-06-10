@@ -1,7 +1,4 @@
-import Link from "next/link";
-import { Category } from "@/lib/types";
 import { Search, FileText } from "lucide-react";
-
 export default function NoResults() {
   return (
     <div className="flex flex-col items-center justify-center text-center">
