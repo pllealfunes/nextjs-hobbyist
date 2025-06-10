@@ -4,14 +4,13 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import DashboardPosts from "@/ui/components/dashboard-posts";
 import NoResults from "@/ui/components/no-results";
-import Link from "next/link";
 import { Post, Category } from "@/lib/types";
 import { getCategoryWithPosts } from "@/app/server/categoryActions";
-import { getMatchingPosts, getLatestPosts } from "@/app/explore/action";
 import { SubmitHandler } from "react-hook-form";
 import SearchForm from "@/ui/forms/search-form";
 import { SearchFormValues } from "@/ui/forms/search-form";
 import { Skeleton } from "@/ui/components/skeleton";
+import { Button } from "@/ui/components/button";
 import {
   Pagination,
   PaginationContent,
@@ -20,6 +19,7 @@ import {
   PaginationNext,
   PaginationLink,
 } from "@/ui/components/pagination";
+import { Minus, Plus } from "lucide-react";
 
 const CategoryPage = () => {
   const params = useParams();
@@ -37,6 +37,7 @@ const CategoryPage = () => {
   const latestPageSize = 4;
   const searchPageSize = 5;
   const [totalPages, setTotalPages] = useState(1);
+  const [isFollowing, setIsFollowing] = useState(false);
 
   const capitalizeFirstLetter = (str?: string) => {
     if (!str) return "This category";
@@ -72,7 +73,7 @@ const CategoryPage = () => {
       } catch (error) {
         console.error("Error fetching posts", error);
       } finally {
-        setIsLoading(false); // Stop loading after fetching
+        setIsLoading(false);
       }
     };
 
@@ -114,13 +115,23 @@ const CategoryPage = () => {
     setResults(posts);
   };
 
+  const handleFollow = () => {
+    setIsFollowing((prevState) => !prevState);
+    console.log(isFollowing);
+  };
+
   return (
     <div>
       {/* Title Section */}
       <div>
-        <h2 className="text-4xl md:text-5xl font-bold text-center mb-2">
-          {displayCategory}
-        </h2>
+        <div className="flex justify-center align-center gap-3">
+          <h2 className="text-4xl md:text-5xl font-bold text-center mb-2">
+            {displayCategory}
+          </h2>
+          <Button onClick={handleFollow} className="mt-2">
+            {isFollowing ? <Minus /> : <Plus />}
+          </Button>
+        </div>
         <div className="h-1 w-1/4 bg-rose-500 mx-auto mb-6"></div>
         <p className="text-center text-lg mb-6">
           Stay updated with the latest posts and insights from our community.
