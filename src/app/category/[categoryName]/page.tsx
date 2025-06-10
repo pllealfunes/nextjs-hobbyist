@@ -21,7 +21,7 @@ import {
 } from "@/ui/components/pagination";
 import { Minus, Plus } from "lucide-react";
 
-const CategoryPage = () => {
+export default function CategoryPage() {
   const params = useParams();
   const categoryName = params?.categoryName as string | undefined;
   const [displayCategory, setDisplayCategory] = useState<string | undefined>(
@@ -30,8 +30,9 @@ const CategoryPage = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
   const [showLatest, setShowLatest] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [results, setResults] = useState<Post[]>([]);
+  const [showNoResults, setShowNoResults] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchPage, setSearchPage] = useState(1);
   const latestPageSize = 4;
@@ -51,11 +52,11 @@ const CategoryPage = () => {
 
   useEffect(() => {
     if (!categoryName) return;
-
+    setIsLoading(true);
+    console.log("start", isLoading);
     const fetchData = async () => {
       try {
         console.log("Fetching posts for category:", categoryName);
-        setIsLoading(true); // Start loading before fetching
 
         const [categoriesResponse, postsResponse] = await Promise.all([
           fetch("/api/categories"),
@@ -70,11 +71,14 @@ const CategoryPage = () => {
         setDisplayCategory(
           capitalizeFirstLetter(decodeURIComponent(categoryName))
         );
+        setShowNoResults(postsData?.length === 0);
+        console.log("results?", showNoResults);
       } catch (error) {
         console.error("Error fetching posts", error);
       } finally {
         setIsLoading(false);
       }
+      console.log("end", isLoading);
     };
 
     fetchData();
@@ -104,6 +108,7 @@ const CategoryPage = () => {
 
       const paginatedResults = matchingPosts.slice(0, searchPageSize);
       setResults(paginatedResults);
+      setShowNoResults(paginatedResults?.length === 0);
     } catch (error) {
       console.error("❌ Error filtering posts:", error);
     } finally {
@@ -112,7 +117,8 @@ const CategoryPage = () => {
   };
 
   const resetResults = () => {
-    setResults(posts);
+    setResults([]);
+    setShowLatest(true);
   };
 
   const handleFollow = () => {
@@ -120,23 +126,38 @@ const CategoryPage = () => {
     console.log(isFollowing);
   };
 
+  const latestPosts = posts.slice(
+    (currentPage - 1) * latestPageSize,
+    currentPage * latestPageSize
+  );
+  const searchResults = results.slice(
+    (searchPage - 1) * searchPageSize,
+    searchPage * searchPageSize
+  );
+
   return (
-    <div>
+    <>
       {/* Title Section */}
-      <div>
+      <section>
         <div className="flex justify-center align-center gap-3">
-          <h2 className="text-4xl md:text-5xl font-bold text-center mb-2">
-            {displayCategory}
-          </h2>
-          <Button onClick={handleFollow} className="mt-2">
-            {isFollowing ? <Minus /> : <Plus />}
-          </Button>
+          {isLoading ? (
+            <Skeleton className="w-64 h-14 rounded-md" />
+          ) : (
+            <div className="flex justify-center align-center gap-3">
+              <h2 className="text-4xl md:text-5xl font-bold text-center mb-2">
+                {displayCategory}
+              </h2>
+              <Button onClick={handleFollow} className="mt-2">
+                {isFollowing ? <Minus /> : <Plus />}
+              </Button>
+            </div>
+          )}
         </div>
         <div className="h-1 w-1/4 bg-rose-500 mx-auto mb-6"></div>
         <p className="text-center text-lg mb-6">
           Stay updated with the latest posts and insights from our community.
         </p>
-      </div>
+      </section>
 
       {/* Form Section */}
       <SearchForm
@@ -147,26 +168,14 @@ const CategoryPage = () => {
 
       {/* Posts Section */}
       <div className="w-full min-h-[50vh] flex flex-col items-center justify-center">
-        {isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-7">
-            {Array.from({ length: 6 }).map((_, index) => (
-              <Skeleton key={index} className="w-full h-24 rounded-md" />
+        {isLoading && (
+          <div className="flex justify-center items-center gap-3 w-full">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <Skeleton key={index} className="w-64 h-80 rounded-md" />
             ))}
           </div>
-        ) : results.length > 0 ? (
-          <div className="flex flex-col items-center">
-            <h3 className="font-bold text-3xl mb-5">Search Results</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-7">
-              {results.map((post) => (
-                <DashboardPosts
-                  key={post.id}
-                  post={post}
-                  categories={categories}
-                />
-              ))}
-            </div>
-          </div>
-        ) : showLatest ? (
+        )}
+        {!isLoading && showLatest && latestPosts.length > 0 && (
           <div className="flex flex-col items-center">
             <h3 className="font-bold text-3xl mb-5">
               {displayCategory} Latest Posts
@@ -213,12 +222,52 @@ const CategoryPage = () => {
               </Pagination>
             )}
           </div>
-        ) : (
-          <NoResults />
-        )}
+        )}{" "}
+        {!isLoading && results.length > 0 && (
+          <div className="flex flex-col items-center">
+            <h3 className="font-bold text-3xl mb-5">Search Results</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-7">
+              {searchResults.map((post) => (
+                <DashboardPosts
+                  key={post.id}
+                  post={post}
+                  categories={categories}
+                />
+              ))}
+            </div>
+            {totalPages > 1 && (
+              <Pagination className="mt-5">
+                <PaginationContent>
+                  <PaginationPrevious
+                    href="#"
+                    onClick={() =>
+                      setSearchPage((prev) => Math.max(1, prev - 1))
+                    }
+                  />
+                  {Array.from({ length: totalPages }, (_, index) => (
+                    <PaginationItem key={index}>
+                      <PaginationLink
+                        href="#"
+                        isActive={index + 1 === searchPage}
+                        onClick={() => setSearchPage(index + 1)}
+                      >
+                        {index + 1}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
+                  <PaginationNext
+                    href="#"
+                    onClick={() =>
+                      setSearchPage((prev) => Math.min(totalPages, prev + 1))
+                    }
+                  />
+                </PaginationContent>
+              </Pagination>
+            )}
+          </div>
+        )}{" "}
+        {!isLoading && showNoResults && <NoResults />}
       </div>
-    </div>
+    </>
   );
-};
-
-export default CategoryPage;
+}

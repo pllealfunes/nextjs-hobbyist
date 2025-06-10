@@ -23,6 +23,7 @@ export default function Explore() {
   const [results, setResults] = useState<Post[]>([]);
   const [showLatest, setShowLatest] = useState(true);
   const [latestPosts, setLatestPosts] = useState<Post[]>([]);
+  const [showNoResults, setShowNoResults] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchPage, setSearchPage] = useState(1);
@@ -84,6 +85,8 @@ export default function Explore() {
       });
 
       setResults(searchResults.success ? searchResults.posts ?? [] : []);
+      setShowNoResults(searchResults.posts?.length === 0);
+      console.log(showNoResults);
     } catch (error) {
       console.error("❌ Error fetching posts:", error);
     } finally {
@@ -94,8 +97,8 @@ export default function Explore() {
   const resetResults = () => {
     setResults([]);
     setShowLatest(true);
+    setShowNoResults(false);
   };
-
   return (
     <>
       <section>
@@ -120,15 +123,17 @@ export default function Explore() {
 
           {/* Posts Section */}
           <div className="w-full min-h-[50vh] flex flex-col items-center justify-center">
-            {isLoading ? (
-              /* Skeleton Loader */
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-7">
-                {Array.from({ length: 6 }).map((_, index) => (
-                  <Skeleton key={index} className="w-full h-24 rounded-md" />
+            {/* Skeleton Loader */}
+            {isLoading && (
+              <div className="flex justify-center items-center gap-3">
+                {Array.from({ length: 4 }).map((_, index) => (
+                  <Skeleton key={index} className="w-64 h-80 rounded-md" />
                 ))}
               </div>
-            ) : showLatest ? (
-              /* Latest Posts */
+            )}
+
+            {/* Latest Posts */}
+            {!isLoading && showLatest && latestPosts.length > 0 && (
               <div className="flex flex-col items-center">
                 <h3 className="font-bold text-3xl mb-5">Latest Posts</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-7">
@@ -146,7 +151,7 @@ export default function Explore() {
                       <PaginationPrevious
                         href="#"
                         onClick={(e) => {
-                          e.preventDefault(); // Stops the page reload
+                          e.preventDefault();
                           if (currentPage > 1)
                             setCurrentPage((prev) => prev - 1);
                         }}
@@ -174,8 +179,10 @@ export default function Explore() {
                   </Pagination>
                 )}
               </div>
-            ) : results.length > 0 ? (
-              /* Search Results */
+            )}
+
+            {/* Search Results */}
+            {!isLoading && results.length > 0 && (
               <div className="flex flex-col items-center">
                 <h3 className="font-bold text-3xl mb-5">Search Results</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-7">
@@ -220,10 +227,10 @@ export default function Explore() {
                   </Pagination>
                 )}
               </div>
-            ) : (
-              /* No Posts Found */
-              <NoResults />
             )}
+
+            {/* No Results */}
+            {!isLoading && showNoResults && <NoResults />}
           </div>
         </div>
       </section>
