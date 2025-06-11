@@ -1,5 +1,5 @@
 import { Plus, Minus } from "lucide-react";
-import { useState } from "react";
+//import { useState } from "react";
 
 interface FollowCategoryButtonProps {
   isFollowing: boolean;

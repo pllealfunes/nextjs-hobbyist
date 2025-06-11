@@ -1,7 +1,6 @@
 "use client";
 
 import { useAuth } from "@/contexts/authContext";
-import { supabase } from "@/lib/supabaseClient";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import DashboardPosts from "@/ui/components/dashboard-posts";

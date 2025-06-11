@@ -18,8 +18,6 @@ import {
   Send,
   Trash2,
   Pencil,
-  Minus,
-  Plus,
 } from "lucide-react";
 import { Post, Comment } from "@/lib/types";
 import { CreateCommentSchema } from "@/app/schemas";
