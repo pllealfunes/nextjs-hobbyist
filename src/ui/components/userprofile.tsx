@@ -5,7 +5,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/ui/components/avatar";
 import { Button } from "@/ui/components/button";
 import { ExternalLinkIcon } from "@radix-ui/react-icons";
 import { useAuth } from "@/contexts/authContext";
-import { UserProfile } from "@/lib/types";
+import { Post, UserProfile } from "@/lib/types";
+import { getFollowedCategories } from "@/app/server/categoryActions";
 
 interface UserProfileProps {
   post: number;
@@ -14,6 +15,7 @@ interface UserProfileProps {
 const UserProfileDetails = ({ post }: UserProfileProps) => {
   const user = useAuth();
   const [userData, setUserData] = useState<UserProfile | null>(null);
+  const [followedCategories, setFollowedCategories] = useState<Post[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -48,7 +50,15 @@ const UserProfileDetails = ({ post }: UserProfileProps) => {
       }
     };
 
+    const fetchFollowedCategories = async () => {
+      if (user) {
+        const categories = await getFollowedCategories();
+        setFollowedCategories(categories);
+      }
+    };
+
     fetchData();
+    fetchFollowedCategories();
   }, [user]);
 
   const getUserInitials = (name?: string | null) => {
@@ -97,7 +107,9 @@ const UserProfileDetails = ({ post }: UserProfileProps) => {
               Posts
             </div>
             <div className="flex flex-col light:hover:text-zinc-50 dark:hover:text-rose-500 cursor-pointer">
-              <span className="font-extrabold text-xl">120</span>
+              <span className="font-extrabold text-xl">
+                {followedCategories.length}
+              </span>
               Following
             </div>
             <div className="flex flex-col light:hover:text-zinc-50 dark:hover:text-rose-500 cursor-pointer">

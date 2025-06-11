@@ -1,5 +1,7 @@
 "use client";
 
+import { useAuth } from "@/contexts/authContext";
+import { supabase } from "@/lib/supabaseClient";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import DashboardPosts from "@/ui/components/dashboard-posts";
@@ -10,7 +12,6 @@ import { SubmitHandler } from "react-hook-form";
 import SearchForm from "@/ui/forms/search-form";
 import { SearchFormValues } from "@/ui/forms/search-form";
 import { Skeleton } from "@/ui/components/skeleton";
-import { Button } from "@/ui/components/button";
 import {
   Pagination,
   PaginationContent,
@@ -19,9 +20,14 @@ import {
   PaginationNext,
   PaginationLink,
 } from "@/ui/components/pagination";
-import { Minus, Plus } from "lucide-react";
+import FollowCategoryButton from "@/ui/components/follow-category-lg";
+import {
+  fetchFollowState,
+  toggleFollowCategory,
+} from "@/app/server/categoryActions";
 
 export default function CategoryPage() {
+  const { user } = useAuth();
   const params = useParams();
   const categoryName = params?.categoryName as string | undefined;
   const [displayCategory, setDisplayCategory] = useState<string | undefined>(
@@ -53,11 +59,9 @@ export default function CategoryPage() {
   useEffect(() => {
     if (!categoryName) return;
     setIsLoading(true);
-    console.log("start", isLoading);
+
     const fetchData = async () => {
       try {
-        console.log("Fetching posts for category:", categoryName);
-
         const [categoriesResponse, postsResponse] = await Promise.all([
           fetch("/api/categories"),
           getCategoryWithPosts(categoryName),
@@ -72,17 +76,30 @@ export default function CategoryPage() {
           capitalizeFirstLetter(decodeURIComponent(categoryName))
         );
         setShowNoResults(postsData?.length === 0);
-        console.log("results?", showNoResults);
+
+        // ✅ Call getFollowState with freshly fetched data
+        const category = categoriesData.find(
+          (cat) =>
+            cat.name.toLowerCase() ===
+            decodeURIComponent(categoryName).toLowerCase()
+        );
+
+        if (!category) {
+          console.error("Category not found:", categoryName);
+          return;
+        }
+
+        const followStatus = await fetchFollowState(category.id);
+        setIsFollowing(followStatus);
       } catch (error) {
-        console.error("Error fetching posts", error);
+        console.error("Error fetching posts or follow state", error);
       } finally {
         setIsLoading(false);
       }
-      console.log("end", isLoading);
     };
 
     fetchData();
-  }, [categoryName]);
+  }, [user, categoryName]);
 
   const onSubmit: SubmitHandler<SearchFormValues> = (data) => {
     setIsLoading(true);
@@ -121,9 +138,24 @@ export default function CategoryPage() {
     setShowLatest(true);
   };
 
-  const handleFollow = () => {
-    setIsFollowing((prevState) => !prevState);
-    console.log(isFollowing);
+  const handleFollow = async () => {
+    if (!categoryName) return;
+
+    // Find category by name
+    const category = categories.find((cat) => cat.name === displayCategory);
+    console.log(category);
+
+    if (!category) {
+      console.error("Category not found:", categoryName);
+      return;
+    }
+
+    try {
+      const newFollowState = await toggleFollowCategory(category.id); // ✅ Pass valid category ID
+      setIsFollowing(newFollowState); // ✅ Update state based on response
+    } catch (error) {
+      console.error("❌ Error toggling follow state:", error);
+    }
   };
 
   const latestPosts = posts.slice(
@@ -139,17 +171,18 @@ export default function CategoryPage() {
     <>
       {/* Title Section */}
       <section>
-        <div className="flex justify-center align-center gap-3">
+        <div className="flex justify-center items-center gap-3">
           {isLoading ? (
             <Skeleton className="w-64 h-14 rounded-md" />
           ) : (
-            <div className="flex justify-center align-center gap-3">
+            <div className="flex justify-center items-center gap-3">
               <h2 className="text-4xl md:text-5xl font-bold text-center mb-2">
                 {displayCategory}
               </h2>
-              <Button onClick={handleFollow} className="mt-2">
-                {isFollowing ? <Minus /> : <Plus />}
-              </Button>
+              <FollowCategoryButton
+                isFollowing={isFollowing}
+                handleFollow={handleFollow}
+              />
             </div>
           )}
         </div>

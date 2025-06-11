@@ -18,6 +18,8 @@ import {
   Send,
   Trash2,
   Pencil,
+  Minus,
+  Plus,
 } from "lucide-react";
 import { Post, Comment } from "@/lib/types";
 import { CreateCommentSchema } from "@/app/schemas";
@@ -45,6 +47,7 @@ import {
   FormMessage,
 } from "@/ui/components/form";
 import DeleteCommentConfirmation from "@/ui/components/deleteCommentConfirmation";
+import FollowCategorySm from "@/ui/components/follow-category-sm";
 
 export default function PostPage() {
   const { id } = useParams();
@@ -56,6 +59,7 @@ export default function PostPage() {
   const router = useRouter();
   const safePostId = typeof id === "string" ? id : "";
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
 
   const capitalizeFirstLetter = (str?: string) => {
     if (!str) return "This category";
@@ -247,6 +251,11 @@ export default function PostPage() {
     fetchComments(); // Ensure this updates the UI with fresh data
   };
 
+  const handleFollow = () => {
+    setIsFollowing((prevState) => !prevState);
+    console.log(isFollowing);
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
       {post ? (
@@ -340,15 +349,20 @@ export default function PostPage() {
                       </div>
                     </div>
                   </div>
-                  <Badge
-                    variant="secondary"
-                    className="bg-rose-100 text-rose-700 px-3 py-1 rounded-full text-xs"
-                  >
-                    <Link href={`/category/${category}`} passHref>
-                      {" "}
-                      {capitalizeFirstLetter(category)}
-                    </Link>
-                  </Badge>
+                  <div className="flex justify-center items-center gap-2">
+                    <Badge
+                      variant="secondary"
+                      className="bg-rose-100 text-rose-700 px-3 py-1 rounded-full text-xs"
+                    >
+                      <Link href={`/category/${category}`} passHref>
+                        {capitalizeFirstLetter(category)}
+                      </Link>
+                    </Badge>
+                    <FollowCategorySm
+                      isFollowing={isFollowing}
+                      handleFollow={handleFollow}
+                    />
+                  </div>
                 </div>
                 <h1 className="text-3xl font-bold mb-4">{post.title}</h1>
                 <div
