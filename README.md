@@ -60,6 +60,8 @@ Leftovers
 - [ ] photos dupliacte on create and edit post
 - [ ] no spacing around media in create and edit post
 
+- [ ] clean up - more components, create more action files to move functions over, etc.
+
 ## Getting Started
 
 First, run the development server:
