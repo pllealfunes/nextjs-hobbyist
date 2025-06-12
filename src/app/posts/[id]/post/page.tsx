@@ -19,7 +19,7 @@ import {
   Trash2,
   Pencil,
 } from "lucide-react";
-import { Post, Comment } from "@/lib/types";
+import { Post, Comment, Category } from "@/lib/types";
 import { CreateCommentSchema } from "@/app/schemas";
 import DeleteConfirmationDialog from "@/ui/components/deleteConfirmationDialog";
 import { deleteSinglePost } from "@/app/posts/actions";
@@ -36,6 +36,7 @@ import { toast } from "react-hot-toast";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import FollowCategorySm from "@/ui/components/follow-category-sm";
 import {
   Form,
   FormControl,
@@ -45,12 +46,16 @@ import {
   FormMessage,
 } from "@/ui/components/form";
 import DeleteCommentConfirmation from "@/ui/components/deleteCommentConfirmation";
-import FollowCategorySm from "@/ui/components/follow-category-sm";
+import {
+  fetchFollowState,
+  toggleFollowCategory,
+} from "@/app/server/categoryActions";
 
 export default function PostPage() {
   const { id } = useParams();
   const searchParams = useSearchParams();
   const category = searchParams.get("category") || "Unknown";
+  const [categories, setCategories] = useState<Category[]>([]);
   const [post, setPost] = useState<Post | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -70,31 +75,30 @@ export default function PostPage() {
   };
 
   const fetchComments = useCallback(async () => {
-    try {
-      if (!safePostId) return;
+    if (!safePostId) return;
 
+    try {
       const response = await getCommentsById(safePostId);
 
-      if (!response.success) {
+      if (!response.success || !Array.isArray(response.comments)) {
         console.warn("Error fetching comments:", response.error);
         setComments([]);
         return;
       }
 
-      const formattedComments =
-        response.comments?.map((comment) => ({
-          id: comment.id,
-          post_id: comment.post_id,
-          author_id: comment.author_id,
-          comment: comment.content,
-          created_at: comment.created_at,
-          updated_at: comment.updated_at,
-          author: {
-            id: comment.author_id,
-            username: comment.user?.username,
-            profileImage: comment.profile?.photo,
-          },
-        })) ?? [];
+      const formattedComments = response.comments.map((comment) => ({
+        id: comment.id,
+        post_id: comment.post_id,
+        author_id: comment.author_id,
+        comment: comment.content,
+        created_at: comment.created_at,
+        updated_at: comment.updated_at,
+        author: {
+          id: comment.author_id,
+          username: comment.user?.username || "Unknown",
+          profileImage: comment.profile?.photo || null,
+        },
+      }));
 
       setComments(formattedComments);
     } catch (error) {
@@ -103,22 +107,54 @@ export default function PostPage() {
   }, [safePostId]);
 
   useEffect(() => {
-    async function loadPost() {
+    const loadPost = async () => {
       if (!safePostId) return;
 
-      const response = await getPostById(safePostId);
+      try {
+        const postData = await getPostById(safePostId);
 
-      if (!response.success) {
-        console.error("Error fetching post:", response.error);
-        return;
+        if (!postData.success) {
+          console.error("Error fetching post:", postData.error);
+          return;
+        }
+
+        setPost(postData.post);
+        await fetchComments(); // Await if you want to ensure it completes before continuing
+      } catch (error) {
+        console.error("Error loading post:", error);
       }
+    };
 
-      setPost(response.post);
-      fetchComments();
-    }
+    const loadCategories = async () => {
+      if (!category) return;
+
+      try {
+        const res = await fetch("/api/categories");
+
+        if (!res.ok) {
+          console.error("Error fetching categories");
+          return;
+        }
+
+        const data = await res.json();
+
+        const currentCategory = data.find(
+          (cat: Category) => cat.name.toLowerCase() === category
+        );
+
+        if (currentCategory?.id) {
+          const followStatus = await fetchFollowState(currentCategory.id);
+          setIsFollowing(followStatus);
+        }
+        setCategories(data);
+      } catch (error) {
+        console.error("Error loading categories:", error);
+      }
+    };
 
     loadPost();
-  }, [safePostId]);
+    loadCategories();
+  }, [safePostId, category]);
 
   const getUserInitials = (name?: string | null) => {
     if (!name) return "N/A";
@@ -249,9 +285,22 @@ export default function PostPage() {
     fetchComments(); // Ensure this updates the UI with fresh data
   };
 
-  const handleFollow = () => {
-    setIsFollowing((prevState) => !prevState);
-    console.log(isFollowing);
+  const handleFollow = async () => {
+    if (!category) return;
+
+    // Find category by name
+    const currentCategory = categories.find(
+      (cat) => cat.name.toLowerCase() === category
+    );
+
+    if (!currentCategory) return;
+
+    try {
+      const newFollowState = await toggleFollowCategory(currentCategory.id);
+      setIsFollowing(newFollowState);
+    } catch (error) {
+      console.error("❌ Error toggling follow state:", error);
+    }
   };
 
   return (

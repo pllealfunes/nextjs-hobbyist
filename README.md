@@ -24,7 +24,6 @@ https://nextjs-hobbyist.vercel.app/
 
 ## Current Tasks:
 
-- [ ] add logic to small category btn
 - [ ] make viewable list of categories in profile page
 - [ ] follow and unfollow categories from profile
 - [ ] follow and unfollow users
