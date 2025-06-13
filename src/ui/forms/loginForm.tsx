@@ -15,6 +15,8 @@ import {
   FormMessage,
 } from "@/ui/components/form";
 import { Input } from "@/ui/components/input";
+import { toast } from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
   const form = useForm<z.infer<typeof LoginSchema>>({
@@ -25,14 +27,45 @@ export default function LoginForm() {
     },
   });
 
+  const router = useRouter();
+
   async function onSubmit(values: z.infer<typeof LoginSchema>) {
     try {
       const formData = new FormData();
       formData.append("email", values.email);
       formData.append("password", values.password);
-      await LoginAction(formData);
+
+      const toastId = toast.loading("Logging you in...");
+
+      const result = await LoginAction(formData);
+
+      if ("fields" in result) {
+        result.fields.forEach((field) => {
+          form.setError(field, {
+            type: "manual",
+            message: result.message,
+          });
+        });
+        toast.error(result.message, { id: toastId });
+        return;
+      }
+
+      if ("message" in result) {
+        toast.error(result.message, { id: toastId });
+        return;
+      }
+
+      if (result.success) {
+        toast.success("Welcome back!", { id: toastId });
+
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 200);
+      }
     } catch (error) {
-      console.error("Error logging out:", error);
+      const message =
+        error instanceof Error ? error.message : "Something went wrong.";
+      toast.error(message);
     }
   }
 

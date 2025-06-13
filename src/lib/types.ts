@@ -1,3 +1,10 @@
+export type LoginField = "email" | "password";
+
+export type LoginResult =
+  | { success: true }
+  | { fields: LoginField[]; message: string }
+  | { message: string };
+
 export interface Post {
   id: string;
   title: string;
