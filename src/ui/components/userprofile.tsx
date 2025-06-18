@@ -7,6 +7,7 @@ import { ExternalLinkIcon } from "@radix-ui/react-icons";
 import { useAuth } from "@/contexts/authContext";
 import { Post, UserProfile } from "@/lib/types";
 import { getFollowedCategories } from "@/app/server/categoryActions";
+import FollowSystem from "@/ui/components/follow-system";
 
 interface UserProfileProps {
   post: number;
@@ -101,30 +102,11 @@ const UserProfileDetails = ({ post }: UserProfileProps) => {
           </div>
 
           {/* Followers, Following, Posts Count */}
-          <div className="flex justify-around w-full max-w-md text-center text-sm light:text-gray-900 font-medium">
-            <div className="flex flex-col light:hover:text-zinc-50 dark:hover:text-rose-500 cursor-pointer">
-              <span className="font-extrabold text-xl">{post}</span>
-              Posts
-            </div>
-            <div className="flex flex-col light:hover:text-zinc-50 dark:hover:text-rose-500 cursor-pointer">
-              <span className="font-extrabold text-xl">
-                {followedCategories.length}
-              </span>
-              Following
-            </div>
-            <div className="flex flex-col light:hover:text-zinc-50 dark:hover:text-rose-500 cursor-pointer">
-              <span className="font-extrabold text-xl">300</span>
-              Followers
-            </div>
-            <div className="flex flex-col light:hover:text-zinc-50 dark:hover:text-rose-500 cursor-pointer">
-              <span className="font-extrabold text-xl">7</span>
-              Categories
-            </div>
-          </div>
+          <FollowSystem />
 
           {/* Social Media Links */}
-          <div className="flex gap-4 mt-6">
-            <div className="space-y-3 mt-4">
+          <div>
+            <div className="flex justify-center items-center flex-row gap-3">
               {userData?.links?.map((link, index) => (
                 <a
                   key={index}
@@ -141,7 +123,7 @@ const UserProfileDetails = ({ post }: UserProfileProps) => {
           </div>
 
           {/* Buttons */}
-          <div className="flex gap-6 mt-6">
+          <div className="flex justify-center items-center gap-6 mt-6">
             <Button className="bg-rose-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 sm:px-6 rounded-lg transition duration-300 ease-in-out shadow-lg transform hover:scale-105">
               Follow
             </Button>
