@@ -13,10 +13,16 @@ interface UserProfileProps {
   post: number;
 }
 
+type Category = {
+  id: any;
+  name: any;
+  isFollowing: boolean;
+};
+
 const UserProfileDetails = ({ post }: UserProfileProps) => {
   const user = useAuth();
   const [userData, setUserData] = useState<UserProfile | null>(null);
-  const [followedCategories, setFollowedCategories] = useState<Post[]>([]);
+  const [followedCategories, setFollowedCategories] = useState<Category[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -102,7 +108,7 @@ const UserProfileDetails = ({ post }: UserProfileProps) => {
           </div>
 
           {/* Followers, Following, Posts Count */}
-          <FollowSystem />
+          <FollowSystem post={post} />
 
           {/* Social Media Links */}
           <div>

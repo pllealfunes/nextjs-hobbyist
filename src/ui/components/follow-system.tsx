@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/ui/components/button";
+import { Category } from "@/lib/types";
 import {
   Dialog,
   DialogContent,
@@ -14,6 +15,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/ui/components/avatar";
 import { Badge } from "@/ui/components/badge";
 import { Users, Tag, Search } from "lucide-react";
 import { Input } from "@/ui/components/input";
+import {
+  fetchFollowState,
+  toggleFollowCategory,
+  getFollowedCategories,
+} from "@/app/server/categoryActions";
 
 // Mock data
 const initialCategories = [
@@ -70,15 +76,46 @@ const initialUsers = [
   },
 ];
 
-export default function FollowSystem() {
-  const [categories, setCategories] = useState(initialCategories);
+interface FollowSystemProps {
+  post: number;
+}
+
+export default function FollowSystem({ post }: FollowSystemProps) {
+  const [followedCategories, setFollowedCategories] =
+    useState(initialCategories);
   const [users, setUsers] = useState(initialUsers);
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [isFollowing, setIsFollowing] = useState(false);
 
-  const followingCount =
-    categories.filter((cat) => cat.isFollowing).length +
-    users.filter((user) => user.isFollowing).length;
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const categoriesRes = await fetch("/api/categories");
+        const allCategories = await categoriesRes.json();
+
+        const followedIds = await getFollowedCategories(); // server action
+
+        // Filter only followed categories
+        const followedCategories = allCategories
+          .filter((category: any) => followedIds.includes(category.id))
+          .map((category: any) => ({
+            ...category,
+            isFollowing: true,
+          }));
+
+        setFollowedCategories(followedCategories);
+      } catch (error) {
+        console.error("Error loading followed categories", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const filteredUsers = users.filter(
     (user) =>
@@ -86,16 +123,26 @@ export default function FollowSystem() {
       user.username.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const filteredCategories = categories.filter((category) =>
-    category.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const toggleCategoryFollow = async (categoryData: Category) => {
+    if (!followedCategories) return;
 
-  const toggleCategoryFollow = (categoryId: number) => {
-    setCategories((prev) =>
-      prev.map((cat) =>
-        cat.id === categoryId ? { ...cat, isFollowing: !cat.isFollowing } : cat
-      )
+    // Find category by name
+    const category = followedCategories.find(
+      (cat) => cat.name === categoryData.name
     );
+    console.log(category);
+
+    if (!category) {
+      console.error("Category not found:", categoryData.name);
+      return;
+    }
+
+    try {
+      const newFollowState = await toggleFollowCategory(category.id); // ✅ Pass valid category ID
+      setIsFollowing(newFollowState); // ✅ Update state based on response
+    } catch (error) {
+      console.error("❌ Error toggling follow state:", error);
+    }
   };
 
   const toggleUserFollow = (userId: number) => {
@@ -119,19 +166,23 @@ export default function FollowSystem() {
         <div className="text-center">
           <div className="flex justify-center gap-14">
             <div className="text-center p-2">
-              <div className="text-2xl font-bold">127</div>
+              <div className="text-2xl font-bold">{post}</div>
               <div className="text-sm text-muted-foreground">Posts</div>
             </div>
             <Dialog open={isOpen} onOpenChange={handleModalChange}>
               <DialogTrigger asChild>
                 <button className="text-center hover:bg-muted rounded-lg p-2 transition-colors">
-                  <div className="text-2xl font-bold">{followingCount}</div>
+                  <div className="text-2xl font-bold">
+                    {followedCategories.length}
+                  </div>
                   <div className="text-sm text-muted-foreground">Following</div>
                 </button>
               </DialogTrigger>
               <DialogContent className="max-w-md dark:[&>button]:text-slate-900">
                 <DialogHeader className="text-slate-900">
-                  <DialogTitle>Following ({followingCount})</DialogTitle>
+                  <DialogTitle>
+                    Following ({followedCategories.length})
+                  </DialogTitle>
                 </DialogHeader>
 
                 <div className="relative">
@@ -158,7 +209,7 @@ export default function FollowSystem() {
                       className="flex items-center gap-2"
                     >
                       <Tag className="w-4 h-4" />
-                      Categories ({filteredCategories.length})
+                      Categories ({followedCategories.length})
                     </TabsTrigger>
                   </TabsList>
 
@@ -220,13 +271,13 @@ export default function FollowSystem() {
                     value="categories"
                     className="space-y-4 max-h-96 overflow-y-auto"
                   >
-                    {filteredCategories.length === 0 ? (
+                    {followedCategories.length === 0 ? (
                       <div className="text-center py-8 text-muted-foreground">
                         <Tag className="w-12 h-12 mx-auto mb-2 opacity-50" />
                         <p>No categories found</p>
                       </div>
                     ) : (
-                      filteredCategories.map((category) => (
+                      followedCategories.map((category) => (
                         <div
                           key={category.id}
                           className="flex items-center justify-between p-3 rounded-lg border"
@@ -249,7 +300,7 @@ export default function FollowSystem() {
                               category.isFollowing ? "outline" : "default"
                             }
                             size="sm"
-                            onClick={() => toggleCategoryFollow(category.id)}
+                            onClick={() => toggleCategoryFollow(category)}
                             className={
                               category.isFollowing
                                 ? "hover:bg-destructive hover:text-destructive-foreground"
