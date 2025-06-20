@@ -6,18 +6,11 @@ import { Button } from "@/ui/components/button";
 import { ExternalLinkIcon } from "@radix-ui/react-icons";
 import { useAuth } from "@/contexts/authContext";
 import { UserProfile } from "@/lib/types";
-import { getFollowedCategories } from "@/app/server/categoryActions";
 import FollowSystem from "@/ui/components/follow-system";
 
 interface UserProfileProps {
   post: number;
 }
-
-type Category = {
-  id: string;
-  name: string;
-  isFollowing: boolean;
-};
 
 const UserProfileDetails = ({ post }: UserProfileProps) => {
   const user = useAuth();

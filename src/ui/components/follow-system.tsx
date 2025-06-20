@@ -16,7 +16,6 @@ import { Badge } from "@/ui/components/badge";
 import { Users, Tag, Search } from "lucide-react";
 import { Input } from "@/ui/components/input";
 import {
-  fetchFollowState,
   toggleFollowCategory,
   getFollowedCategories,
 } from "@/app/server/categoryActions";
@@ -87,20 +86,19 @@ export default function FollowSystem({ post }: FollowSystemProps) {
   const [users, setUsers] = useState(initialUsers);
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  //const [isLoading, setIsLoading] = useState(true);
-  //const [isFollowing, setIsFollowing] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       // setIsLoading(true);
       try {
         const categoriesRes = await fetch("/api/categories");
-        const allCategories = await categoriesRes.json();
+        const allCategories: Category[] = await categoriesRes.json();
 
-        const followedIds = await getFollowedCategories(); // server action
+        const followedIds = await getFollowedCategories();
+        type CategoryWithFollow = Category & { isFollowing: boolean };
 
         // Filter only followed categories
-        const followedCategories = allCategories
+        const followedCategories: CategoryWithFollow[] = allCategories
           .filter((category: any) => followedIds.includes(category.id))
           .map((category: any) => ({
             ...category,
@@ -148,7 +146,7 @@ export default function FollowSystem({ post }: FollowSystemProps) {
         ...prev,
         { ...category, isFollowing: true },
       ]);
-      toast.error("Something went wrong. Try again?");
+      toast.error(`Something went wrong: ${error}. Try again?`);
     }
   };
 
