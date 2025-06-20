@@ -99,8 +99,8 @@ export default function FollowSystem({ post }: FollowSystemProps) {
 
         // Filter only followed categories
         const followedCategories: CategoryWithFollow[] = allCategories
-          .filter((category: any) => followedIds.includes(category.id))
-          .map((category: any) => ({
+          .filter((category) => followedIds.includes(category.id))
+          .map((category) => ({
             ...category,
             isFollowing: true,
           }));
