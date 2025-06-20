@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/ui/components/avatar";
 import { Button } from "@/ui/components/button";
 import { ExternalLinkIcon } from "@radix-ui/react-icons";
 import { useAuth } from "@/contexts/authContext";
-import { Post, UserProfile } from "@/lib/types";
+import { UserProfile } from "@/lib/types";
 import { getFollowedCategories } from "@/app/server/categoryActions";
 import FollowSystem from "@/ui/components/follow-system";
 
@@ -14,15 +14,14 @@ interface UserProfileProps {
 }
 
 type Category = {
-  id: any;
-  name: any;
+  id: string;
+  name: string;
   isFollowing: boolean;
 };
 
 const UserProfileDetails = ({ post }: UserProfileProps) => {
   const user = useAuth();
   const [userData, setUserData] = useState<UserProfile | null>(null);
-  const [followedCategories, setFollowedCategories] = useState<Category[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -57,15 +56,7 @@ const UserProfileDetails = ({ post }: UserProfileProps) => {
       }
     };
 
-    const fetchFollowedCategories = async () => {
-      if (user) {
-        const categories = await getFollowedCategories();
-        setFollowedCategories(categories);
-      }
-    };
-
     fetchData();
-    fetchFollowedCategories();
   }, [user]);
 
   const getUserInitials = (name?: string | null) => {

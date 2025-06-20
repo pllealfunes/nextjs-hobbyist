@@ -20,6 +20,7 @@ import {
   toggleFollowCategory,
   getFollowedCategories,
 } from "@/app/server/categoryActions";
+import { toast } from "react-hot-toast";
 
 // Mock data
 const initialCategories = [
@@ -86,12 +87,12 @@ export default function FollowSystem({ post }: FollowSystemProps) {
   const [users, setUsers] = useState(initialUsers);
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
-  const [isFollowing, setIsFollowing] = useState(false);
+  //const [isLoading, setIsLoading] = useState(true);
+  //const [isFollowing, setIsFollowing] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
-      setIsLoading(true);
+      // setIsLoading(true);
       try {
         const categoriesRes = await fetch("/api/categories");
         const allCategories = await categoriesRes.json();
@@ -110,7 +111,7 @@ export default function FollowSystem({ post }: FollowSystemProps) {
       } catch (error) {
         console.error("Error loading followed categories", error);
       } finally {
-        setIsLoading(false);
+        //setIsLoading(false);
       }
     };
 
@@ -123,25 +124,31 @@ export default function FollowSystem({ post }: FollowSystemProps) {
       user.username.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const toggleCategoryFollow = async (categoryData: Category) => {
-    if (!followedCategories) return;
-
-    // Find category by name
-    const category = followedCategories.find(
-      (cat) => cat.name === categoryData.name
+  const toggleCategoryFollow = async (category: Category) => {
+    // Optimistically remove the category from state
+    setFollowedCategories((prev) =>
+      prev.filter((cat) => cat.id !== category.id)
     );
-    console.log(category);
-
-    if (!category) {
-      console.error("Category not found:", categoryData.name);
-      return;
-    }
 
     try {
-      const newFollowState = await toggleFollowCategory(category.id); // ✅ Pass valid category ID
-      setIsFollowing(newFollowState); // ✅ Update state based on response
+      const updatedStatus = await toast.promise(
+        toggleFollowCategory(category.id),
+        {
+          loading: `Unfollowing ${category.name}`,
+          success: `Successfully Unfollowed ${category.name}`,
+          error: "Something went wrong. Try again?",
+        }
+      );
+
+      // If somehow it failed to unfollow, re-add it
+      if (!updatedStatus) return;
     } catch (error) {
-      console.error("❌ Error toggling follow state:", error);
+      // Revert by adding the category back if unfollow failed
+      setFollowedCategories((prev) => [
+        ...prev,
+        { ...category, isFollowing: true },
+      ]);
+      toast.error("Something went wrong. Try again?");
     }
   };
 
@@ -173,7 +180,7 @@ export default function FollowSystem({ post }: FollowSystemProps) {
               <DialogTrigger asChild>
                 <button className="text-center hover:bg-muted rounded-lg p-2 transition-colors">
                   <div className="text-2xl font-bold">
-                    {followedCategories.length}
+                    {followedCategories.length + users.length}
                   </div>
                   <div className="text-sm text-muted-foreground">Following</div>
                 </button>
