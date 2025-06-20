@@ -24,10 +24,7 @@ https://nextjs-hobbyist.vercel.app/
 
 ## Current Tasks:
 
-- [ ] make viewable list of categories in profile page
-- [ ] follow and unfollow categories from profile
 - [ ] follow and unfollow users
-- [ ] make viewable list of categories in profile page
 - [ ] add user count to profile
 - [ ] make viewable list of users in profile page
 - [ ] follow and unfollow users from profile
