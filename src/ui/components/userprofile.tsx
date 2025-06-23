@@ -95,22 +95,26 @@ const UserProfileDetails = ({ post }: UserProfileProps) => {
           <FollowSystem post={post} />
 
           {/* Social Media Links */}
-          <div>
-            <div className="flex justify-center items-center flex-row gap-3">
-              {userData?.links?.map((link, index) => (
-                <a
-                  key={index}
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 hover:text-rose-900 transition-all duration-300 font-semibold text-lg"
-                >
-                  <ExternalLinkIcon className="w-5 h-5" />
-                  {link.label}
-                </a>
-              ))}
-            </div>
-          </div>
+          {userData &&
+            Array.isArray(userData?.links) &&
+            userData.links.filter((link) => link?.url?.trim()).length > 0 && (
+              <div>
+                <div className="flex justify-center items-center flex-row gap-3">
+                  {userData.links.map((link, index) => (
+                    <a
+                      key={index}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 hover:text-rose-900 transition-all duration-300 font-semibold text-lg"
+                    >
+                      <ExternalLinkIcon className="w-5 h-5" />
+                      {link.label}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
 
           {/* Buttons */}
           <div className="flex justify-center items-center gap-6 mt-6">
