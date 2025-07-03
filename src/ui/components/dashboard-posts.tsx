@@ -1,30 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Category, UserProfile } from "@/lib/types";
+import { Post, Category, UserProfile } from "@/lib/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/ui/components/avatar";
 import { Heart } from "lucide-react";
 
 interface PostCardProps {
   post: Post;
   categories: Category[];
-}
-
-interface Post {
-  id: number;
-  title: string;
-  content: string;
-  category_id: number;
-  created_at: string;
-  coverphoto?: string;
-  author_id: string;
-  user: {
-    id: string;
-    username: string;
-  };
-  profile: {
-    id: string;
-    photo: string | null;
-  };
 }
 
 function stripHtmlAndTrim(content: string, maxLength: number): string {

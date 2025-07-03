@@ -2,53 +2,36 @@
 
 import { useEffect, useState } from "react";
 import UserProfile from "@/ui/components/userprofile";
-import { Category } from "@/lib/types";
+import { Post, Category } from "@/lib/types";
 import { getPublishedPosts } from "@/app/server/postActions";
 import { useAuth } from "@/contexts/authContext";
 import { FileText } from "lucide-react";
 import { useParams } from "next/navigation";
-
-interface Post {
-  id: number;
-  title: string;
-  content: string;
-  category_id: number;
-  created_at: string;
-  coverphoto?: string;
-  author_id: string;
-  user: {
-    id: string;
-    username: string;
-  };
-  profile: {
-    id: string;
-    photo: string | null;
-  };
-}
+import DashboardPosts from "@/ui/components/dashboard-posts";
 
 export default function Profile() {
   const [posts, setPosts] = useState<Post[]>([]);
-  //const [categories, setCategories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const { user } = useAuth();
   const params = useParams();
   const isOwnProfile = user?.id === params.id;
-  const userPosts = posts.filter((post: Post) => post.author_id === params.id);
 
   useEffect(() => {
     async function getPosts() {
+      if (!params.id) return;
       try {
-        const data = await getPublishedPosts();
+        const data = await getPublishedPosts(params.id?.toString());
 
-        // const categoriesResponse = await fetch("/api/categories");
-        // const categoriesData: Category[] = await categoriesResponse.json();
+        const categoriesResponse = await fetch("/api/categories");
+        const categoriesData: Category[] = await categoriesResponse.json();
 
         if (Array.isArray(data)) {
           setPosts(data);
         }
 
-        // if (Array.isArray(categoriesData)) {
-        //   setCategories(categoriesData);
-        // }
+        if (Array.isArray(categoriesData)) {
+          setCategories(categoriesData);
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -58,9 +41,32 @@ export default function Profile() {
   }, []);
   return (
     <div>
-      <UserProfile post={userPosts.length} />
-      {userPosts.length > 0 ? (
-        <section className="mt-14">{/* posts grid */}</section>
+      <UserProfile post={posts.length} />
+      {posts.length > 0 ? (
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-7">
+          {posts.map((post) => (
+            <DashboardPosts
+              key={post.id}
+              post={{
+                id: post.id,
+                title: post.title,
+                content: post.content,
+                created_at: post.created_at,
+                category_id: post.category_id,
+                author_id: post.author_id,
+                user: {
+                  id: post.user?.id,
+                  username: post.user?.username,
+                },
+                profile: {
+                  id: post.profile.id,
+                  photo: post.profile?.photo,
+                },
+              }}
+              categories={categories}
+            />
+          ))}
+        </section>
       ) : (
         <section className="m-24 text-center">
           <div className="col-span-full flex flex-col items-center justify-center py-24 px-4">

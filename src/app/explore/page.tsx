@@ -3,7 +3,7 @@
 import DashboardPosts from "@/ui/components/dashboard-posts";
 import { useState, useEffect } from "react";
 import { getMatchingPosts, getLatestPosts } from "@/app/explore/action";
-import { Category } from "@/lib/types";
+import { Post, Category } from "@/lib/types";
 import { SubmitHandler } from "react-hook-form";
 import SearchForm from "@/ui/forms/explore-posts";
 import { SearchFormValues } from "@/ui/forms/explore-posts";
@@ -17,24 +17,6 @@ import {
   PaginationNext,
   PaginationLink,
 } from "@/ui/components/pagination";
-
-interface Post {
-  id: number;
-  title: string;
-  content: string;
-  category_id: number;
-  created_at: string;
-  coverphoto?: string;
-  author_id: string;
-  user: {
-    id: string;
-    username: string;
-  };
-  profile: {
-    id: string;
-    photo: string | null;
-  };
-}
 
 export default function Explore() {
   const [categories, setCategories] = useState<Category[]>([]);
