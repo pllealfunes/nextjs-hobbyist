@@ -341,20 +341,29 @@ export default function PostPage() {
               <div className="p-6 md:p-8">
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center space-x-4">
-                    <Avatar>
+                    {/* User Info */}
+                    <Avatar className="w-10 h-10">
                       <AvatarImage
-                        src="https://randomuser.me/api/portraits/men/2.jpg"
-                        alt="Author"
+                        src={post?.profile?.photo || undefined}
+                        alt={getUserInitials(post?.user?.username)}
                       />
-                      <AvatarFallback>JD</AvatarFallback>
+                      <AvatarFallback>
+                        {post ? getUserInitials(post?.user?.username) : "?"}
+                      </AvatarFallback>
                     </Avatar>
                     <div>
-                      <Link
-                        href="#"
-                        className="text-lg font-semibold hover:text-rose-600"
-                      >
-                        John Doe
-                      </Link>
+                      {post?.user?.username ? (
+                        <Link
+                          href={`/profiles/${post.user.id}`}
+                          className="text-lg hover:text-rose-600 font-semibold hover:underline"
+                        >
+                          {post.user?.username}
+                        </Link>
+                      ) : (
+                        <p className="text-gray-800 font-semibold">
+                          Loading...
+                        </p>
+                      )}
                       <div className="flex items-center text-sm">
                         {post.updated_at &&
                         post.updated_at != post.created_at ? (
@@ -386,7 +395,7 @@ export default function PostPage() {
                             <Calendar className="h-4 w-4 mr-1" />
                             <time
                               dateTime={new Date(
-                                post.updated_at
+                                post.created_at
                               ).toLocaleDateString()}
                             >
                               {new Date(post.created_at).toLocaleDateString()}

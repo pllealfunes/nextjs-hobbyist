@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/ui/components/avatar";
 import { Button } from "@/ui/components/button";
 import { ExternalLinkIcon } from "@radix-ui/react-icons";
-import { useAuth } from "@/contexts/authContext";
+import { useParams } from "next/navigation";
 import { UserProfile } from "@/lib/types";
 import FollowSystem from "@/ui/components/follow-system";
 
@@ -13,16 +13,16 @@ interface UserProfileProps {
 }
 
 const UserProfileDetails = ({ post }: UserProfileProps) => {
-  const user = useAuth();
+  const user = useParams();
   const [userData, setUserData] = useState<UserProfile | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
-      const userId = user.user?.id;
+      const userId = user.id;
       if (!userId) return;
 
       try {
-        const userRes = await fetch("/api/user");
+        const userRes = await fetch(`/api/user/${user.id}`);
         if (!userRes.ok) throw new Error("Failed to fetch user data");
         const userInfo = await userRes.json();
 
@@ -63,7 +63,7 @@ const UserProfileDetails = ({ post }: UserProfileProps) => {
   return (
     <div>
       <section>
-        <div className="py-12 sm:py-20 rounded-3xl flex flex-col justify-center items-center gap-8 px-4 sm:px-10">
+        <div className="py-12 sm:py-20 flex flex-col justify-center items-center gap-8 px-4 sm:px-10">
           {/* Avatar and Name */}
           <div className="flex flex-col items-center gap-4">
             <Avatar className="w-36 h-36">
@@ -71,7 +71,7 @@ const UserProfileDetails = ({ post }: UserProfileProps) => {
                 src={userData?.photo || undefined}
                 alt={getUserInitials(userData?.username)}
               />
-              <AvatarFallback className="text-7xl">
+              <AvatarFallback className="bg-gray-200 text-7xl">
                 {userData ? getUserInitials(userData.username) : "?"}
               </AvatarFallback>
             </Avatar>

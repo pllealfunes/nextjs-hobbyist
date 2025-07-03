@@ -182,7 +182,10 @@ export default function LoginNav() {
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                   <DropdownMenuItem>
-                    <Link href="/profiles" aria-label="Go to profiles page">
+                    <Link
+                      href={`/profiles/${user.user?.id}`}
+                      aria-label="Go to profiles page"
+                    >
                       Profile
                     </Link>
                   </DropdownMenuItem>
@@ -223,7 +226,7 @@ export default function LoginNav() {
               <DropdownMenuContent className="w-56">
                 <div className="flex justify-between items-center">
                   <div className="flex justify-between items-center gap-2 my-2">
-                    <Link href="/profiles">
+                    <Link href={`/profiles/${user.user?.id}`}>
                       <Image
                         alt="User avatar"
                         src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
@@ -286,7 +289,10 @@ export default function LoginNav() {
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                   <DropdownMenuItem>
-                    <Link href="/profiles" aria-label="Go to profile page">
+                    <Link
+                      href={`/profiles/${user.user?.id}`}
+                      aria-label="Go to profile page"
+                    >
                       Profile
                     </Link>
                   </DropdownMenuItem>

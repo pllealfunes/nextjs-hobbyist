@@ -1,33 +1,54 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import DashboardPosts from "@/ui/components/dashboard-posts";
 import UserProfile from "@/ui/components/userprofile";
-import { Post, Category } from "@/lib/types";
+import { Category } from "@/lib/types";
 import { getPublishedPosts } from "@/app/server/postActions";
 import { useAuth } from "@/contexts/authContext";
 import { FileText } from "lucide-react";
+import { useParams } from "next/navigation";
+
+interface Post {
+  id: number;
+  title: string;
+  content: string;
+  category_id: number;
+  created_at: string;
+  coverphoto?: string;
+  author_id: string;
+  user: {
+    id: string;
+    username: string;
+  };
+  profile: {
+    id: string;
+    photo: string | null;
+  };
+}
 
 export default function Profile() {
   const [posts, setPosts] = useState<Post[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
+  //const [categories, setCategories] = useState<Category[]>([]);
   const { user } = useAuth();
+  const params = useParams();
+  const isOwnProfile = user?.id === params.id;
+  const userPosts = posts.filter((post: Post) => post.author_id === params.id);
 
   useEffect(() => {
     async function getPosts() {
       try {
         const data = await getPublishedPosts();
 
-        const categoriesResponse = await fetch("/api/categories");
-        const categoriesData: Category[] = await categoriesResponse.json();
+        // const categoriesResponse = await fetch("/api/categories");
+        // const categoriesData: Category[] = await categoriesResponse.json();
 
         if (Array.isArray(data)) {
           setPosts(data);
         }
 
-        if (Array.isArray(categoriesData)) {
-          setCategories(categoriesData);
-        }
+        // if (Array.isArray(categoriesData)) {
+        //   setCategories(categoriesData);
+        // }
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -35,25 +56,11 @@ export default function Profile() {
 
     getPosts();
   }, []);
-
   return (
     <div>
-      <UserProfile post={posts.length} />
-      {/* Posts Section */}
-      {user &&
-      Array.isArray(posts) &&
-      posts.some((post) => post.author_id === user.id) ? (
-        <section className="mt-14">
-          <div className="grid gap-6 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 p-6">
-            {posts.map((post) => (
-              <DashboardPosts
-                key={post.id}
-                post={post}
-                categories={categories}
-              />
-            ))}
-          </div>
-        </section>
+      <UserProfile post={userPosts.length} />
+      {userPosts.length > 0 ? (
+        <section className="mt-14">{/* posts grid */}</section>
       ) : (
         <section className="m-24 text-center">
           <div className="col-span-full flex flex-col items-center justify-center py-24 px-4">
@@ -61,10 +68,12 @@ export default function Profile() {
               <FileText className="w-11 h-11 text-rose-400" />
             </div>
             <h3 className="text-3xl font-semibold text-gray-900 dark:text-slate-100 mb-2">
-              No Posts Found
+              {isOwnProfile ? "No Posts Yet" : "No Posts Found"}
             </h3>
             <p className="text-slate-500 dark:text-slate-400 text-center max-w-md mb-6">
-              Create a post to see it here!
+              {isOwnProfile
+                ? "Create a post to see it here!"
+                : "This user hasn't posted anything yet!"}
             </p>
           </div>
         </section>

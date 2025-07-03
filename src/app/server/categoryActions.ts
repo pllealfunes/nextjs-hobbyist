@@ -5,16 +5,13 @@ export async function getCategoryWithPosts(categoryName: string) {
   try {
     const supabase = await createClient();
 
-    // Validate category input
     if (!categoryName) {
       throw new Error("Category name is required");
     }
 
-    // Format category name
+    // Format the category string
     const capitalizeFirstLetter = (str: string) => {
-      if (str.toLowerCase() === "games+puzzles") {
-        return "Games+Puzzles";
-      }
+      if (str.toLowerCase() === "games+puzzles") return "Games+Puzzles";
       return str.charAt(0).toUpperCase() + str.slice(1);
     };
 
@@ -22,18 +19,18 @@ export async function getCategoryWithPosts(categoryName: string) {
       decodeURIComponent(categoryName.replace(/-/g, "+"))
     );
 
-    // Fetch category data
+    // Fetch category
     const { data: categoryData, error: categoryError } = await supabase
       .from("Category")
       .select("*")
       .eq("name", formattedCategory)
-      .maybeSingle(); // ✅ Ensures only one result or null
+      .maybeSingle();
 
     if (categoryError)
       throw new Error(`Error fetching category: ${categoryError.message}`);
     if (!categoryData) throw new Error("Category not found");
 
-    // Fetch posts filtered by categoryId
+    // Fetch posts
     const { data: posts, error: postsError } = await supabase
       .from("Post")
       .select("*")
@@ -43,7 +40,44 @@ export async function getCategoryWithPosts(categoryName: string) {
     if (postsError)
       throw new Error(`Error fetching posts: ${postsError.message}`);
 
-    return { success: true, category: categoryData, posts };
+    const authorIds = posts?.map((p) => p.author_id).filter(Boolean);
+    if (!authorIds.length) {
+      return { success: true, posts: [] };
+    }
+
+    const { data: users, error: userError } = await supabase
+      .from("User")
+      .select("id, username")
+      .in("id", authorIds);
+
+    if (userError) {
+      throw new Error(`Error fetching users: ${userError.message}`);
+    }
+
+    const { data: profiles, error: profileError } = await supabase
+      .from("Profile")
+      .select("id, photo")
+      .in("id", authorIds);
+
+    if (profileError) {
+      throw new Error(`Error fetching profiles: ${profileError.message}`);
+    }
+
+    const enrichedPosts = posts.map((post) => {
+      return {
+        ...post,
+        user: users.find((u) => u.id === post.author_id) || {
+          id: post.author_id,
+          username: "Unknown User",
+        },
+        profile: profiles.find((p) => p.id === post.author_id) || {
+          id: post.author_id,
+          photo: null,
+        },
+      };
+    });
+
+    return { success: true, posts: enrichedPosts };
   } catch (error) {
     console.error("❌ Error fetching category with posts:", error);
     return {

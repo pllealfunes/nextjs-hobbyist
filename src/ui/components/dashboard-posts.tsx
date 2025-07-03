@@ -1,11 +1,30 @@
 import Image from "next/image";
-//import { Button } from "./button";
 import Link from "next/link";
-import { Post, Category } from "@/lib/types";
+import { Category, UserProfile } from "@/lib/types";
+import { Avatar, AvatarFallback, AvatarImage } from "@/ui/components/avatar";
+import { Heart } from "lucide-react";
 
 interface PostCardProps {
   post: Post;
   categories: Category[];
+}
+
+interface Post {
+  id: number;
+  title: string;
+  content: string;
+  category_id: number;
+  created_at: string;
+  coverphoto?: string;
+  author_id: string;
+  user: {
+    id: string;
+    username: string;
+  };
+  profile: {
+    id: string;
+    photo: string | null;
+  };
 }
 
 function stripHtmlAndTrim(content: string, maxLength: number): string {
@@ -18,13 +37,21 @@ function stripHtmlAndTrim(content: string, maxLength: number): string {
 }
 
 export default function DashboardPosts({ post, categories }: PostCardProps) {
+  const getUserInitials = (name?: string | null) => {
+    if (!name) return "N/A";
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("");
+  };
+
   const getCategoryName = (categoryId: number): string => {
     const category = categories.find((cat) => cat.id === categoryId);
     return category ? category.name : "Unknown";
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform transform hover:scale-105 duration-300 cursor-pointer">
+    <div className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform transform hover:scale-105 duration-300">
       {/* Card Image */}
       {post.coverphoto && post.coverphoto.trim() !== "" && (
         <div className="relative">
@@ -58,59 +85,55 @@ export default function DashboardPosts({ post, categories }: PostCardProps) {
           </Link>
         </div>
 
-        <Link
-          href={`/posts/${post.id}/post?category=${encodeURIComponent(
-            getCategoryName(post.category_id).toLowerCase()
-          )}`}
-          passHref
-        >
-          <div className="block">
-            {/* Title */}
-            <h3 className="font-semibold text-xl text-gray-900 mb-3">
+        <div className="cardInfo">
+          {/* Title */}
+          <Link
+            href={`/posts/${post.id}/post?category=${encodeURIComponent(
+              getCategoryName(post.category_id).toLowerCase()
+            )}`}
+            passHref
+          >
+            <h3 className="font-semibold text-xl text-gray-900 hover:underline mb-3">
               {post.title}
             </h3>
+          </Link>
+          {/* Description */}
+          <p className="text-gray-700 text-sm mb-6">
+            {stripHtmlAndTrim(post.content || "", 100)}
+          </p>
 
-            {/* Description */}
-            <p className="text-gray-700 text-sm mb-6">
-              {stripHtmlAndTrim(post.content || "", 100)}
-            </p>
-
-            {/* User Info and Like Section */}
-            <div className="flex items-center justify-between">
-              {/* User Info */}
-              <div className="flex items-center gap-3">
-                {/* <Image
-                  src={post.user_image}
-                  alt={post.user_name}
-                  height={40}
-                  width={40}
-                  className="h-10 w-10 rounded-full"
-                /> */}
-                {/* <p className="text-gray-800 font-semibold">{post.user_name}</p> */}
-              </div>
-
-              {/* Like Section */}
-              <div className="flex items-center gap-1 text-red-500">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.5"
-                  stroke="currentColor"
-                  className="h-6 w-6"
-                  aria-hidden="true"
+          {/* User Info and Like Section */}
+          <div className="flex items-center justify-between">
+            {/* User Info */}
+            <div className="flex items-center gap-3">
+              <Avatar className="w-10 h-10">
+                <AvatarImage
+                  src={post?.profile?.photo || undefined}
+                  alt={getUserInitials(post?.user?.username)}
+                />
+                <AvatarFallback>
+                  {post ? getUserInitials(post?.user?.username) : "?"}
+                </AvatarFallback>
+              </Avatar>
+              {post?.user?.username ? (
+                <Link
+                  href={`/profiles/${post.user.id}`}
+                  className="text-gray-800 font-semibold hover:underline"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
-                  />
-                </svg>
-                <span className="text-gray-600 text-sm">50</span>
-              </div>
+                  {post.user?.username}
+                </Link>
+              ) : (
+                <p className="text-gray-800 font-semibold">Loading...</p>
+              )}
+            </div>
+
+            {/* Like Section */}
+            <div className="flex items-center gap-1 text-red-500">
+              <Heart className="test-rose-500" />
+              <span className="text-gray-600 text-sm">50</span>
             </div>
           </div>
-        </Link>
+        </div>
       </div>
     </div>
   );

@@ -3,7 +3,7 @@
 import DashboardPosts from "@/ui/components/dashboard-posts";
 import { useState, useEffect } from "react";
 import { getMatchingPosts, getLatestPosts } from "@/app/explore/action";
-import { Post, Category } from "@/lib/types";
+import { Category } from "@/lib/types";
 import { SubmitHandler } from "react-hook-form";
 import SearchForm from "@/ui/forms/explore-posts";
 import { SearchFormValues } from "@/ui/forms/explore-posts";
@@ -17,6 +17,24 @@ import {
   PaginationNext,
   PaginationLink,
 } from "@/ui/components/pagination";
+
+interface Post {
+  id: number;
+  title: string;
+  content: string;
+  category_id: number;
+  created_at: string;
+  coverphoto?: string;
+  author_id: string;
+  user: {
+    id: string;
+    username: string;
+  };
+  profile: {
+    id: string;
+    photo: string | null;
+  };
+}
 
 export default function Explore() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -32,39 +50,37 @@ export default function Explore() {
   const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
-    async function fetchLatestPosts(page = 1) {
+    const fetchData = async () => {
       setIsLoading(true);
+
       try {
-        const response = await getLatestPosts({
-          page,
-          pageSize: latestPageSize,
-        });
-        if (response.success) {
-          setLatestPosts(response.posts ?? []);
+        const [categoriesResponse, postsResponse] = await Promise.all([
+          fetch("/api/categories"),
+          getLatestPosts({
+            page: currentPage,
+            pageSize: latestPageSize,
+          }),
+        ]);
+
+        const categoriesData: Category[] = await categoriesResponse.json();
+
+        setCategories(categoriesData);
+
+        if (postsResponse.success) {
+          setLatestPosts(postsResponse.posts ?? []);
           setTotalPages(
-            Math.ceil((response?.totalCount ?? 1) / latestPageSize)
+            Math.ceil((postsResponse.totalCount ?? 1) / latestPageSize)
           );
         }
       } catch (error) {
-        console.error(error);
+        console.error("Error loading categories or posts:", error);
+      } finally {
+        setIsLoading(false);
       }
-    }
+    };
 
-    async function loadCategories() {
-      try {
-        const response = await fetch("/api/categories");
-        const data = await response.json();
-
-        setCategories(data);
-      } catch (error) {
-        console.error("Error fetching categories", error);
-      }
-    }
-
-    loadCategories();
-    fetchLatestPosts(currentPage);
-    setIsLoading(false);
-  }, []);
+    fetchData();
+  }, [currentPage]);
 
   const onSubmit: SubmitHandler<SearchFormValues> = async (data) => {
     setShowLatest(false);

@@ -8,14 +8,20 @@ export type LoginResult =
 export interface Post {
   id: string;
   title: string;
-  coverphoto?: string;
   content: string;
   category_id: number;
-  published: boolean;
-  private: boolean;
+  coverphoto?: string;
   author_id: string;
-  created_at: Date;
-  updated_at: Date;
+  user: {
+    id: string;
+    username: string;
+  };
+  profile: {
+    id: string;
+    photo: string | null;
+  };
+  created_at: string;
+  updated_at?: string;
 }
 
 export interface Category {

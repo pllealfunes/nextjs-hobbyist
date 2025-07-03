@@ -15,20 +15,56 @@ export async function getPostById(postId: string) {
 
     console.log("🔍 Fetching post with ID:", postId);
 
-    // Fetch post data by ID
-    const { data: post, error } = await supabase
+    // Fetch post
+    const { data: post, error: postError } = await supabase
       .from("Post")
       .select("*")
       .eq("id", postId)
       .maybeSingle();
 
-    if (error) throw new Error(`Error fetching post: ${error.message}`);
+    if (postError) throw new Error(`Error fetching post: ${postError.message}`);
+    if (!post) throw new Error("Post not found");
 
-    console.log("📌 Found post:", post);
+    const authorId = post.author_id;
+    if (!authorId) {
+      return {
+        success: true,
+        post: {
+          ...post,
+          user: { id: null, username: "Unknown User" },
+          profile: { id: null, photo: null },
+        },
+      };
+    }
 
-    return { success: true, post };
+    // Fetch user
+    const { data: user, error: userError } = await supabase
+      .from("User")
+      .select("id, username")
+      .eq("id", authorId)
+      .maybeSingle();
+
+    if (userError) throw new Error(`Error fetching user: ${userError.message}`);
+
+    // Fetch profile
+    const { data: profile, error: profileError } = await supabase
+      .from("Profile")
+      .select("id, photo")
+      .eq("id", authorId)
+      .maybeSingle();
+
+    if (profileError)
+      throw new Error(`Error fetching profile: ${profileError.message}`);
+
+    const enrichedPost = {
+      ...post,
+      user: user ?? { id: authorId, username: "Unknown User" },
+      profile: profile ?? { id: authorId, photo: null },
+    };
+
+    return { success: true, post: enrichedPost };
   } catch (error) {
-    console.error("❌ Error fetching post:", error);
+    console.error("❌ Error fetching post with user info:", error);
     return {
       success: false,
       error: error instanceof Error ? error.message : "Internal server error",
