@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Post, Category, UserProfile } from "@/lib/types";
+import { Post, Category } from "@/lib/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/ui/components/avatar";
 import { Heart } from "lucide-react";
 
