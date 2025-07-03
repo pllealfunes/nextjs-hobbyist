@@ -3,15 +3,17 @@ import { createClient } from "@/utils/supabase/server";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const resolvedParams = await context.params;
+    const id = resolvedParams.id;
     const supabase = await createClient();
 
     const { data: userInfo, error } = await supabase
       .from("User")
       .select("id, name, username, email")
-      .eq("id", params.id)
+      .eq("id", id)
       .single();
 
     if (error || !userInfo) {
