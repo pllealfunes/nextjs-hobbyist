@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import DashboardPosts from "@/ui/components/dashboard-posts";
 import NoResults from "@/ui/components/no-results";
-import { Category } from "@/lib/types";
+import { Post, Category } from "@/lib/types";
 import { getCategoryWithPosts } from "@/app/server/categoryActions";
 import { SubmitHandler } from "react-hook-form";
 import SearchForm from "@/ui/forms/search-form";
@@ -24,24 +24,6 @@ import {
   fetchFollowState,
   toggleFollowCategory,
 } from "@/app/server/categoryActions";
-
-interface Post {
-  id: number;
-  title: string;
-  content: string;
-  category_id: number;
-  created_at: string;
-  coverphoto?: string;
-  author_id: string;
-  user: {
-    id: string;
-    username: string;
-  };
-  profile: {
-    id: string;
-    photo: string | null;
-  };
-}
 
 export default function CategoryPage() {
   const { user } = useAuth();
