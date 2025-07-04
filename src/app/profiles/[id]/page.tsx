@@ -54,6 +54,7 @@ export default function Profile() {
                 created_at: post.created_at,
                 category_id: post.category_id,
                 author_id: post.author_id,
+                published: post.published,
                 user: {
                   id: post.user?.id,
                   username: post.user?.username,

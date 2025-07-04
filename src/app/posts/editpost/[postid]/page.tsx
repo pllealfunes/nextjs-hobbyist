@@ -36,7 +36,6 @@ export default function EditPost() {
   useEffect(() => {
     async function loadData() {
       try {
-        // ✅ Use server actions instead of API requests
         const categoryRresponse = await fetch("/api/categories");
         const categoryData = await categoryRresponse.json();
         const postResponse = await getPostById(safePostId);

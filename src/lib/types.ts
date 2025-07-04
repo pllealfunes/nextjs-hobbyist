@@ -12,6 +12,7 @@ export interface Post {
   category_id: number;
   coverphoto?: string;
   author_id: string;
+  published: boolean;
   user: {
     id: string;
     username: string;
