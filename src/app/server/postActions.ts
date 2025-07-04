@@ -132,35 +132,60 @@ export async function getPublishedPosts(userId: string) {
   }
 }
 
-export async function getDraftPosts() {
+export async function getDraftPosts(userId: string) {
   try {
     const supabase = await createClient();
 
-    // Get the authenticated user
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      throw new Error("Unauthorized");
+    if (!userId) {
+      throw new Error("User ID is required to fetch draft posts");
     }
 
-    // Fetch only the user's draft posts
-    const { data: posts, error } = await supabase
+    // Fetch published posts for the given user
+    const { data: posts, error: postError } = await supabase
       .from("Post")
       .select("*")
-      .eq("author_id", user.id)
+      .eq("author_id", userId)
       .eq("published", false)
       .order("created_at", { ascending: false });
 
-    if (error) {
-      throw new Error(`Error fetching draft posts: ${error.message}`);
+    if (postError) {
+      throw new Error(`Error fetching draft posts: ${postError.message}`);
     }
 
-    return posts;
+    if (!posts || posts.length === 0) {
+      return [];
+    }
+
+    // Fetch user data once
+    const { data: user, error: userError } = await supabase
+      .from("User")
+      .select("id, username")
+      .eq("id", userId)
+      .maybeSingle();
+
+    if (userError) {
+      throw new Error(`Error fetching user: ${userError.message}`);
+    }
+
+    const { data: profile, error: profileError } = await supabase
+      .from("Profile")
+      .select("id, photo")
+      .eq("id", userId)
+      .maybeSingle();
+
+    if (profileError) {
+      throw new Error(`Error fetching profile: ${profileError.message}`);
+    }
+
+    const enrichedPosts = posts.map((post) => ({
+      ...post,
+      user: user ?? { id: userId, username: "Unknown User" },
+      profile: profile ?? { id: userId, photo: null },
+    }));
+
+    return enrichedPosts;
   } catch (error) {
-    console.error("Error fetching draft posts:", error);
+    console.error("❌ Error fetching enriched draft posts:", error);
     throw new Error(
       error instanceof Error ? error.message : "Internal server error"
     );

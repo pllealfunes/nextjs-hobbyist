@@ -7,14 +7,18 @@ import PostCalendar from "@/ui/components/calendar";
 import { LikesCommentsChart } from "@/ui/components/likescomments-chart";
 import { Post, Category } from "@/lib/types";
 import { getDraftPosts } from "@/app/server/postActions";
+import { useAuth } from "@/contexts/authContext";
 
 export default function Drafts() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const user = useAuth();
 
   const fetchData = useCallback(async () => {
     try {
-      const data = await getDraftPosts();
+      const userId = user?.user?.id;
+      if (!userId) return;
+      const data = await getDraftPosts(userId);
       if (Array.isArray(data)) {
         setPosts(data); // empty array = no posts, still valid
       } else {

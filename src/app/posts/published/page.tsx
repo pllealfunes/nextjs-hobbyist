@@ -7,14 +7,18 @@ import { DataTable } from "@/ui/components/data-table";
 import PostCalendar from "@/ui/components/calendar";
 import { LikesCommentsChart } from "@/ui/components/likescomments-chart";
 import { getPublishedPosts } from "@/app/server/postActions";
+import { useAuth } from "@/contexts/authContext";
 
 export default function Published() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const user = useAuth();
 
   const fetchData = useCallback(async () => {
     try {
-      const data = await getPublishedPosts();
+      const userId = user?.user?.id;
+      if (!userId) return;
+      const data = await getPublishedPosts(userId);
 
       if (Array.isArray(data)) {
         setPosts(data); // empty array = no posts, still valid
