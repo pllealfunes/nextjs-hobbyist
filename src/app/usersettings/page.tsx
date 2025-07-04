@@ -90,7 +90,7 @@ export default function UserSettings() {
       name: userData?.name || "",
       username: userData?.username || "",
       bio: userData?.bio || "",
-      links: userData?.links ?? [{ label: "", url: "" }],
+      links: userData?.links ?? [],
     },
   });
 
@@ -140,7 +140,7 @@ export default function UserSettings() {
             email: userInfo.email || "",
             role: userInfo.role || "USER",
             bio: profileInfo.bio || "",
-            links: profileInfo.links || [{ label: "", url: "" }],
+            links: profileInfo.links || [],
           };
 
           setUserData(fetchedUserData);
@@ -558,6 +558,7 @@ export default function UserSettings() {
                           <Button
                             type="button"
                             variant="outline"
+                            className="ml-2"
                             onClick={() => append({ label: "", url: "" })}
                           >
                             + Add Link

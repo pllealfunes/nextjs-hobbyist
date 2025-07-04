@@ -26,7 +26,7 @@ const UserProfileDetails = ({ post }: UserProfileProps) => {
         if (!userRes.ok) throw new Error("Failed to fetch user data");
         const userInfo = await userRes.json();
 
-        const profileRes = await fetch("/api/profile");
+        const profileRes = await fetch(`/api/profile/${user.id}`);
         if (!profileRes.ok) throw new Error("Failed to fetch profile data");
         const profileInfo = await profileRes.json();
 
@@ -71,7 +71,7 @@ const UserProfileDetails = ({ post }: UserProfileProps) => {
                 src={userData?.photo || undefined}
                 alt={getUserInitials(userData?.username)}
               />
-              <AvatarFallback className="bg-gray-200 text-7xl">
+              <AvatarFallback className="bg-muted text-7xl">
                 {userData ? getUserInitials(userData.username) : "?"}
               </AvatarFallback>
             </Avatar>
