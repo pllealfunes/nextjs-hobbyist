@@ -122,7 +122,7 @@ export default function FollowSystem({ post, profileId }: FollowSystemProps) {
         )
       );
     } catch (error) {
-      toast.error("Failed to update follow status.");
+      toast.error(`Failed to update follow status: ${error}`);
     }
   };
 
