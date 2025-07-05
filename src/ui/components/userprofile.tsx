@@ -4,29 +4,37 @@ import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/ui/components/avatar";
 import { Button } from "@/ui/components/button";
 import { ExternalLinkIcon } from "@radix-ui/react-icons";
+import { useAuth } from "@/contexts/authContext";
 import { useParams } from "next/navigation";
 import { UserProfile } from "@/lib/types";
 import FollowSystem from "@/ui/components/follow-system";
+import FollowUserBtn from "./follow-user-btn";
+import {
+  followUserState,
+  toggleFollowUser,
+} from "@/app/server/followUsersActions";
 
 interface UserProfileProps {
   post: number;
 }
 
 const UserProfileDetails = ({ post }: UserProfileProps) => {
-  const user = useParams();
+  const authUser = useAuth();
+  const { id: profileId } = useParams<{ id: string }>();
+  const isSelf = authUser.user?.id === profileId;
   const [userData, setUserData] = useState<UserProfile | null>(null);
+  const [isFollowing, setIsFollowing] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
-      const userId = user.id;
-      if (!userId) return;
-
       try {
-        const userRes = await fetch(`/api/user/${user.id}`);
+        if (!profileId) return;
+
+        const userRes = await fetch(`/api/user/${profileId}`);
         if (!userRes.ok) throw new Error("Failed to fetch user data");
         const userInfo = await userRes.json();
 
-        const profileRes = await fetch(`/api/profile/${user.id}`);
+        const profileRes = await fetch(`/api/profile/${profileId}`);
         if (!profileRes.ok) throw new Error("Failed to fetch profile data");
         const profileInfo = await profileRes.json();
 
@@ -43,14 +51,18 @@ const UserProfileDetails = ({ post }: UserProfileProps) => {
           };
 
           setUserData(fetchedUserData);
+          const followStatus = await followUserState(profileId);
+          setIsFollowing(followStatus);
         }
       } catch (error) {
         console.error(error);
       }
     };
 
-    fetchData();
-  }, [user]);
+    if (profileId) {
+      fetchData();
+    }
+  }, [profileId]);
 
   const getUserInitials = (name?: string | null) => {
     if (!name) return "N/A";
@@ -58,6 +70,17 @@ const UserProfileDetails = ({ post }: UserProfileProps) => {
       .split(" ")
       .map((n) => n[0])
       .join("");
+  };
+
+  const handleFollow = async () => {
+    if (!profileId) return;
+
+    try {
+      const newFollowState = await toggleFollowUser(profileId);
+      setIsFollowing(newFollowState);
+    } catch (error) {
+      console.error("❌ Error toggling follow state:", error);
+    }
   };
 
   return (
@@ -75,7 +98,7 @@ const UserProfileDetails = ({ post }: UserProfileProps) => {
                 {userData ? getUserInitials(userData.username) : "?"}
               </AvatarFallback>
             </Avatar>
-            {user ? (
+            {profileId ? (
               <h2 className="text-4xl font-extrabold tracking-tight light:text-gray-900">
                 {userData?.username}
               </h2>
@@ -92,7 +115,7 @@ const UserProfileDetails = ({ post }: UserProfileProps) => {
           </div>
 
           {/* Followers, Following, Posts Count */}
-          <FollowSystem post={post} />
+          <FollowSystem post={post} profileId={profileId} />
 
           {/* Social Media Links */}
           {userData &&
@@ -118,9 +141,12 @@ const UserProfileDetails = ({ post }: UserProfileProps) => {
 
           {/* Buttons */}
           <div className="flex justify-center items-center gap-6 mt-6">
-            <Button className="bg-rose-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 sm:px-6 rounded-lg transition duration-300 ease-in-out shadow-lg transform hover:scale-105">
-              Follow
-            </Button>
+            {!isSelf && (
+              <FollowUserBtn
+                isFollowing={isFollowing}
+                handleFollow={handleFollow}
+              />
+            )}
             <Button className="bg-rose-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 sm:px-6 rounded-lg transition duration-300 ease-in-out shadow-lg transform hover:scale-105">
               Message
             </Button>

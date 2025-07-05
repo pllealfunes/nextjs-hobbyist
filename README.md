@@ -24,14 +24,16 @@ https://nextjs-hobbyist.vercel.app/
 
 ## Current Tasks:
 
-- [ ] follow and unfollow users
-- [ ] add user count to profile
-- [ ] make viewable list of users in profile page
-- [ ] follow and unfollow users from profile
+- [ ] display followers count in profile
+- [ ] unfollow followers from profile?
+- [ ] add hide_followers, hide_following, and move private to Profile table
+- [ ] private following or followers
 
 ## Project Tasks:
 
-- [ ] feed
+- [ ] display following users posts in feed
+- [ ] display following catgeories posts in feed
+- [ ] filtering feed
 
 - [ ] create like functionality
 

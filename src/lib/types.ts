@@ -59,3 +59,13 @@ export interface UserProfile {
   photo?: string;
   links?: SocialLink[];
 }
+
+export interface FollowingUser {
+  id: number;
+  name: string;
+  username: string;
+  avatar?: string;
+  isFollowing: boolean;
+}
+
+export type CategoryWithFollow = Category & { isFollowing: boolean };
