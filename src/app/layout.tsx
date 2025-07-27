@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/ui/theme-provider";
 import { AuthProvider } from "@/contexts/authContext";
 import { Toaster } from "react-hot-toast";
+import { QueryProvider } from "@/providers/query-provider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -31,25 +32,28 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Toaster
-          position="top-center"
-          toastOptions={{
-            style: {
-              fontSize: "18px", // Global font size
-              padding: "16px", // Global padding
-              minWidth: "300px", // Global min-width
-              borderRadius: "8px", // Global border radius
-            },
-          }}
-        />
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <AuthProvider>{children}</AuthProvider>
-        </ThemeProvider>
+        <QueryProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <Toaster
+              position="top-center"
+              toastOptions={{
+                style: {
+                  fontSize: "18px",
+                  padding: "16px",
+                  minWidth: "300px",
+                  borderRadius: "8px",
+                },
+              }}
+            />
+
+            <AuthProvider>{children}</AuthProvider>
+          </ThemeProvider>
+        </QueryProvider>
       </body>
     </html>
   );

@@ -115,7 +115,11 @@ const UserProfileDetails = ({ post }: UserProfileProps) => {
           </div>
 
           {/* Followers, Following, Posts Count */}
-          <FollowSystem post={post} profileId={profileId} />
+          <FollowSystem
+            post={post}
+            profileId={profileId}
+            authUser={authUser?.user?.id ?? ""}
+          />
 
           {/* Social Media Links */}
           {userData &&

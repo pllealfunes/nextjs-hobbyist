@@ -68,4 +68,8 @@ export interface FollowingUser {
   isFollowing: boolean;
 }
 
-export type CategoryWithFollow = Category & { isFollowing: boolean };
+export interface CategoryWithFollow {
+  id: number;
+  name: string;
+  isFollowing: boolean;
+}

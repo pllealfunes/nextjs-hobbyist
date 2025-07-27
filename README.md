@@ -24,12 +24,14 @@ https://nextjs-hobbyist.vercel.app/
 
 ## Current Tasks:
 
-- [ ] display followers count in profile
-- [ ] unfollow followers from profile?
-- [ ] add hide_followers, hide_following, and move private to Profile table
-- [ ] private following or followers
+- [ ] add stores to all follow and unfollow user btns
+- [ ] add stores to all follow and unfollow category btns
+- [ ] add stores to all fetch categories call
 
 ## Project Tasks:
+
+- [ ] add hide_followers, hide_following, and move private to Profile table
+- [ ] private following or followers
 
 - [ ] display following users posts in feed
 - [ ] display following catgeories posts in feed
@@ -59,6 +61,9 @@ Leftovers
 - [ ] no spacing around media in create and edit post
 
 - [ ] clean up - more components, create more action files to move functions over, etc.
+- [ ] TipTap is now open sourced?
+- [ ] state management for CRUD POSTS and COMMENTS
+- [ ] what else can go into state management? ...profile and user info?
 
 ## Getting Started
 
