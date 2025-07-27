@@ -83,9 +83,7 @@ export default function FollowSystem({
   const toggleCategoryFollow = async (categoryId: number) => {
     const category = followedCategories.find((u) => u.id === categoryId);
     if (!category) return;
-    console.log(categoryId);
-    console.log(category);
-    let id = Number(categoryId);
+    const id = Number(categoryId);
 
     unfollowCategoryMutation.mutate(id, {
       onSuccess: () => {
@@ -96,7 +94,7 @@ export default function FollowSystem({
       },
       onError: (error) => {
         addCategory(category);
-        toast.error("Failed to Unfollow Category");
+        toast.error(`Failed to Unfollow Category: ${error}`);
       },
     });
   };
@@ -115,7 +113,7 @@ export default function FollowSystem({
       },
       onError: (error) => {
         addFollowing(user);
-        toast.error("Failed to Unfollow User");
+        toast.error(`Failed to Unfollow User: ${error}`);
       },
     });
   };
@@ -160,7 +158,7 @@ export default function FollowSystem({
       },
       onError: (error) => {
         addFollower(user);
-        toast.error("Failed to remove follower");
+        toast.error(`Failed to remove follower: ${error}`);
       },
     });
   };

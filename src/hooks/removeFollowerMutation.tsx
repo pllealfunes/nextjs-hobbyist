@@ -1,13 +1,9 @@
 import { useMutation } from "@tanstack/react-query";
 import {
-  getUserConnections,
   toggleFollowUser,
   removeFollower,
 } from "@/app/server/followUsersActions";
-import {
-  toggleFollowCategory,
-  getFollowedCategories,
-} from "@/app/server/categoryActions";
+import { toggleFollowCategory } from "@/app/server/categoryActions";
 
 export const RemoveCategoryMutation = () => {
   return useMutation({
