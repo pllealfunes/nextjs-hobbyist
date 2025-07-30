@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { getFollowedCategories } from "@/app/server/categoryActions";
 
-export const useFollowedCategoriesQuery = () =>
+export const useFollowedCategoriesQuery = (profileId: string) =>
   useQuery({
-    queryKey: ["followedCategoryIds"],
-    queryFn: () => getFollowedCategories(),
+    queryKey: ["followedCategoryIds", profileId],
+    queryFn: () => getFollowedCategories(profileId),
   });

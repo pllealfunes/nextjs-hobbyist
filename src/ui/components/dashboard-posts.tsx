@@ -29,6 +29,7 @@ export default function DashboardPosts({ post, categories }: PostCardProps) {
 
   const getCategoryName = (categoryId: number): string => {
     const category = categories.find((cat) => cat.id === categoryId);
+
     return category ? category.name : "Unknown";
   };
 

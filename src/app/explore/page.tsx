@@ -17,9 +17,11 @@ import {
   PaginationNext,
   PaginationLink,
 } from "@/ui/components/pagination";
+import { useCategoryStore } from "@/stores/categoryStore";
+import { toast } from "react-hot-toast";
 
 export default function Explore() {
-  const [categories, setCategories] = useState<Category[]>([]);
+  const categories = useCategoryStore((state) => state.categories);
   const [results, setResults] = useState<Post[]>([]);
   const [showLatest, setShowLatest] = useState(true);
   const [latestPosts, setLatestPosts] = useState<Post[]>([]);
@@ -36,17 +38,10 @@ export default function Explore() {
       setIsLoading(true);
 
       try {
-        const [categoriesResponse, postsResponse] = await Promise.all([
-          fetch("/api/categories"),
-          getLatestPosts({
-            page: currentPage,
-            pageSize: latestPageSize,
-          }),
-        ]);
-
-        const categoriesData: Category[] = await categoriesResponse.json();
-
-        setCategories(categoriesData);
+        const postsResponse = await getLatestPosts({
+          page: currentPage,
+          pageSize: latestPageSize,
+        });
 
         if (postsResponse.success) {
           setLatestPosts(postsResponse.posts ?? []);
@@ -84,9 +79,8 @@ export default function Explore() {
 
       setResults(searchResults.success ? searchResults.posts ?? [] : []);
       setShowNoResults(searchResults.posts?.length === 0);
-      console.log(showNoResults);
     } catch (error) {
-      console.error("❌ Error fetching posts:", error);
+      toast.error(`Error fetching posts $[error}`);
     } finally {
       setIsLoading(false);
     }
@@ -98,140 +92,137 @@ export default function Explore() {
     setShowNoResults(false);
   };
   return (
-    <>
-      <section>
-        <div className="light:bg-zinc-50 min-h-screen flex flex-col items-center">
-          {/* Title Section */}
-          <div>
-            <h2 className="text-4xl md:text-5xl font-bold text-center mb-2">
-              Explore
-            </h2>
-            <div className="h-1 w-1/4 bg-rose-500 mx-auto mb-6"></div>
-            <p className="text-center light:text-gray-600 text-lg mb-6">
-              Discover Content Tailored to Your Interests and Passions.
-            </p>
-          </div>
+    <section>
+      <div className="light:bg-zinc-50 min-h-screen flex flex-col items-center">
+        {/* Title Section */}
+        <div>
+          <h2 className="text-4xl md:text-5xl font-bold text-center mb-2">
+            Explore
+          </h2>
+          <div className="h-1 w-1/4 bg-rose-500 mx-auto mb-6"></div>
+          <p className="text-center light:text-gray-600 text-lg mb-6">
+            Discover Content Tailored to Your Interests and Passions.
+          </p>
+        </div>
 
-          {/* Form Section */}
-          <SearchForm
-            categories={categories}
-            onSubmit={onSubmit}
-            resetResults={resetResults}
-          />
+        {/* Form Section */}
+        <SearchForm
+          categories={categories}
+          onSubmit={onSubmit}
+          resetResults={resetResults}
+        />
 
-          {/* Posts Section */}
-          <div className="w-full min-h-[50vh] flex flex-col items-center justify-center">
-            {/* Skeleton Loader */}
-            {isLoading && (
-              <div className="flex justify-center items-center gap-3">
-                {Array.from({ length: 4 }).map((_, index) => (
-                  <Skeleton key={index} className="w-64 h-80 rounded-md" />
+        {/* Posts Section */}
+        <div className="w-full min-h-[50vh] flex flex-col items-center justify-center">
+          {/* Skeleton Loader */}
+          {isLoading && (
+            <div className="flex justify-center items-center gap-3">
+              {Array.from({ length: 4 }).map((_, index) => (
+                <Skeleton key={index} className="w-64 h-80 rounded-md" />
+              ))}
+            </div>
+          )}
+
+          {/* Latest Posts */}
+          {!isLoading && showLatest && latestPosts.length > 0 && (
+            <div className="flex flex-col items-center">
+              <h3 className="font-bold text-3xl mb-5">Latest Posts</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-7">
+                {latestPosts.map((post) => (
+                  <DashboardPosts
+                    key={post.id}
+                    post={post}
+                    categories={categories}
+                  />
                 ))}
               </div>
-            )}
-
-            {/* Latest Posts */}
-            {!isLoading && showLatest && latestPosts.length > 0 && (
-              <div className="flex flex-col items-center">
-                <h3 className="font-bold text-3xl mb-5">Latest Posts</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-7">
-                  {latestPosts.map((post) => (
-                    <DashboardPosts
-                      key={post.id}
-                      post={post}
-                      categories={categories}
+              {totalPages > 1 && (
+                <Pagination className="mt-5">
+                  <PaginationContent>
+                    <PaginationPrevious
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (currentPage > 1) setCurrentPage((prev) => prev - 1);
+                      }}
                     />
-                  ))}
-                </div>
-                {totalPages > 1 && (
-                  <Pagination className="mt-5">
-                    <PaginationContent>
-                      <PaginationPrevious
-                        href="#"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          if (currentPage > 1)
-                            setCurrentPage((prev) => prev - 1);
-                        }}
-                      />
-                      {Array.from({ length: totalPages }, (_, index) => (
-                        <PaginationItem key={index}>
-                          <PaginationLink
-                            href="#"
-                            isActive={index + 1 === currentPage}
-                            onClick={() => setCurrentPage(index + 1)}
-                          >
-                            {index + 1}
-                          </PaginationLink>
-                        </PaginationItem>
-                      ))}
-                      <PaginationNext
-                        href="#"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          if (currentPage < totalPages)
-                            setCurrentPage((prev) => prev + 1);
-                        }}
-                      />
-                    </PaginationContent>
-                  </Pagination>
-                )}
-              </div>
-            )}
-
-            {/* Search Results */}
-            {!isLoading && results.length > 0 && (
-              <div className="flex flex-col items-center">
-                <h3 className="font-bold text-3xl mb-5">Search Results</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-7">
-                  {results.map((post) => (
-                    <DashboardPosts
-                      key={post.id}
-                      post={post}
-                      categories={categories}
+                    {Array.from({ length: totalPages }, (_, index) => (
+                      <PaginationItem key={index}>
+                        <PaginationLink
+                          href="#"
+                          isActive={index + 1 === currentPage}
+                          onClick={() => setCurrentPage(index + 1)}
+                        >
+                          {index + 1}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ))}
+                    <PaginationNext
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (currentPage < totalPages)
+                          setCurrentPage((prev) => prev + 1);
+                      }}
                     />
-                  ))}
-                </div>
-                {totalPages > 1 && (
-                  <Pagination className="mt-5">
-                    <PaginationContent>
-                      <PaginationPrevious
-                        href="#"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          if (searchPage > 1) setSearchPage((prev) => prev - 1);
-                        }}
-                      />
-                      {Array.from({ length: totalPages }, (_, index) => (
-                        <PaginationItem key={index}>
-                          <PaginationLink
-                            href="#"
-                            isActive={index + 1 === searchPage}
-                            onClick={() => setSearchPage(index + 1)}
-                          >
-                            {index + 1}
-                          </PaginationLink>
-                        </PaginationItem>
-                      ))}
-                      <PaginationNext
-                        href="#"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          if (searchPage < totalPages)
-                            setSearchPage((prev) => prev + 1);
-                        }}
-                      />
-                    </PaginationContent>
-                  </Pagination>
-                )}
-              </div>
-            )}
+                  </PaginationContent>
+                </Pagination>
+              )}
+            </div>
+          )}
 
-            {/* No Results */}
-            {!isLoading && showNoResults && <NoResults />}
-          </div>
+          {/* Search Results */}
+          {!isLoading && results.length > 0 && (
+            <div className="flex flex-col items-center">
+              <h3 className="font-bold text-3xl mb-5">Search Results</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-7">
+                {results.map((post) => (
+                  <DashboardPosts
+                    key={post.id}
+                    post={post}
+                    categories={categories}
+                  />
+                ))}
+              </div>
+              {totalPages > 1 && (
+                <Pagination className="mt-5">
+                  <PaginationContent>
+                    <PaginationPrevious
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (searchPage > 1) setSearchPage((prev) => prev - 1);
+                      }}
+                    />
+                    {Array.from({ length: totalPages }, (_, index) => (
+                      <PaginationItem key={index}>
+                        <PaginationLink
+                          href="#"
+                          isActive={index + 1 === searchPage}
+                          onClick={() => setSearchPage(index + 1)}
+                        >
+                          {index + 1}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ))}
+                    <PaginationNext
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (searchPage < totalPages)
+                          setSearchPage((prev) => prev + 1);
+                      }}
+                    />
+                  </PaginationContent>
+                </Pagination>
+              )}
+            </div>
+          )}
+
+          {/* No Results */}
+          {!isLoading && showNoResults && <NoResults />}
         </div>
-      </section>
-    </>
+      </div>
+    </section>
   );
 }

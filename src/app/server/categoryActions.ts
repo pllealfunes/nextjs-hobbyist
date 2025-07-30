@@ -87,22 +87,17 @@ export async function getCategoryWithPosts(categoryName: string) {
   }
 }
 
-export async function getFollowedCategories() {
+export async function getFollowedCategories(profileId: string) {
   const supabase = await createClient();
 
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
-
-  if (authError || !user) {
+  if (!profileId) {
     throw new Error("Unauthorized");
   }
   // Fetch all followed categories by user
   const { data, error } = await supabase
     .from("CategoryFollows")
     .select("category_id")
-    .eq("user_id", user.id);
+    .eq("user_id", profileId);
 
   if (error) {
     throw new Error(`Error fetching followed categories: ${error.message}`);

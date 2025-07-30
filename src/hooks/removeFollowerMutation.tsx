@@ -5,7 +5,7 @@ import {
 } from "@/app/server/followUsersActions";
 import { toggleFollowCategory } from "@/app/server/categoryActions";
 
-export const RemoveCategoryMutation = () => {
+export const useRemoveCategoryMutation = () => {
   return useMutation({
     mutationFn: (categoryId: number) => toggleFollowCategory(categoryId),
   });

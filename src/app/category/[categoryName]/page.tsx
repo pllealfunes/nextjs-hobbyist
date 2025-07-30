@@ -1,12 +1,10 @@
 "use client";
 
-import { useAuth } from "@/contexts/authContext";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import DashboardPosts from "@/ui/components/dashboard-posts";
 import NoResults from "@/ui/components/no-results";
-import { Post, Category } from "@/lib/types";
-import { getCategoryWithPosts } from "@/app/server/categoryActions";
+import { Post } from "@/lib/types";
 import { SubmitHandler } from "react-hook-form";
 import SearchForm from "@/ui/forms/search-form";
 import { SearchFormValues } from "@/ui/forms/search-form";
@@ -19,31 +17,26 @@ import {
   PaginationNext,
   PaginationLink,
 } from "@/ui/components/pagination";
+import { toast } from "react-hot-toast";
 import FollowCategoryButton from "@/ui/components/follow-category-lg";
-import {
-  fetchFollowState,
-  toggleFollowCategory,
-} from "@/app/server/categoryActions";
+import { useFollowStore } from "@/stores/followStore";
+import { useCategoryDetails } from "@/app/features/category/hooks/useCategoryDetails";
+import { useQueryClient } from "@tanstack/react-query";
+import { useRemoveCategoryMutation } from "@/hooks/removeFollowerMutation";
 
 export default function CategoryPage() {
-  const { user } = useAuth();
   const params = useParams();
   const categoryName = params?.categoryName as string | undefined;
-  const [displayCategory, setDisplayCategory] = useState<string | undefined>(
-    undefined
-  );
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [posts, setPosts] = useState<Post[]>([]);
+  const queryClient = useQueryClient();
   const [showLatest, setShowLatest] = useState(true);
-  const [isLoading, setIsLoading] = useState(true);
   const [results, setResults] = useState<Post[]>([]);
-  const [showNoResults, setShowNoResults] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchPage, setSearchPage] = useState(1);
   const latestPageSize = 4;
   const searchPageSize = 5;
   const [totalPages, setTotalPages] = useState(1);
-  const [isFollowing, setIsFollowing] = useState(false);
+  const removeCategoryMutation = useRemoveCategoryMutation();
+  const { removeFollowedCategory, addCategory } = useFollowStore();
 
   const capitalizeFirstLetter = (str?: string) => {
     if (!str) return "This category";
@@ -55,53 +48,21 @@ export default function CategoryPage() {
     return str.charAt(0).toUpperCase() + str.slice(1);
   };
 
-  useEffect(() => {
-    if (!categoryName) return;
-    setIsLoading(true);
+  const {
+    posts,
+    isFollowing,
+    setIsFollowing,
+    showNoResults,
+    isLoading,
+    categories,
+  } = useCategoryDetails(categoryName);
 
-    const fetchData = async () => {
-      try {
-        const [categoriesResponse, postsResponse] = await Promise.all([
-          fetch("/api/categories"),
-          getCategoryWithPosts(categoryName),
-        ]);
-
-        const categoriesData: Category[] = await categoriesResponse.json();
-        const postsData = postsResponse.posts;
-
-        setCategories(categoriesData);
-        setPosts(postsData ?? []);
-        setDisplayCategory(
-          capitalizeFirstLetter(decodeURIComponent(categoryName))
-        );
-        setShowNoResults(postsData?.length === 0);
-
-        // ✅ Call getFollowState with freshly fetched data
-        const category = categoriesData.find(
-          (cat) =>
-            cat.name.toLowerCase() ===
-            decodeURIComponent(categoryName).toLowerCase()
-        );
-
-        if (!category) {
-          console.error("Category not found:", categoryName);
-          return;
-        }
-
-        const followStatus = await fetchFollowState(category.id);
-        setIsFollowing(followStatus);
-      } catch (error) {
-        console.error("Error fetching posts or follow state", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [user, categoryName]);
+  const displayCategory = categoryName
+    ? capitalizeFirstLetter(decodeURIComponent(categoryName))
+    : "";
 
   const onSubmit: SubmitHandler<SearchFormValues> = (data) => {
-    setIsLoading(true);
+    isLoading;
     setShowLatest(false);
     setResults([]);
     try {
@@ -124,11 +85,11 @@ export default function CategoryPage() {
 
       const paginatedResults = matchingPosts.slice(0, searchPageSize);
       setResults(paginatedResults);
-      setShowNoResults(paginatedResults?.length === 0);
+      showNoResults;
     } catch (error) {
-      console.error("❌ Error filtering posts:", error);
+      toast.error(`Error filtering posts:${error}`);
     } finally {
-      setIsLoading(false);
+      isLoading;
     }
   };
 
@@ -140,20 +101,32 @@ export default function CategoryPage() {
   const handleFollow = async () => {
     if (!categoryName) return;
 
-    // Find category by name
-    const category = categories.find((cat) => cat.name === displayCategory);
-    console.log(category);
+    const category = categories?.find((cat) => cat.name === displayCategory);
 
     if (!category) {
-      console.error("Category not found:", categoryName);
+      toast.error("Cannot Find Category to Follow or Unfollow");
       return;
     }
 
     try {
-      const newFollowState = await toggleFollowCategory(category.id); // ✅ Pass valid category ID
-      setIsFollowing(newFollowState); // ✅ Update state based on response
+      removeCategoryMutation.mutate(category.id, {
+        onSuccess: () => {
+          removeFollowedCategory(category.id);
+          setIsFollowing((prev) => !prev);
+          toast.success(
+            `${isFollowing ? "Unfollowed" : "Followed"} ${
+              category.name
+            } Category`
+          );
+          queryClient.invalidateQueries({ queryKey: ["categories"] });
+        },
+        onError: (error) => {
+          addCategory(category);
+          toast.error(`Failed to Unfollow Category: ${error}`);
+        },
+      });
     } catch (error) {
-      console.error("❌ Error toggling follow state:", error);
+      toast.error("Error toggling category follow state");
     }
   };
 

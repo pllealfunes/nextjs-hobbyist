@@ -24,14 +24,10 @@ https://nextjs-hobbyist.vercel.app/
 
 ## Current Tasks:
 
-- [ ] add stores to all follow and unfollow user btns
-- [ ] add stores to all follow and unfollow category btns
-- [ ] add stores to all fetch categories call
+- [ ] add auth permsissions to post page - comments, edit btn, delete btn
+- [ ] add management to all fetch categories call - create, edit
 
 ## Project Tasks:
-
-- [ ] add hide_followers, hide_following, and move private to Profile table
-- [ ] private following or followers
 
 - [ ] display following users posts in feed
 - [ ] display following catgeories posts in feed
@@ -45,7 +41,8 @@ https://nextjs-hobbyist.vercel.app/
 
 - [ ] chat/dms between users
 
-- [ ] mark profile private or public
+- [ ] add hide_followers, hide_following, and move private to Profile table
+- [ ] private following or followers
 
 - [ ] protected routes
 

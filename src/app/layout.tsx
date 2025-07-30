@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/ui/theme-provider";
 import { AuthProvider } from "@/contexts/authContext";
 import { Toaster } from "react-hot-toast";
 import { QueryProvider } from "@/providers/query-provider";
+import { LayoutInitializer } from "@/ui/components/layoutInitializer";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -50,7 +51,7 @@ export default function RootLayout({
                 },
               }}
             />
-
+            <LayoutInitializer />
             <AuthProvider>{children}</AuthProvider>
           </ThemeProvider>
         </QueryProvider>

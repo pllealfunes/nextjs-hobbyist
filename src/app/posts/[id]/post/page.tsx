@@ -46,23 +46,27 @@ import {
   FormMessage,
 } from "@/ui/components/form";
 import DeleteCommentConfirmation from "@/ui/components/deleteCommentConfirmation";
-import {
-  fetchFollowState,
-  toggleFollowCategory,
-} from "@/app/server/categoryActions";
+import { useFollowStore } from "@/stores/followStore";
+import { useCategoryDetails } from "@/app/features/category/hooks/useCategoryDetails";
+import { useQueryClient } from "@tanstack/react-query";
+import { useRemoveCategoryMutation } from "@/hooks/removeFollowerMutation";
 
 export default function PostPage() {
   const { id } = useParams();
   const searchParams = useSearchParams();
   const category = searchParams.get("category") || "Unknown";
-  const [categories, setCategories] = useState<Category[]>([]);
   const [post, setPost] = useState<Post | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const router = useRouter();
   const safePostId = typeof id === "string" ? id : "";
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isFollowing, setIsFollowing] = useState(false);
+  const queryClient = useQueryClient();
+  const removeCategoryMutation = useRemoveCategoryMutation();
+  const { removeFollowedCategory, addCategory } = useFollowStore();
+
+  const { posts, isFollowing, setIsFollowing, isLoading, categories } =
+    useCategoryDetails(category);
 
   const capitalizeFirstLetter = (str?: string) => {
     if (!str) return "This category";
@@ -81,7 +85,7 @@ export default function PostPage() {
       const response = await getCommentsById(safePostId);
 
       if (!response.success || !Array.isArray(response.comments)) {
-        console.warn("Error fetching comments:", response.error);
+        toast.error(`Error fetching comments ${response.error}`);
         setComments([]);
         return;
       }
@@ -102,59 +106,34 @@ export default function PostPage() {
 
       setComments(formattedComments);
     } catch (error) {
-      console.error("Error fetching comments:", error);
+      toast.error(`Error fetching comments ${error}`);
     }
   }, [safePostId]);
 
   useEffect(() => {
+    if (isLoading) return;
+    if (!posts || posts.length === 0) return;
+
     const loadPost = async () => {
       if (!safePostId) return;
 
       try {
-        const postData = await getPostById(safePostId);
+        const matchedPost = posts.find((post) => post.id === safePostId);
 
-        if (!postData.success) {
-          console.error("Error fetching post:", postData.error);
+        if (!matchedPost) {
+          toast.error("Post not found matching post category");
           return;
         }
 
-        setPost(postData.post);
-        await fetchComments(); // Await if you want to ensure it completes before continuing
+        setPost(matchedPost); // Now sets correctly
+        await fetchComments();
       } catch (error) {
-        console.error("Error loading post:", error);
-      }
-    };
-
-    const loadCategories = async () => {
-      if (!category) return;
-
-      try {
-        const res = await fetch("/api/categories");
-
-        if (!res.ok) {
-          console.error("Error fetching categories");
-          return;
-        }
-
-        const data = await res.json();
-
-        const currentCategory = data.find(
-          (cat: Category) => cat.name.toLowerCase() === category
-        );
-
-        if (currentCategory?.id) {
-          const followStatus = await fetchFollowState(currentCategory.id);
-          setIsFollowing(followStatus);
-        }
-        setCategories(data);
-      } catch (error) {
-        console.error("Error loading categories:", error);
+        toast.error(`Error loading post ${error}`);
       }
     };
 
     loadPost();
-    loadCategories();
-  }, [safePostId, category]);
+  }, [safePostId, posts, isLoading]);
 
   const getUserInitials = (name?: string | null) => {
     if (!name) return "N/A";
@@ -201,7 +180,7 @@ export default function PostPage() {
       const comment = await createComment(formData);
 
       if (!comment.success) {
-        throw new Error(`Failed to create comment: ${comment.error}`);
+        toast.error(`Failed to create comment: ${comment.error}`);
       }
 
       return comment;
@@ -240,7 +219,7 @@ export default function PostPage() {
       );
 
       if (!editedComment.success) {
-        throw new Error(`Failed to create comment: ${editedComment.error}`);
+        toast.error(`Failed to create comment: ${editedComment.error}`);
       }
 
       return editedComment;
@@ -268,7 +247,7 @@ export default function PostPage() {
         const deletedComment = await deleteComment(commentId);
 
         if (!deletedComment?.success) {
-          throw new Error(`Failed to delete comment: ${deletedComment?.error}`);
+          toast.error(`Failed to delete comment: ${deletedComment?.error}`);
         }
 
         return deletedComment;
@@ -288,18 +267,34 @@ export default function PostPage() {
   const handleFollow = async () => {
     if (!category) return;
 
-    // Find category by name
     const currentCategory = categories.find(
       (cat) => cat.name.toLowerCase() === category
     );
 
-    if (!currentCategory) return;
+    if (!currentCategory) {
+      toast.error("Cannot Find Category to Follow or Unfollow");
+      return;
+    }
 
     try {
-      const newFollowState = await toggleFollowCategory(currentCategory.id);
-      setIsFollowing(newFollowState);
+      removeCategoryMutation.mutate(currentCategory.id, {
+        onSuccess: () => {
+          removeFollowedCategory(currentCategory.id);
+          setIsFollowing((prev) => !prev);
+          toast.success(
+            `${isFollowing ? "Unfollowed" : "Followed"} ${
+              currentCategory.name
+            } Category`
+          );
+          queryClient.invalidateQueries({ queryKey: ["categories"] });
+        },
+        onError: (error) => {
+          addCategory(currentCategory);
+          toast.error(`Failed to Unfollow Category: ${error}`);
+        },
+      });
     } catch (error) {
-      console.error("❌ Error toggling follow state:", error);
+      toast.error("Error toggling category follow state");
     }
   };
 

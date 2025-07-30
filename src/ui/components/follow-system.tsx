@@ -19,7 +19,7 @@ import { toast } from "react-hot-toast";
 import { getInitials } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import {
-  RemoveCategoryMutation,
+  useRemoveCategoryMutation,
   RemoveFollowingMutation,
   RemoveFollowerMutation,
 } from "@/hooks/removeFollowerMutation";
@@ -54,13 +54,13 @@ export default function FollowSystem({
     addFollower,
   } = useFollowStore();
 
-  const unfollowCategoryMutation = RemoveCategoryMutation();
+  const unfollowCategoryMutation = useRemoveCategoryMutation();
   const unfollowUserMutation = RemoveFollowingMutation();
   const removeFollowerMutation = RemoveFollowerMutation();
 
   const { data: userConnections } = useUserConnectionsQuery(profileId);
   const { data: categories } = useCategoriesQuery();
-  const { data: followedIds } = useFollowedCategoriesQuery();
+  const { data: followedIds } = useFollowedCategoriesQuery(profileId);
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
@@ -71,6 +71,7 @@ export default function FollowSystem({
           ...category,
           isFollowing: true,
         }));
+      console.log(followedCategories);
 
       useFollowStore.getState().setCategories(followedCategories);
 

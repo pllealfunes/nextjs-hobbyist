@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { CategoryWithFollow, FollowingUser } from "@/lib/types"; // if you have a type
+import type { CategoryWithFollow, FollowingUser } from "@/lib/types";
 
 interface FollowState {
   categories: CategoryWithFollow[];
