@@ -3,7 +3,7 @@
 import DashboardPosts from "@/ui/components/dashboard-posts";
 import { useState, useEffect } from "react";
 import { getMatchingPosts, getLatestPosts } from "@/app/explore/action";
-import { Post, Category } from "@/lib/types";
+import { Post } from "@/lib/types";
 import { SubmitHandler } from "react-hook-form";
 import SearchForm from "@/ui/forms/explore-posts";
 import { SearchFormValues } from "@/ui/forms/explore-posts";
@@ -80,7 +80,7 @@ export default function Feed() {
       setResults(searchResults.success ? searchResults.posts ?? [] : []);
       setShowNoResults(searchResults.posts?.length === 0);
     } catch (error) {
-      toast.error(`Error fetching posts $[error}`);
+      toast.error(`Error fetching posts ${error}`);
     } finally {
       setIsLoading(false);
     }

@@ -19,7 +19,7 @@ import {
   Trash2,
   Pencil,
 } from "lucide-react";
-import { Post, Comment, Category } from "@/lib/types";
+import { Post, Comment } from "@/lib/types";
 import { CreateCommentSchema } from "@/app/schemas";
 import DeleteConfirmationDialog from "@/ui/components/deleteConfirmationDialog";
 import { deleteSinglePost } from "@/app/posts/actions";
@@ -30,7 +30,6 @@ import {
   updateComment,
   deleteComment,
 } from "@/app/server/commentActions";
-import { getPostById } from "@/app/server/postActions";
 import PostSkeleton from "@/ui/components/postSkeleton";
 import { toast } from "react-hot-toast";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -294,7 +293,7 @@ export default function PostPage() {
         },
       });
     } catch (error) {
-      toast.error("Error toggling category follow state");
+      toast.error(`Error toggling category follow state ${error}`);
     }
   };
 

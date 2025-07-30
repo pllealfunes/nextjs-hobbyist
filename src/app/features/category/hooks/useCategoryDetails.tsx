@@ -1,27 +1,7 @@
-import { useAuth } from "@/contexts/authContext";
-import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import DashboardPosts from "@/ui/components/dashboard-posts";
-import NoResults from "@/ui/components/no-results";
-import { Post, Category } from "@/lib/types";
+import { Post } from "@/lib/types";
 import { getCategoryWithPosts } from "@/app/server/categoryActions";
-import { SubmitHandler } from "react-hook-form";
-import SearchForm from "@/ui/forms/search-form";
-import { SearchFormValues } from "@/ui/forms/search-form";
-import { Skeleton } from "@/ui/components/skeleton";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationPrevious,
-  PaginationItem,
-  PaginationNext,
-  PaginationLink,
-} from "@/ui/components/pagination";
-import FollowCategoryButton from "@/ui/components/follow-category-lg";
-import {
-  fetchFollowState,
-  toggleFollowCategory,
-} from "@/app/server/categoryActions";
+import { fetchFollowState } from "@/app/server/categoryActions";
 import { useCategoryStore } from "@/stores/categoryStore";
 import { toast } from "react-hot-toast";
 
