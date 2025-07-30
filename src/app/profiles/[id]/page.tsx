@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/authContext";
 import { FileText } from "lucide-react";
 import { useParams } from "next/navigation";
 import DashboardPosts from "@/ui/components/dashboard-posts";
+import { toast } from "react-hot-toast";
 
 export default function Profile() {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -33,7 +34,7 @@ export default function Profile() {
           setCategories(categoriesData);
         }
       } catch (error) {
-        console.error("Error fetching data:", error);
+        toast.error(`Error fetching data: ${error}`);
       }
     }
 

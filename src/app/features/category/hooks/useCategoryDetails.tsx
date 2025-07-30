@@ -13,17 +13,6 @@ export const useCategoryDetails = (categoryName: string | undefined) => {
 
   const categories = useCategoryStore((state) => state.categories);
 
-  if (!categoryName || typeof categoryName !== "string") {
-    return {
-      posts: [],
-      isFollowing: false,
-      setIsFollowing,
-      showNoResults: false,
-      isLoading: false,
-      categories,
-    };
-  }
-
   const capitalizeFirstLetter = (str?: string) => {
     if (!str) return "This category";
 
@@ -35,9 +24,10 @@ export const useCategoryDetails = (categoryName: string | undefined) => {
   };
 
   useEffect(() => {
-    setIsLoading(true);
+    if (!categoryName || typeof categoryName !== "string") return;
 
     const loadDetails = async () => {
+      setIsLoading(true);
       try {
         const postsData = await getCategoryWithPosts(
           capitalizeFirstLetter(categoryName)
@@ -73,7 +63,9 @@ export const useCategoryDetails = (categoryName: string | undefined) => {
     isFollowing,
     setIsFollowing,
     showNoResults,
+    setShowNoResults,
     isLoading,
+    setIsLoading,
     categories,
   };
 };

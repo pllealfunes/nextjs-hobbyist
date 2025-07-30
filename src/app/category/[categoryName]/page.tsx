@@ -52,8 +52,10 @@ export default function CategoryPage() {
     posts,
     isFollowing,
     setIsFollowing,
-    showNoResults,
+    setShowNoResults,
+    setIsLoading,
     isLoading,
+    showNoResults,
     categories,
   } = useCategoryDetails(categoryName);
 
@@ -62,7 +64,7 @@ export default function CategoryPage() {
     : "";
 
   const onSubmit: SubmitHandler<SearchFormValues> = (data) => {
-    isLoading;
+    setIsLoading(true);
     setShowLatest(false);
     setResults([]);
     try {
@@ -84,12 +86,11 @@ export default function CategoryPage() {
       setSearchPage(1);
 
       const paginatedResults = matchingPosts.slice(0, searchPageSize);
-      setResults(paginatedResults);
-      showNoResults;
+      setShowNoResults(paginatedResults.length === 0);
     } catch (error) {
       toast.error(`Error filtering posts:${error}`);
     } finally {
-      isLoading;
+      setIsLoading(false);
     }
   };
 
@@ -126,7 +127,7 @@ export default function CategoryPage() {
         },
       });
     } catch (error) {
-      toast.error("Error toggling category follow state");
+      toast.error(`Error toggling category follow state ${error}`);
     }
   };
 
