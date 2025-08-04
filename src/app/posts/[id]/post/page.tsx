@@ -49,10 +49,12 @@ import { useFollowStore } from "@/stores/followStore";
 import { useCategoryDetails } from "@/app/features/category/hooks/useCategoryDetails";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRemoveCategoryMutation } from "@/hooks/removeFollowerMutation";
+import { useAuth } from "@/contexts/authContext";
 
 export default function PostPage() {
   const { id } = useParams();
   const searchParams = useSearchParams();
+  const user = useAuth();
   const category = searchParams.get("category") || "Unknown";
   const [post, setPost] = useState<Post | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
@@ -307,20 +309,22 @@ export default function PostPage() {
               className="inline-flex items-center hover:text-rose-600 mb-6 transition"
             >
               <ChevronLeft className="h-4 w-4 mr-2" />
-              Back to Profile
+              Back
             </Link>
-            <div className="mx-auto w-full flex justify-end gap-4 mb-4">
-              <Link href={`/posts/editpost/${post.id}`} passHref>
-                <Pencil className="text-rose-400 cursor-pointer w-9 h-9 hover:text-rose-600 transition" />
-              </Link>
+            {user.user?.username === post.author_id && (
+              <div className="mx-auto w-full flex justify-end gap-4 mb-4">
+                <Link href={`/posts/editpost/${post.id}`} passHref>
+                  <Pencil className="text-rose-400 cursor-pointer w-9 h-9 hover:text-rose-600 transition" />
+                </Link>
 
-              <DeleteConfirmationDialog
-                trigger={
-                  <Trash2 className="text-red-500 cursor-pointer w-9 h-9 hover:text-red-600 transition" />
-                }
-                onConfirm={() => deleteSinglePost(post.id, onDeleteSuccess)}
-              />
-            </div>
+                <DeleteConfirmationDialog
+                  trigger={
+                    <Trash2 className="text-red-500 cursor-pointer w-9 h-9 hover:text-red-600 transition" />
+                  }
+                  onConfirm={() => deleteSinglePost(post.id, onDeleteSuccess)}
+                />
+              </div>
+            )}
             <article>
               {post.coverphoto && (
                 <Image
@@ -578,21 +582,23 @@ export default function PostPage() {
                             </Form>
                           </>
                         ) : (
-                          <>
+                          <div>
                             <p className="text-zinc-900">{comment.comment}</p>
-                            <div className="flex justify-end gap-2">
-                              <Pencil
-                                onClick={() =>
-                                  handleEditClick(comment.id, comment.comment)
-                                }
-                                className="text-rose-400 cursor-pointer w-7 h-7 hover:text-rose-600 transition"
-                              />
-                              <DeleteCommentConfirmation
-                                onConfirm={handleDeleteComment}
-                                commentId={comment.id}
-                              />
-                            </div>
-                          </>
+                            {user.user?.id === comment.author_id && (
+                              <div className="flex justify-end gap-2">
+                                <Pencil
+                                  onClick={() =>
+                                    handleEditClick(comment.id, comment.comment)
+                                  }
+                                  className="text-rose-400 cursor-pointer w-7 h-7 hover:text-rose-600 transition"
+                                />
+                                <DeleteCommentConfirmation
+                                  onConfirm={handleDeleteComment}
+                                  commentId={comment.id}
+                                />
+                              </div>
+                            )}
+                          </div>
                         )}
                       </div>
                     </div>

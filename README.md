@@ -24,8 +24,7 @@ https://nextjs-hobbyist.vercel.app/
 
 ## Current Tasks:
 
-- [ ] add auth permsissions to post page - comments, edit btn, delete btn
-- [ ] add management to all fetch categories call - create, edit
+- [ ] add management to all fetch categories call - create, edit, profiles, drafts, published, more?
 
 ## Project Tasks:
 
