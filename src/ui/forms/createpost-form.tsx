@@ -22,22 +22,17 @@ import {
   FormLabel,
   FormMessage,
 } from "@/ui/components/form";
+import { useCategoriesQuery } from "@/hooks/categoriesQuery";
 
 // Define the type for form data
 type FormData = z.infer<typeof CreatePostSchema>;
 
-type Category = {
-  id: number;
-  name: string;
+type Props = {
+  onSubmit: SubmitHandler<FormData>;
 };
 
-const CreatePostForm = ({
-  categories,
-  onSubmit,
-}: {
-  categories: Category[];
-  onSubmit: SubmitHandler<FormData>;
-}) => {
+export default function CreatePostForm({ onSubmit }: Props) {
+  const { data: categories } = useCategoriesQuery();
   const form = useForm<FormData>({
     mode: "onTouched",
     resolver: zodResolver(CreatePostSchema),
@@ -92,7 +87,7 @@ const CreatePostForm = ({
                       <SelectValue placeholder="Select a category" />
                     </SelectTrigger>
                     <SelectContent>
-                      {categories.map((category) => (
+                      {categories?.map((category) => (
                         <SelectItem
                           key={category.id}
                           value={category.id.toString()}
@@ -174,6 +169,4 @@ const CreatePostForm = ({
       </Form>
     </div>
   );
-};
-
-export default CreatePostForm;
+}

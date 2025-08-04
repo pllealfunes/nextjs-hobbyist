@@ -18,6 +18,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/ui/components/form";
+import { useCategoriesQuery } from "@/hooks/categoriesQuery";
 
 const SearchFormSchema = z
   .object({
@@ -32,20 +33,15 @@ const SearchFormSchema = z
 // Define the type for form data
 export type SearchFormValues = z.infer<typeof SearchFormSchema>;
 
-type Category = {
-  id: number;
-  name: string;
-};
-
-const SearchForm = ({
-  categories,
+export default function SearchForm({
   onSubmit,
   resetResults,
 }: {
-  categories: Category[];
   onSubmit: SubmitHandler<SearchFormValues>;
   resetResults: () => void;
-}) => {
+}) {
+  const { data: categories } = useCategoriesQuery();
+
   const form = useForm<SearchFormValues>({
     mode: "onTouched",
     resolver: zodResolver(SearchFormSchema),
@@ -100,7 +96,7 @@ const SearchForm = ({
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="None">Select a Category</SelectItem>
-                      {categories.map((category) => (
+                      {categories?.map((category) => (
                         <SelectItem
                           key={category.id}
                           value={category.id.toString()}
@@ -131,6 +127,4 @@ const SearchForm = ({
       </Form>
     </div>
   );
-};
-
-export default SearchForm;
+}

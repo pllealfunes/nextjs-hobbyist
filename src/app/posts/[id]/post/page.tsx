@@ -311,7 +311,7 @@ export default function PostPage() {
               <ChevronLeft className="h-4 w-4 mr-2" />
               Back
             </Link>
-            {user.user?.username === post.author_id && (
+            {user.user?.id === post.author_id && (
               <div className="mx-auto w-full flex justify-end gap-4 mb-4">
                 <Link href={`/posts/editpost/${post.id}`} passHref>
                   <Pencil className="text-rose-400 cursor-pointer w-9 h-9 hover:text-rose-600 transition" />

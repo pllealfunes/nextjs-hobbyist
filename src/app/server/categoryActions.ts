@@ -18,6 +18,7 @@ export async function getCategoryWithPosts(categoryName: string) {
     const formattedCategory = capitalizeFirstLetter(
       decodeURIComponent(categoryName.replace(/-/g, "+"))
     );
+    console.log(categoryName);
 
     // Fetch category
     const { data: categoryData, error: categoryError } = await supabase
@@ -25,7 +26,7 @@ export async function getCategoryWithPosts(categoryName: string) {
       .select("*")
       .eq("name", formattedCategory)
       .maybeSingle();
-
+    console.log(categoryName);
     if (categoryError)
       throw new Error(`Error fetching category: ${categoryError.message}`);
     if (!categoryData) throw new Error("Category not found");

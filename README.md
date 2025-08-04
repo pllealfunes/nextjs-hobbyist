@@ -24,8 +24,6 @@ https://nextjs-hobbyist.vercel.app/
 
 ## Current Tasks:
 
-- [ ] add management to all fetch categories call - create, edit, profiles, drafts, published, more?
-
 ## Project Tasks:
 
 - [ ] display following users posts in feed

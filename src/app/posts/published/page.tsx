@@ -8,10 +8,11 @@ import PostCalendar from "@/ui/components/calendar";
 import { LikesCommentsChart } from "@/ui/components/likescomments-chart";
 import { getPublishedPosts } from "@/app/server/postActions";
 import { useAuth } from "@/contexts/authContext";
+import { useCategoriesQuery } from "@/hooks/categoriesQuery";
 
 export default function Published() {
   const [posts, setPosts] = useState<Post[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const { data: categories } = useCategoriesQuery();
   const user = useAuth();
 
   const fetchData = useCallback(async () => {
@@ -31,23 +32,8 @@ export default function Published() {
     }
   }, []);
 
-  useEffect(() => {
-    async function loadCategories() {
-      try {
-        const response = await fetch("/api/categories");
-        const data = await response.json();
-        setCategories(data);
-      } catch (error) {
-        console.error("Error fetching categories", error);
-      }
-    }
-
-    fetchData();
-    loadCategories();
-  }, []);
-
   const getCategoryName = (categoryId: number): string => {
-    const category = categories.find((cat) => cat.id === categoryId);
+    const category = categories?.find((cat) => cat.id === categoryId);
     return category ? category.name : "Unknown";
   };
 

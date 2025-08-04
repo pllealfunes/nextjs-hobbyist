@@ -25,19 +25,13 @@ const SearchFormSchema = z
 // Define the type for form data
 export type SearchFormValues = z.infer<typeof SearchFormSchema>;
 
-type Category = {
-  id: number;
-  name: string;
-};
-
-const SearchForm = ({
+export default function SearchForm({
   onSubmit,
   resetResults,
 }: {
-  categories: Category[];
   onSubmit: SubmitHandler<SearchFormValues>;
   resetResults: () => void;
-}) => {
+}) {
   const form = useForm<SearchFormValues>({
     mode: "onTouched",
     resolver: zodResolver(SearchFormSchema),
@@ -89,6 +83,4 @@ const SearchForm = ({
       </Form>
     </div>
   );
-};
-
-export default SearchForm;
+}

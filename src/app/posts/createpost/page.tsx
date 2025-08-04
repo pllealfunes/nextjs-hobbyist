@@ -16,33 +16,17 @@ import {
 import { extractImages } from "@/app/server/utils/postUtils";
 import { toast } from "react-hot-toast";
 import { createPost, updatePost } from "@/app/server/postActions";
+import { useCategoriesQuery } from "@/hooks/categoriesQuery";
 
 // Define the type for form data
 type FormData = z.infer<typeof CreatePostSchema>;
 
 export default function CreatePost() {
   const router = useRouter();
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function loadCategories() {
-      try {
-        const response = await fetch("/api/categories");
-        const data = await response.json();
-
-        setCategories(data);
-      } catch (error) {
-        console.error("Error fetching categories", error);
-      }
-    }
-
-    loadCategories();
-    setLoading(false);
-  }, []);
+  const { data: categories, isLoading } = useCategoriesQuery();
 
   const getCategoryName = (categoryId: number): string => {
-    const category = categories.find((cat) => cat.id === categoryId);
+    const category = categories?.find((cat) => cat.id === categoryId);
     return category ? category.name : "Unknown";
   };
 
@@ -113,9 +97,9 @@ export default function CreatePost() {
         const categoryName = getCategoryName(Number(data.category));
         router.push(
           data.published
-            ? `/posts/${
-                post.post.id
-              }/post?category=${categoryName.toLowerCase()}`
+            ? `/posts/${post.post.id}/post?category=${encodeURIComponent(
+                categoryName.toLowerCase()
+              )}`
             : "/posts/drafts"
         );
       })(),
@@ -130,7 +114,7 @@ export default function CreatePost() {
     );
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="max-w-3xl mx-auto py-5 space-y-4">
         {/* Skeleton for title input */}
@@ -153,7 +137,7 @@ export default function CreatePost() {
 
   return (
     <div>
-      <CreatePostForm categories={categories} onSubmit={onSubmit} />
+      <CreatePostForm onSubmit={onSubmit} />
     </div>
   );
 }

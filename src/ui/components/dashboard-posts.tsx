@@ -3,10 +3,10 @@ import Link from "next/link";
 import { Post, Category } from "@/lib/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/ui/components/avatar";
 import { Heart } from "lucide-react";
+import { useCategoriesQuery } from "@/hooks/categoriesQuery";
 
 interface PostCardProps {
   post: Post;
-  categories: Category[];
 }
 
 function stripHtmlAndTrim(content: string, maxLength: number): string {
@@ -18,7 +18,9 @@ function stripHtmlAndTrim(content: string, maxLength: number): string {
     : strippedContent;
 }
 
-export default function DashboardPosts({ post, categories }: PostCardProps) {
+export default function DashboardPosts({ post }: PostCardProps) {
+  const { data: categories } = useCategoriesQuery();
+
   const getUserInitials = (name?: string | null) => {
     if (!name) return "N/A";
     return name
@@ -28,7 +30,7 @@ export default function DashboardPosts({ post, categories }: PostCardProps) {
   };
 
   const getCategoryName = (categoryId: number): string => {
-    const category = categories.find((cat) => cat.id === categoryId);
+    const category = categories?.find((cat) => cat.id === categoryId);
 
     return category ? category.name : "Unknown";
   };

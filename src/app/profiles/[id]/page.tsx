@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import UserProfile from "@/ui/components/userprofile";
-import { Post, Category } from "@/lib/types";
+import { Post } from "@/lib/types";
 import { getPublishedPosts } from "@/app/server/postActions";
 import { useAuth } from "@/contexts/authContext";
 import { FileText } from "lucide-react";
@@ -12,7 +12,6 @@ import { toast } from "react-hot-toast";
 
 export default function Profile() {
   const [posts, setPosts] = useState<Post[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
   const { user } = useAuth();
   const params = useParams();
   const isOwnProfile = user?.id === params.id;
@@ -23,15 +22,8 @@ export default function Profile() {
       try {
         const data = await getPublishedPosts(params.id?.toString());
 
-        const categoriesResponse = await fetch("/api/categories");
-        const categoriesData: Category[] = await categoriesResponse.json();
-
         if (Array.isArray(data)) {
           setPosts(data);
-        }
-
-        if (Array.isArray(categoriesData)) {
-          setCategories(categoriesData);
         }
       } catch (error) {
         toast.error(`Error fetching data: ${error}`);
@@ -65,7 +57,6 @@ export default function Profile() {
                   photo: post.profile?.photo,
                 },
               }}
-              categories={categories}
             />
           ))}
         </section>

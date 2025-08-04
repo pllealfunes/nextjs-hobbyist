@@ -25,26 +25,26 @@ import {
   FormMessage,
 } from "@/ui/components/form";
 import Image from "next/image";
+import { useCategoriesQuery } from "@/hooks/categoriesQuery";
 
 // Define the type for form data
 type FormData = z.infer<typeof CreatePostSchema>;
 
 interface EditPostFormProps {
-  categories: { id: number; name: string }[];
   post: Post;
   onSubmit: SubmitHandler<FormData>;
   isDeleted: boolean;
   setIsDeleted: (value: boolean) => void;
 }
 
-const EditPostForm = ({
-  categories,
+export default function EditPostForm({
   post,
   onSubmit,
   isDeleted,
   setIsDeleted,
-}: EditPostFormProps) => {
+}: EditPostFormProps) {
   const [coverPhoto, setCoverPhoto] = useState(post.coverphoto);
+  const { data: categories } = useCategoriesQuery();
 
   const form = useForm<FormData>({
     mode: "onTouched",
@@ -121,7 +121,7 @@ const EditPostForm = ({
                       <SelectValue placeholder="Select a category" />
                     </SelectTrigger>
                     <SelectContent>
-                      {categories.map((category) => (
+                      {categories?.map((category) => (
                         <SelectItem
                           key={category.id}
                           value={category.id.toString()}
@@ -218,6 +218,4 @@ const EditPostForm = ({
       </Form>
     </div>
   );
-};
-
-export default EditPostForm;
+}

@@ -20,6 +20,7 @@ import { Post, Category } from "@/lib/types";
 import DeleteConfirmationDialog from "@/ui/components/deleteConfirmationDialog";
 import { deletePost, updatePost } from "@/app/server/postActions";
 import { getPostById } from "@/app/server/postActions";
+import { useCategoriesQuery } from "@/hooks/categoriesQuery";
 
 // Define the type for form data
 type FormData = z.infer<typeof CreatePostSchema>;
@@ -27,7 +28,7 @@ type FormData = z.infer<typeof CreatePostSchema>;
 export default function EditPost() {
   const { postid } = useParams();
   const [post, setPost] = useState<Post | null>(null);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const { data: categories } = useCategoriesQuery();
   const router = useRouter();
   const [isDeleted, setIsDeleted] = useState(false);
 
@@ -36,20 +37,12 @@ export default function EditPost() {
   useEffect(() => {
     async function loadData() {
       try {
-        const categoryRresponse = await fetch("/api/categories");
-        const categoryData = await categoryRresponse.json();
         const postResponse = await getPostById(safePostId);
 
-        if (!categoryData || !postResponse.success) {
-          console.error(
-            "Error fetching data:",
-            categoryData.error,
-            postResponse.error
-          );
+        if (!postResponse.success) {
+          console.error("Error fetching data:", postResponse.error);
           return;
         }
-
-        setCategories(categoryData);
         setPost(postResponse.post);
       } catch (error) {
         console.error("❌ Error fetching data:", error);
@@ -60,7 +53,7 @@ export default function EditPost() {
   }, [postid]);
 
   const getCategoryName = (categoryId: number): string => {
-    const category = categories.find((cat) => cat.id === categoryId);
+    const category = categories?.find((cat) => cat.id === categoryId);
     return category ? category.name : "Unknown";
   };
 
@@ -165,7 +158,9 @@ export default function EditPost() {
         const getCategory = getCategoryName(Number(data.category));
         router.push(
           data.published
-            ? `/posts/${post?.id}/post?category=${getCategory.toLowerCase()}`
+            ? `/posts/${post?.id}/post?category=${encodeURIComponent(
+                getCategory.toLowerCase()
+              )}`
             : "/posts/drafts"
         );
       })(),
@@ -209,7 +204,6 @@ export default function EditPost() {
           {/* Centered form underneath */}
           <div className="w-full max-w-2xl">
             <EditPostForm
-              categories={categories}
               post={post}
               onSubmit={onSubmit}
               isDeleted={isDeleted}
