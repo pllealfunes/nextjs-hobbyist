@@ -17,11 +17,9 @@ import {
   PaginationNext,
   PaginationLink,
 } from "@/ui/components/pagination";
-import { useCategoryStore } from "@/stores/categoryStore";
 import { toast } from "react-hot-toast";
 
 export default function Explore() {
-  const categories = useCategoryStore((state) => state.categories);
   const [results, setResults] = useState<Post[]>([]);
   const [showLatest, setShowLatest] = useState(true);
   const [latestPosts, setLatestPosts] = useState<Post[]>([]);
