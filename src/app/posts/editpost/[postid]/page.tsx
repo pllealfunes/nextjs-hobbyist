@@ -16,7 +16,7 @@ import {
 import { deleteImageFromCloudinary } from "@/app/server/utils/cloudinaryUtils";
 import { processPostImages } from "@/app/server/processPostImages";
 import { toast } from "react-hot-toast";
-import { Post, Category } from "@/lib/types";
+import { Post } from "@/lib/types";
 import DeleteConfirmationDialog from "@/ui/components/deleteConfirmationDialog";
 import { deletePost, updatePost } from "@/app/server/postActions";
 import { getPostById } from "@/app/server/postActions";

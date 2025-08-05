@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-import { Post, Category } from "@/lib/types";
+import { useState, useCallback } from "react";
+import { Post } from "@/lib/types";
 import { columns } from "@/ui/components/table-columns";
 import { DataTable } from "@/ui/components/data-table";
 import PostCalendar from "@/ui/components/calendar";

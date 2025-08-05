@@ -1,12 +1,11 @@
 "use client";
-import { useState, useEffect } from "react";
+
 import { useRouter } from "next/navigation";
 import CreatePostForm from "@/ui/forms/createpost-form";
 import { SubmitHandler } from "react-hook-form";
 import { CreatePostSchema } from "@/app/schemas";
 import { z } from "zod";
 import { Skeleton } from "@/ui/components/skeleton";
-import { Category } from "@/lib/types";
 import {
   fileToBase64,
   uploadImageToCloudinary,
