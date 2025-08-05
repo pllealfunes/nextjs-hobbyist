@@ -17,11 +17,9 @@ import {
   PaginationNext,
   PaginationLink,
 } from "@/ui/components/pagination";
-import { useCategoryStore } from "@/stores/categoryStore";
 import { toast } from "react-hot-toast";
 
 export default function Feed() {
-  const categories = useCategoryStore((state) => state.categories);
   const [results, setResults] = useState<Post[]>([]);
   const [showLatest, setShowLatest] = useState(true);
   const [latestPosts, setLatestPosts] = useState<Post[]>([]);
@@ -107,11 +105,7 @@ export default function Feed() {
         </div>
 
         {/* Form Section */}
-        <SearchForm
-          categories={categories}
-          onSubmit={onSubmit}
-          resetResults={resetResults}
-        />
+        <SearchForm onSubmit={onSubmit} resetResults={resetResults} />
 
         {/* Posts Section */}
         <div className="w-full min-h-[50vh] flex flex-col items-center justify-center">
@@ -129,11 +123,7 @@ export default function Feed() {
             <div className="flex flex-col items-center">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-7">
                 {latestPosts.map((post) => (
-                  <DashboardPosts
-                    key={post.id}
-                    post={post}
-                    categories={categories}
-                  />
+                  <DashboardPosts key={post.id} post={post} />
                 ))}
               </div>
               {totalPages > 1 && (
@@ -177,11 +167,7 @@ export default function Feed() {
               <h3 className="font-bold text-3xl mb-5">Search Results</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-7">
                 {results.map((post) => (
-                  <DashboardPosts
-                    key={post.id}
-                    post={post}
-                    categories={categories}
-                  />
+                  <DashboardPosts key={post.id} post={post} />
                 ))}
               </div>
               {totalPages > 1 && (
