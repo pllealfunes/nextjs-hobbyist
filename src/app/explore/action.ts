@@ -110,31 +110,30 @@ export async function getMatchingPosts({
   try {
     const supabase = await createClient();
 
-    let query = supabase.from("Post").select("*");
+    let searchQuery = supabase.from("Post").select("*", { count: "exact" });
 
-    if (search) {
-      query = query.ilike("title", `%${search}%`);
+    const searchTerm = search?.trim();
+    const searchCategory = typeof category === "number" && category > 0;
+
+    if (searchTerm) {
+      searchQuery = searchQuery.ilike("title", `%${searchTerm.trim()}%`);
     }
 
-    if (category !== undefined && category !== null) {
-      query = query.eq("category_id", category);
+    if (searchCategory) {
+      searchQuery = searchQuery.eq("category_id", category);
     }
 
-    if (!search && !category) {
-      throw new Error("Error fetching posts");
-    }
+    const from = (page - 1) * pageSize;
+    const to = from + pageSize - 1;
+    searchQuery = searchQuery.range(from, to);
 
-    const start = (page - 1) * pageSize;
-    const end = start + pageSize - 1;
-    const { count } = await supabase
-      .from("Post")
-      .select("*", { count: "exact" });
+    const { data, error, count } = await searchQuery;
 
-    const { data, error } = await query.range(start, end);
-
-    if (error) throw new Error(`Error fetching posts: ${error.message}`);
-
-    return { success: true, posts: data, totalCount: count };
+    return {
+      success: true,
+      posts: data ?? [],
+      totalCount: count ?? 0,
+    };
   } catch (error) {
     console.error("❌ Error fetching posts:", error);
     return {

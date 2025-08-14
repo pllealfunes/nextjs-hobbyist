@@ -60,25 +60,38 @@ export default function Explore() {
   const onSubmit: SubmitHandler<SearchFormValues> = async (data) => {
     setShowLatest(false);
     setResults([]);
+    setShowNoResults(false);
+    setSearchPage(1);
     setIsLoading(true);
 
     try {
       const requestData = {
         ...data,
         category: data.category === "None" ? undefined : Number(data.category),
-        search: data.search ?? "",
+        search: data.search?.trim() ?? "",
       };
+      console.log("Search request:", requestData);
 
       const searchResults = await getMatchingPosts({
         ...requestData,
-        page: searchPage,
+        page: 1,
         pageSize: searchPageSize,
       });
-      console.log(searchResults);
-      setResults(searchResults.success ? searchResults.posts ?? [] : []);
-      setShowNoResults(searchResults.posts?.length === 0);
+
+      if (searchResults.success) {
+        const posts = searchResults.posts ?? [];
+
+        setResults(posts);
+        setShowNoResults(posts.length === 0);
+        setTotalPages(
+          Math.ceil((searchResults.totalCount ?? 1) / searchPageSize)
+        );
+      } else {
+        setShowNoResults(true);
+      }
     } catch (error) {
-      toast.error(`Error fetching posts ${error}`);
+      toast.error(`Error fetching posts: ${error}`);
+      setShowNoResults(true);
     } finally {
       setIsLoading(false);
     }
