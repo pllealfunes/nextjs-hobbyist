@@ -180,6 +180,10 @@ export async function getMatchingFeedPosts({
 
     const { data, error, count } = await searchQuery;
 
+    if (error) {
+      throw new Error(`Error fetching feed posts: ${error.message}`);
+    }
+
     return {
       success: true,
       posts: data ?? [],
