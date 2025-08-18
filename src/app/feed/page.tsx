@@ -2,7 +2,7 @@
 
 import DashboardPosts from "@/ui/components/dashboard-posts";
 import { useState, useEffect } from "react";
-import { getMatchingPosts, getLatestPosts } from "@/app/explore/action";
+import { getMatchingFeedPosts, getLatestFeedPosts } from "@/app/feed/action";
 import { Post } from "@/lib/types";
 import { SubmitHandler } from "react-hook-form";
 import SearchForm from "@/ui/forms/explore-posts";
@@ -19,7 +19,7 @@ import {
 } from "@/ui/components/pagination";
 import { toast } from "react-hot-toast";
 
-export default function Feed() {
+export default function Explore() {
   const [results, setResults] = useState<Post[]>([]);
   const [showLatest, setShowLatest] = useState(true);
   const [latestPosts, setLatestPosts] = useState<Post[]>([]);
@@ -36,7 +36,7 @@ export default function Feed() {
       setIsLoading(true);
 
       try {
-        const postsResponse = await getLatestPosts({
+        const postsResponse = await getLatestFeedPosts({
           page: currentPage,
           pageSize: latestPageSize,
         });
@@ -60,25 +60,38 @@ export default function Feed() {
   const onSubmit: SubmitHandler<SearchFormValues> = async (data) => {
     setShowLatest(false);
     setResults([]);
+    setShowNoResults(false);
+    setSearchPage(1);
     setIsLoading(true);
 
     try {
       const requestData = {
         ...data,
         category: data.category === "None" ? undefined : Number(data.category),
-        search: data.search ?? "",
+        search: data.search?.trim() ?? "",
       };
+      console.log("Search request:", requestData);
 
-      const searchResults = await getMatchingPosts({
+      const searchResults = await getMatchingFeedPosts({
         ...requestData,
-        page: searchPage,
+        page: 1,
         pageSize: searchPageSize,
       });
 
-      setResults(searchResults.success ? searchResults.posts ?? [] : []);
-      setShowNoResults(searchResults.posts?.length === 0);
+      if (searchResults.success) {
+        const posts = searchResults.posts ?? [];
+
+        setResults(posts);
+        setShowNoResults(posts.length === 0);
+        setTotalPages(
+          Math.ceil((searchResults.totalCount ?? 1) / searchPageSize)
+        );
+      } else {
+        setShowNoResults(true);
+      }
     } catch (error) {
-      toast.error(`Error fetching posts ${error}`);
+      toast.error(`Error fetching posts: ${error}`);
+      setShowNoResults(true);
     } finally {
       setIsLoading(false);
     }
@@ -89,7 +102,6 @@ export default function Feed() {
     setShowLatest(true);
     setShowNoResults(false);
   };
-
   return (
     <section>
       <div className="light:bg-zinc-50 min-h-screen flex flex-col items-center">
@@ -100,7 +112,7 @@ export default function Feed() {
           </h2>
           <div className="h-1 w-1/4 bg-rose-500 mx-auto mb-6"></div>
           <p className="text-center light:text-gray-600 text-lg mb-6">
-            Stay Up to Date With Your Favorites
+            Catch Up With Your Favorites
           </p>
         </div>
 
@@ -121,6 +133,7 @@ export default function Feed() {
           {/* Latest Posts */}
           {!isLoading && showLatest && latestPosts.length > 0 && (
             <div className="flex flex-col items-center">
+              <h3 className="font-bold text-3xl mb-5">Latest Posts</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-7">
                 {latestPosts.map((post) => (
                   <DashboardPosts key={post.id} post={post} />

@@ -129,9 +129,53 @@ export async function getMatchingPosts({
 
     const { data, error, count } = await searchQuery;
 
+    if (error) {
+      throw new Error(`Error fetching latest posts: ${error.message}`);
+    }
+
+    const authorIds = data?.map((p) => p.author_id).filter(Boolean);
+    if (!authorIds?.length) {
+      return { success: true, data, totalCount: count };
+    }
+
+    // Fetch related users
+    const { data: users, error: userError } = await supabase
+      .from("User")
+      .select("id, username")
+      .in("id", authorIds);
+
+    if (userError) {
+      throw new Error(`Error fetching users: ${userError.message}`);
+    }
+
+    // Fetch related profiles
+    const { data: profiles, error: profileError } = await supabase
+      .from("Profile")
+      .select("id, photo")
+      .in("id", authorIds);
+
+    if (profileError) {
+      throw new Error(`Error fetching profiles: ${profileError.message}`);
+    }
+
+    // Enrich posts
+    const enrichedPosts = data?.map((post) => {
+      return {
+        ...post,
+        user: users.find((u) => u.id === post.author_id) || {
+          id: post.author_id,
+          username: "Unknown User",
+        },
+        profile: profiles.find((p) => p.id === post.author_id) || {
+          id: post.author_id,
+          photo: null,
+        },
+      };
+    });
+
     return {
       success: true,
-      posts: data ?? [],
+      posts: enrichedPosts ?? [],
       totalCount: count ?? 0,
     };
   } catch (error) {
