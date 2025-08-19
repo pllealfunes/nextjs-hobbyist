@@ -19,65 +19,46 @@ export async function getLatestFeedPosts({ page = 1, pageSize = 3 }) {
     const start = (page - 1) * pageSize;
     const end = start + pageSize - 1;
 
-    // // Fetch total count
-    const { data: followedUsers, error: followsErrors } = await supabase
-      .from("Follows")
-      .select("*", { count: "exact" })
-      .eq("follower_id", user.id)
-      .order("created_at", { ascending: false });
-
-    if (followsErrors) {
-      throw new Error(
-        `Error fetching latest users posts: ${followsErrors.message}`
-      );
-    }
-
     // Fetch total count
-    const { data: followedCategories, error: categoryErrors } = await supabase
-      .from("CategoryFollows")
-      .select("*", { count: "exact" })
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false });
+    const [followsRes, categoriesRes] = await Promise.all([
+      supabase.from("Follows").select("follower_id").eq("follower_id", user.id),
+      supabase
+        .from("CategoryFollows")
+        .select("category_id")
+        .eq("user_id", user.id),
+    ]);
 
-    if (categoryErrors) {
+    if (followsRes.error || categoriesRes.error) {
       throw new Error(
-        `Error fetching latest category posts: ${categoryErrors.message}`
+        `Error fetching follows:\nUser: ${followsRes.error?.message}\nCategory: ${categoriesRes.error?.message}`
       );
     }
 
-    const followedUserIds = followedUsers
-      .map((f) => f.followed_id)
-      .filter((id) => typeof id === "string" && id.length > 0);
+    const followedUserIds = followsRes.data
+      .map((follower) => follower.follower_id)
+      .filter(Boolean);
 
-    const followedCategoryIds = followedCategories
-      .map((c) => c.category_id)
-      .filter((id) => typeof id === "string" && id.length > 0);
+    const followedCategoryIds = categoriesRes.data
+      .map((category) => category.category_id)
+      .filter(Boolean);
 
-    const { data: userPosts, error: errorUsers } = await supabase
-      .from("Post")
-      .select("*")
-      .in("author_id", followedUserIds)
-      .range(start, end);
+    if (!followedUserIds.length && !followedCategoryIds.length) {
+      return { success: true, posts: [], totalCount: 0 };
+    }
 
-    const { data: categoryPosts, error: errorCategory } = await supabase
-      .from("Post")
-      .select("*")
-      .in("category_id", followedCategoryIds)
-      .range(start, end);
+    const [userPostsRes, categoryPostsRes] = await Promise.all([
+      supabase.from("Post").select("*").in("author_id", followedUserIds),
+      supabase.from("Post").select("*").in("category_id", followedCategoryIds),
+    ]);
 
-    if (errorUsers || errorCategory) {
-      const userErrorMsg = errorUsers?.message ?? "No user post error";
-      const categoryErrorMsg =
-        errorCategory?.message ?? "No category post error";
-
+    if (userPostsRes.error || categoryPostsRes.error) {
       throw new Error(
-        `Error fetching latest posts for feed:\nUser error: ${userErrorMsg}\nCategory error: ${categoryErrorMsg}`
+        `Error fetching posts:\nUser: ${userPostsRes.error?.message}\nCategory: ${categoryPostsRes.error?.message}`
       );
     }
-    console.log("Followed user IDs:", followedUserIds);
-    console.log("Followed category IDs:", followedCategoryIds);
 
-    const combinedPosts = Array.from(new Set([...categoryPosts, ...userPosts]));
+    // Merge, deduplicate, and sort posts
+    const combinedPosts = [...userPostsRes.data, ...categoryPostsRes.data];
     const uniquePosts = Array.from(
       new Map(combinedPosts.map((p) => [p.id, p])).values()
     );
@@ -85,21 +66,14 @@ export async function getLatestFeedPosts({ page = 1, pageSize = 3 }) {
       (a, b) =>
         new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     );
+
     const paginatedPosts = sortedPosts.slice(start, end + 1);
+    const authorIds = paginatedPosts.map((p) => p.author_id).filter(Boolean);
+    const totalCount = sortedPosts.length;
 
-    const authorIds = paginatedPosts?.map((p) => p.author_id).filter(Boolean);
     if (!authorIds.length) {
-      //   return { success: true, posts, totalCount: count };
+      return { success: true, posts: [], totalCount };
     }
-
-    // ✅ Total count for pagination
-    const count = sortedPosts.length;
-
-    console.log("Combined posts:", combinedPosts);
-    console.log("Unique posts:", uniquePosts);
-    console.log("Sorted posts:", sortedPosts);
-    console.log("Paginated posts:", paginatedPosts);
-    console.log("Author IDs:", authorIds);
 
     // Fetch related users
     const { data: users, error: userError } = await supabase
@@ -111,18 +85,18 @@ export async function getLatestFeedPosts({ page = 1, pageSize = 3 }) {
       throw new Error(`Error fetching users: ${userError.message}`);
     }
 
-    // Fetch related profiles
-    const { data: profiles, error: profileError } = await supabase
-      .from("Profile")
-      .select("id, photo")
-      .in("id", authorIds);
+    // Fetch related user and profile data in parallel
+    const [usersRes, profilesRes] = await Promise.all([
+      supabase.from("User").select("id, username").in("id", authorIds),
+      supabase.from("Profile").select("id, photo").in("id", authorIds),
+    ]);
 
-    if (profileError) {
-      throw new Error(`Error fetching profiles: ${profileError.message}`);
+    if (usersRes.error || profilesRes.error) {
+      throw new Error(
+        `Error fetching user/profile data:\nUsers: ${usersRes.error?.message}\nProfiles: ${profilesRes.error?.message}`
+      );
     }
-    console.log("Users:", users);
-    console.log("Profiles:", profiles);
-    // Enrich posts
+
     const enrichedPosts = paginatedPosts.map((post) => {
       return {
         ...post,
@@ -130,14 +104,14 @@ export async function getLatestFeedPosts({ page = 1, pageSize = 3 }) {
           id: post.author_id,
           username: "Unknown User",
         },
-        profile: profiles.find((p) => p.id === post.author_id) || {
+        profile: profilesRes.data.find((p) => p.id === post.author_id) || {
           id: post.author_id,
           photo: null,
         },
       };
     });
 
-    return { success: true, posts: enrichedPosts, totalCount: count };
+    return { success: true, posts: enrichedPosts, totalCount };
   } catch (error) {
     console.error("❌ Error fetching latest posts:", error);
     return {
@@ -160,7 +134,6 @@ export async function getMatchingFeedPosts({
 }) {
   try {
     const supabase = await createClient();
-
     let searchQuery = supabase.from("Post").select("*", { count: "exact" });
 
     const searchTerm = search?.trim();
@@ -181,12 +154,52 @@ export async function getMatchingFeedPosts({
     const { data, error, count } = await searchQuery;
 
     if (error) {
-      throw new Error(`Error fetching feed posts: ${error.message}`);
+      throw new Error(`Error fetching latest posts: ${error.message}`);
     }
+
+    const authorIds = data?.map((p) => p.author_id).filter(Boolean);
+    if (!authorIds?.length) {
+      return { success: true, data, totalCount: count };
+    }
+
+    // Fetch related users
+    const { data: users, error: userError } = await supabase
+      .from("User")
+      .select("id, username")
+      .in("id", authorIds);
+
+    if (userError) {
+      throw new Error(`Error fetching users: ${userError.message}`);
+    }
+
+    // Fetch related profiles
+    const { data: profiles, error: profileError } = await supabase
+      .from("Profile")
+      .select("id, photo")
+      .in("id", authorIds);
+
+    if (profileError) {
+      throw new Error(`Error fetching profiles: ${profileError.message}`);
+    }
+
+    // Enrich posts
+    const enrichedPosts = data?.map((post) => {
+      return {
+        ...post,
+        user: users.find((u) => u.id === post.author_id) || {
+          id: post.author_id,
+          username: "Unknown User",
+        },
+        profile: profiles.find((p) => p.id === post.author_id) || {
+          id: post.author_id,
+          photo: null,
+        },
+      };
+    });
 
     return {
       success: true,
-      posts: data ?? [],
+      posts: enrichedPosts ?? [],
       totalCount: count ?? 0,
     };
   } catch (error) {
