@@ -1,7 +1,13 @@
-import { UserProfile } from "@/lib/types";
+import { createClient } from "@/utils/supabase/server";
+import { Post } from "./types";
 
-export async function enrichPostsWithUserData(supabase: any, posts: any[]) {
-  const authorIds = posts.map((p) => p.author_id).filter(Boolean);
+type PartialUser = { id: string; username: string };
+type PartialProfile = { id: string; photo: string | null };
+
+export async function postsWithUserData(posts: Post[]) {
+  const supabase = await createClient();
+
+  const authorIds = posts.map((post) => post.author_id).filter(Boolean);
   if (!authorIds.length) return posts;
 
   const [usersRes, profilesRes] = await Promise.all([
@@ -18,13 +24,13 @@ export async function enrichPostsWithUserData(supabase: any, posts: any[]) {
   return posts.map((post) => ({
     ...post,
     user: usersRes.data.find(
-      (user: UserProfile) => user.id === post.author_id
+      (user: PartialUser) => user.id === post.author_id
     ) || {
       id: post.author_id,
       username: "Unknown User",
     },
     profile: profilesRes.data.find(
-      (profile: UserProfile) => profile.id === post.author_id
+      (profile: PartialProfile) => profile.id === post.author_id
     ) || {
       id: post.author_id,
       photo: null,

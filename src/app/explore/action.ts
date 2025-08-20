@@ -1,6 +1,6 @@
 "use server";
 
-import { enrichPostsWithUserData } from "@/lib/getLatestPosts";
+import { postsWithUserData } from "@/lib/getLatestPosts";
 import { getPaginationRange } from "@/utils/paginationRage";
 import { createClient } from "@/utils/supabase/server";
 
@@ -53,7 +53,7 @@ export async function getLatestPosts({ page = 1, pageSize = 3 }) {
     }
 
     // Get posts with user profiles
-    const latestPosts = await enrichPostsWithUserData(supabase, posts);
+    const latestPosts = await postsWithUserData(posts);
 
     return { success: true, posts: latestPosts, totalCount: count };
   } catch (error) {
@@ -127,24 +127,12 @@ export async function getMatchingPosts({
       throw new Error(`Error fetching profiles: ${profileError.message}`);
     }
 
-    // Enrich posts
-    const enrichedPosts = data?.map((post) => {
-      return {
-        ...post,
-        user: users.find((u) => u.id === post.author_id) || {
-          id: post.author_id,
-          username: "Unknown User",
-        },
-        profile: profiles.find((p) => p.id === post.author_id) || {
-          id: post.author_id,
-          photo: null,
-        },
-      };
-    });
+    // Get posts with user profiles
+    const matchingPosts = await postsWithUserData(data);
 
     return {
       success: true,
-      posts: enrichedPosts ?? [],
+      posts: matchingPosts ?? [],
       totalCount: count ?? 0,
     };
   } catch (error) {

@@ -71,7 +71,7 @@ export default function Explore() {
         search: data.search?.trim() ?? "",
       };
 
-      if (requestData.category === undefined) {
+      if (requestData.category === undefined && requestData.search === "") {
         return setShowNoResults(true);
       }
 
