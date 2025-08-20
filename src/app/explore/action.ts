@@ -107,26 +107,6 @@ export async function getMatchingPosts({
       return { success: true, data, totalCount: count };
     }
 
-    // Fetch related users
-    const { data: users, error: userError } = await supabase
-      .from("User")
-      .select("id, username")
-      .in("id", authorIds);
-
-    if (userError) {
-      throw new Error(`Error fetching users: ${userError.message}`);
-    }
-
-    // Fetch related profiles
-    const { data: profiles, error: profileError } = await supabase
-      .from("Profile")
-      .select("id, photo")
-      .in("id", authorIds);
-
-    if (profileError) {
-      throw new Error(`Error fetching profiles: ${profileError.message}`);
-    }
-
     // Get posts with user profiles
     const matchingPosts = await postsWithUserData(data);
 
