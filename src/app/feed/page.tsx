@@ -48,7 +48,7 @@ export default function Explore() {
           );
         }
       } catch (error) {
-        console.error("Error loading categories or posts:", error);
+        toast.error(`Error loading categories or posts:${error}`);
       } finally {
         setIsLoading(false);
       }
@@ -70,7 +70,10 @@ export default function Explore() {
         category: data.category === "None" ? undefined : Number(data.category),
         search: data.search?.trim() ?? "",
       };
-      console.log("Search request:", requestData);
+
+      if (requestData.category === undefined) {
+        return setShowNoResults(true);
+      }
 
       const searchResults = await getMatchingFeedPosts({
         ...requestData,

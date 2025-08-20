@@ -24,13 +24,9 @@ https://nextjs-hobbyist.vercel.app/
 
 ## Current Tasks:
 
-- [ ] display following users posts in feed
-- [ ] display following catgeories posts in feed
-- [ ] filtering feed
+- [ ] create like functionality
 
 ## Project Tasks:
-
-- [ ] create like functionality
 
 - [ ] display data in charts
 

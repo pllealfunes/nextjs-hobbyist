@@ -1,5 +1,7 @@
 "use server";
 
+import { enrichPostsWithUserData } from "@/lib/getLatestPosts";
+import { getPaginationRange } from "@/utils/paginationRage";
 import { createClient } from "@/utils/supabase/server";
 
 export async function getAllPosts() {
@@ -27,8 +29,7 @@ export async function getLatestPosts({ page = 1, pageSize = 3 }) {
   try {
     const supabase = await createClient();
 
-    const start = (page - 1) * pageSize;
-    const end = start + pageSize - 1;
+    const { start, end } = getPaginationRange(page, pageSize);
 
     // Fetch total count
     const { count } = await supabase
@@ -51,42 +52,10 @@ export async function getLatestPosts({ page = 1, pageSize = 3 }) {
       return { success: true, posts, totalCount: count };
     }
 
-    // Fetch related users
-    const { data: users, error: userError } = await supabase
-      .from("User")
-      .select("id, username")
-      .in("id", authorIds);
+    // Get posts with user profiles
+    const latestPosts = await enrichPostsWithUserData(supabase, posts);
 
-    if (userError) {
-      throw new Error(`Error fetching users: ${userError.message}`);
-    }
-
-    // Fetch related profiles
-    const { data: profiles, error: profileError } = await supabase
-      .from("Profile")
-      .select("id, photo")
-      .in("id", authorIds);
-
-    if (profileError) {
-      throw new Error(`Error fetching profiles: ${profileError.message}`);
-    }
-
-    // Enrich posts
-    const enrichedPosts = posts.map((post) => {
-      return {
-        ...post,
-        user: users.find((u) => u.id === post.author_id) || {
-          id: post.author_id,
-          username: "Unknown User",
-        },
-        profile: profiles.find((p) => p.id === post.author_id) || {
-          id: post.author_id,
-          photo: null,
-        },
-      };
-    });
-
-    return { success: true, posts: enrichedPosts, totalCount: count };
+    return { success: true, posts: latestPosts, totalCount: count };
   } catch (error) {
     console.error("❌ Error fetching latest posts:", error);
     return {

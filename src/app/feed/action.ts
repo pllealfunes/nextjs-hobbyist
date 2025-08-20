@@ -1,5 +1,7 @@
 "use server";
 
+import { enrichPostsWithUserData } from "@/lib/getLatestPosts";
+import { getPaginationRange } from "@/utils/paginationRage";
 import { createClient } from "@/utils/supabase/server";
 
 export async function getLatestFeedPosts({ page = 1, pageSize = 3 }) {
@@ -16,8 +18,7 @@ export async function getLatestFeedPosts({ page = 1, pageSize = 3 }) {
       throw new Error("Unauthorized");
     }
 
-    const start = (page - 1) * pageSize;
-    const end = start + pageSize - 1;
+    const { start, end } = getPaginationRange(page, pageSize);
 
     // Fetch total count
     const [followsRes, categoriesRes] = await Promise.all([
@@ -75,45 +76,12 @@ export async function getLatestFeedPosts({ page = 1, pageSize = 3 }) {
       return { success: true, posts: [], totalCount };
     }
 
-    // Fetch related users
-    const { data: users, error: userError } = await supabase
-      .from("User")
-      .select("id, username")
-      .in("id", authorIds);
+    // Get posts with user profiles
+    const latestPosts = await enrichPostsWithUserData(supabase, paginatedPosts);
 
-    if (userError) {
-      throw new Error(`Error fetching users: ${userError.message}`);
-    }
-
-    // Fetch related user and profile data in parallel
-    const [usersRes, profilesRes] = await Promise.all([
-      supabase.from("User").select("id, username").in("id", authorIds),
-      supabase.from("Profile").select("id, photo").in("id", authorIds),
-    ]);
-
-    if (usersRes.error || profilesRes.error) {
-      throw new Error(
-        `Error fetching user/profile data:\nUsers: ${usersRes.error?.message}\nProfiles: ${profilesRes.error?.message}`
-      );
-    }
-
-    const enrichedPosts = paginatedPosts.map((post) => {
-      return {
-        ...post,
-        user: users.find((u) => u.id === post.author_id) || {
-          id: post.author_id,
-          username: "Unknown User",
-        },
-        profile: profilesRes.data.find((p) => p.id === post.author_id) || {
-          id: post.author_id,
-          photo: null,
-        },
-      };
-    });
-
-    return { success: true, posts: enrichedPosts, totalCount };
+    return { success: true, posts: latestPosts, totalCount };
   } catch (error) {
-    console.error("❌ Error fetching latest posts:", error);
+    console.error("❌ Error fetching latest feed posts:", error);
     return {
       success: false,
       error: error instanceof Error ? error.message : "Internal server error",
