@@ -34,7 +34,6 @@ https://nextjs-hobbyist.vercel.app/
 
 - [ ] chat/dms between users
 
-- [ ] add hide_followers, hide_following, and move private to Profile table
 - [ ] private following or followers
 
 - [ ] protected routes
