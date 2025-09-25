@@ -18,6 +18,7 @@ import {
   Send,
   Trash2,
   Pencil,
+  Heart,
 } from "lucide-react";
 import { Post, Comment } from "@/lib/types";
 import { CreateCommentSchema } from "@/app/schemas";
@@ -50,6 +51,7 @@ import { useCategoryDetails } from "@/app/features/category/hooks/useCategoryDet
 import { useQueryClient } from "@tanstack/react-query";
 import { useRemoveCategoryMutation } from "@/hooks/removeFollowerMutation";
 import { useAuth } from "@/contexts/authContext";
+import { useLike } from "@/hooks/useLike";
 
 export default function PostPage() {
   const { id } = useParams();
@@ -65,6 +67,9 @@ export default function PostPage() {
   const queryClient = useQueryClient();
   const removeCategoryMutation = useRemoveCategoryMutation();
   const { removeFollowedCategory, addCategory } = useFollowStore();
+
+  const { liked, likeCount, toggleLike } = useLike(safePostId);
+  const Icon = liked ? Heart : ThumbsUp;
 
   const { posts, isFollowing, setIsFollowing, isLoading, categories } =
     useCategoryDetails(category);
@@ -427,10 +432,21 @@ export default function PostPage() {
             </article>
             <div className="mt-8 flex justify-end items-center">
               <div className="flex space-x-4">
-                <Button>
-                  <ThumbsUp className="h-5 w-5 mr-2" />
-                  Like
+                <Button
+                  variant="outline"
+                  onClick={() => toggleLike()}
+                  disabled={isLoading}
+                  className="flex items-center gap-2 text-red-600"
+                >
+                  <Icon
+                    className={`h-5 w-5 transition-all duration-200 ${
+                      liked ? "fill-red-600 stroke-red-600" : "stroke-red-600"
+                    }`}
+                  />
+                  <span>{likeCount}</span>
+                  <span>{liked ? "Liked" : "Like"}</span>
                 </Button>
+
                 <Button>
                   <MessageCircle className="h-5 w-5 mr-2" />
                   Comment

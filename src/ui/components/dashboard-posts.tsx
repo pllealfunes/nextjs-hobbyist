@@ -2,8 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { Post } from "@/lib/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/ui/components/avatar";
-import { Heart } from "lucide-react";
 import { useCategoriesQuery } from "@/hooks/categoriesQuery";
+import { LikeButton } from "./like-button";
 
 interface PostCardProps {
   post: Post;
@@ -113,10 +113,7 @@ export default function DashboardPosts({ post }: PostCardProps) {
             </div>
 
             {/* Like Section */}
-            <div className="flex items-center gap-1 text-red-500">
-              <Heart className="test-rose-500" />
-              <span className="text-gray-600 text-sm">50</span>
-            </div>
+            <LikeButton postId={post.id} />
           </div>
         </div>
       </div>

@@ -14,8 +14,6 @@ export async function GET() {
 
     if (error) throw error;
 
-    console.log("Categories fetched:", categories);
-
     return NextResponse.json(categories, { status: 200 });
   } catch (error) {
     console.log(error);

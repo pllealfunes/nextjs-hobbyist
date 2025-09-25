@@ -24,8 +24,6 @@ https://nextjs-hobbyist.vercel.app/
 
 ## Current Tasks:
 
-- [ ] create like functionality
-
 ## Project Tasks:
 
 - [ ] display data in charts

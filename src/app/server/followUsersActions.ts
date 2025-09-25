@@ -83,7 +83,6 @@ export async function followUserState(followingId: string) {
     data: { user },
     error: authError,
   } = await supabase.auth.getUser();
-  console.log("Follow User State", followingId);
 
   if (authError || !user) {
     throw new Error("Unauthorized");
@@ -182,8 +181,6 @@ export async function removeFollower(followerId: string) {
     .delete()
     .eq("follower_id", followerId)
     .eq("following_id", user.id); // User wants to remove a follower
-
-  console.log(user.id, data, typeof user.id);
 
   if (deleteError) {
     throw new Error(`Error removing follower: ${deleteError.message}`);
