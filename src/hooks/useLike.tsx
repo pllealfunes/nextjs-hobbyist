@@ -1,6 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { likePostState, toggleLikePost } from "@/app/server/likeAction";
-import { useLikeStore } from "@/stores/useLikeStore";
+
+interface LikeState {
+  count: number;
+  liked: boolean;
+}
 
 export function useLike(postId: string) {
   const queryClient = useQueryClient();
@@ -21,10 +25,14 @@ export function useLike(postId: string) {
 
       const previous = queryClient.getQueryData(["likes", postId]);
 
-      queryClient.setQueryData(["likes", postId], (old: any) => ({
-        count: old.liked ? old.count - 1 : old.count + 1,
-        liked: !old.liked,
-      }));
+      queryClient.setQueryData<LikeState>(["likes", postId], (old) => {
+        if (!old) return { count: 1, liked: true }; // fallback if no cache
+
+        return {
+          count: old.liked ? old.count - 1 : old.count + 1,
+          liked: !old.liked,
+        };
+      });
 
       return { previous };
     },

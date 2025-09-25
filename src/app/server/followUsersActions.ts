@@ -143,7 +143,7 @@ export async function toggleFollowUser(followId: string) {
       throw new Error(`Error unfollowing category: ${unfollowError.message}`);
     }
 
-    return false; // Unfollowed successfully
+    return false;
   } else {
     // User is NOT following → Follow (Insert record)
     const { error: followError } = await supabase
@@ -154,7 +154,7 @@ export async function toggleFollowUser(followId: string) {
       throw new Error(`Error following user: ${followError.message}`);
     }
 
-    return true; // Followed successfully
+    return true;
   }
 }
 
@@ -176,15 +176,15 @@ export async function removeFollower(followerId: string) {
   }
 
   // Step 2: Delete the follow relationship where the current user is being followed
-  const { data, error: deleteError } = await supabase
+  const { error: deleteError } = await supabase
     .from("Follows")
     .delete()
     .eq("follower_id", followerId)
-    .eq("following_id", user.id); // User wants to remove a follower
+    .eq("following_id", user.id);
 
   if (deleteError) {
     throw new Error(`Error removing follower: ${deleteError.message}`);
   }
 
-  return true; // Successfully removed
+  return true;
 }

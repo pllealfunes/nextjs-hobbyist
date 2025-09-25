@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/ui/components/button";
+import Link from "next/link";
 import {
   Dialog,
   DialogContent,
@@ -252,12 +253,18 @@ export default function FollowSystem({
                                 </AvatarFallback>
                               </Avatar>
                               <div>
-                                <div className="font-medium text-slate-900">
-                                  {user.name}
-                                </div>
-                                <div className="text-sm text-muted-foreground">
-                                  {user.username}
-                                </div>
+                                {user?.username ? (
+                                  <Link
+                                    href={`/profiles/${user.id}`}
+                                    className="text-gray-800 font-semibold hover:underline"
+                                  >
+                                    {user?.username}
+                                  </Link>
+                                ) : (
+                                  <p className="text-gray-800 font-semibold">
+                                    Loading...
+                                  </p>
+                                )}
                               </div>
                             </div>
                             <Button
@@ -298,7 +305,18 @@ export default function FollowSystem({
                               </div>
                               <div>
                                 <div className="font-medium text-slate-900">
-                                  {category.name}
+                                  {category?.name ? (
+                                    <Link
+                                      href={`/category/${category.name}`}
+                                      className="text-gray-800 font-semibold hover:underline"
+                                    >
+                                      {category.name}
+                                    </Link>
+                                  ) : (
+                                    <p className="text-gray-800 font-semibold">
+                                      Loading...
+                                    </p>
+                                  )}
                                 </div>
                                 <Badge variant="secondary" className="text-xs">
                                   Category
